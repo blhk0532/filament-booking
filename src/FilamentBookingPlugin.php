@@ -15,6 +15,7 @@ use Adultdate\FilamentBooking\Filament\Widgets\CustomersChart;
 use Adultdate\FilamentBooking\Filament\Widgets\LatestOrders;
 use Adultdate\FilamentBooking\Filament\Widgets\OrdersChart;
 use Adultdate\FilamentBooking\Filament\Widgets\StatsOverviewWidget;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\DailyLocationResource;
 
 class FilamentBookingPlugin implements Plugin
 {
@@ -34,6 +35,7 @@ class FilamentBookingPlugin implements Plugin
             ->resources([
                 CustomerResource::class,
                 OrderResource::class,
+                DailyLocationResource::class,
             ])
             ->widgets([
                 BookingCalendarWidget::class,

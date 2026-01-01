@@ -31,7 +31,6 @@ use Filament\Schemas\Schema as FilamentSchema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Adultdate\FilamentBooking\Models\Booking\DailyLocation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -84,9 +83,9 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
         return [
             'initialView' => 'timeGridWeek',
             'headerToolbar' => [
-                'left' => 'prev,next today list',
+                'left' => 'prev,next today',
                 'center' => 'title',
-                'right' => 'dayGridMonth,timeGridWeek,timeGridDay',
+                'right' => 'listWeek dayGridMonth,timeGridWeek,timeGridDay',
             ],
             'nowIndicator' => true,
             'slotMinTime' => '06:00:00',
@@ -348,35 +347,7 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
             ->get();
 
         // Transform bookings to calendar events
-        $bookingEvents = $bookings->map(fn (Booking $booking) => $booking->toCalendarEvent())->toArray();
-
-        // Also include DailyLocation entries as all-day events on the calendar
-        $dailyLocations = DailyLocation::query()
-            ->whereBetween('date', [$start, $end])
-            ->with(['serviceUser'])
-            ->get();
-
-        $locationEvents = $dailyLocations->map(function (DailyLocation $loc) {
-            $title = $loc->location ?: ($loc->serviceUser?->name ?? 'Location');
-
-            return [
-                'id' => 'location-'.$loc->id,
-                'title' => $title,
-                'start' => $loc->date?->toDateString(),
-                'allDay' => true,
-                'backgroundColor' => '#f3f4f6',
-                'borderColor' => 'transparent',
-                'textColor' => '#111827',
-                'extendedProps' => [
-                    'is_location' => true,
-                    'daily_location_id' => $loc->id,
-                    'service_user_id' => $loc->service_user_id,
-                    'location' => $loc->location,
-                ],
-            ];
-        })->toArray();
-
-        return collect(array_merge($bookingEvents, $locationEvents));
+        return $bookings->map(fn (Booking $booking) => $booking->toCalendarEvent());
     }
 
     public function fetchEvents(array $info): array
@@ -433,6 +404,8 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
         $timezone = config('app.timezone');
         $startDate = Carbon::parse($start, $timezone);
 
+        // No special date-click handling; allow select to mount create action.
+
         $data = $this->getDefaultFormData([
             'service_date' => $startDate->format('Y-m-d'),
         ]);
@@ -450,6 +423,9 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
 
         $this->mountAction('create', ['data' => $data]);
     }
+
+    
+    
 
     public function onEventClick(array $event): void
     {
@@ -504,6 +480,8 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
     protected function getActions(): array
     {
         return [
+            
+
             \Filament\Actions\Action::make('view')
                 ->label('View')
                 ->icon('heroicon-o-eye')
