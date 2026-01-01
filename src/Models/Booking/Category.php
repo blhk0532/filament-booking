@@ -21,11 +21,22 @@ class Category extends Model implements HasMedia
     /**
      * @var string
      */
-    protected $table = 'shop_categories';
+    protected $table = 'booking_categories';
 
     /**
-     * @var array<string, string>
+     * @var array<string>
      */
+    protected $fillable = [
+        'name',
+        'slug',
+        'parent_id',
+        'description',
+        'position',
+        'is_visible',
+        'seo_title',
+        'seo_description',
+    ];
+
     protected $casts = [
         'is_visible' => 'boolean',
     ];
@@ -45,6 +56,12 @@ class Category extends Model implements HasMedia
     /** @return BelongsToMany<Product, $this> */
     public function products(): BelongsToMany
     {
-        return $this->belongsToMany(Product::class, 'shop_category_product', 'shop_category_id', 'shop_product_id');
+        return $this->belongsToMany(Product::class, 'booking_category_product', 'booking_category_id', 'booking_product_id');
+    }
+
+    /** @return BelongsToMany<Service, $this> */
+    public function services(): BelongsToMany
+    {
+        return $this->belongsToMany(Service::class, 'booking_category_service', 'booking_category_id', 'booking_service_id')->withTimestamps();
     }
 }

@@ -38,7 +38,7 @@ class BookingStats extends BaseWidget
                         ->map(fn (TrendValue $value) => $value->aggregate)
                         ->toArray()
                 ),
-            Stat::make('Open orders', $this->getPageTableQuery()->whereIn('status', ['open', 'processing'])->count()),
+            Stat::make('Complete', $this->getPageTableQuery()->whereIn('status', ['complete'])->count()),
             Stat::make('Average price', number_format((float) $this->getPageTableQuery()->avg('total_price'), 2)),
         ];
     }

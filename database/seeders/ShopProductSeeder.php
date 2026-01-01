@@ -16,7 +16,7 @@ class BookingProductSeeder extends Seeder
         Product::firstOrCreate(
             ['name' => 'IM-Kanal Ventilationsrengöring '],
             [
-                'shop_brand_id' => 1,
+                'booking_brand_id' => 1,
                 'description' => '<p></p>',
                 'qty' => 0,
                 'security_stock' => 0,

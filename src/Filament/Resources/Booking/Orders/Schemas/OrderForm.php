@@ -62,21 +62,7 @@ class OrderForm
                     ->columnSpan(['lg' => 1])
                     ->hidden(fn (?Order $record) => $record === null),
             ])
-            ->columns(3)
-            ->mutateDehydratedStateUsing(function (array $state): array {
-                // Calculate total price from order items
-                $totalPrice = 0;
-                if (isset($state['items']) && is_array($state['items'])) {
-                    foreach ($state['items'] as $item) {
-                        if (isset($item['qty']) && isset($item['unit_price'])) {
-                            $totalPrice += (int) $item['qty'] * (float) $item['unit_price'];
-                        }
-                    }
-                }
-                $state['total_price'] = $totalPrice;
-
-                return $state;
-            });
+            ->columns(3);
     }
 
     /**
@@ -93,7 +79,7 @@ class OrderForm
                 ->maxLength(32)
                 ->unique(Order::class, 'number', ignoreRecord: true),
 
-            Select::make('shop_customer_id')
+            Select::make('booking_customer_id')
                 ->relationship('customer', 'name')
                 ->searchable()
                 ->required()
@@ -150,7 +136,7 @@ class OrderForm
                     ->width(110),
             ])
             ->schema([
-                Select::make('shop_product_id')
+                Select::make('booking_product_id')
                     ->label('Product')
                     ->options(Product::query()->pluck('name', 'id'))
                     ->required()
@@ -179,7 +165,7 @@ class OrderForm
                     ->url(function (array $arguments, Repeater $component): ?string {
                         $itemData = $component->getRawItemState($arguments['item']);
 
-                        $product = Product::find($itemData['shop_product_id']);
+                        $product = Product::find($itemData['booking_product_id']);
 
                         if (! $product) {
                             return null;
@@ -187,7 +173,7 @@ class OrderForm
 
                         return ProductResource::getUrl('edit', ['record' => $product]);
                     }, shouldOpenInNewTab: true)
-                    ->hidden(fn (array $arguments, Repeater $component): bool => blank($component->getRawItemState($arguments['item'])['shop_product_id'])),
+                    ->hidden(fn (array $arguments, Repeater $component): bool => blank($component->getRawItemState($arguments['item'])['booking_product_id'])),
             ])
             ->orderColumn('sort')
             ->defaultItems(1)

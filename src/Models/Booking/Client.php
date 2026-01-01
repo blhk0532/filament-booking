@@ -26,9 +26,23 @@ class Client extends Model
     }
 
     /**
+     * Boot the model.
+     */
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::creating(function (Client $client) {
+            if (empty($client->ulid)) {
+                $client->ulid = (string) Str::ulid();
+            }
+        });
+    }
+
+    /**
      * @var string
      */
-    protected $table = 'shop_clients';
+    protected $table = 'booking_clients';
 
     /**
      * @var string
@@ -82,7 +96,7 @@ class Client extends Model
     /** @return MorphToMany<Address, $this> */
     public function addresses(): MorphToMany
     {
-        return $this->morphToMany(Address::class, 'addressable');
+        return $this->morphToMany(Address::class, 'booking_addressable');
     }
 
     /** @return HasMany<Comment, $this> */
@@ -94,6 +108,6 @@ class Client extends Model
     /** @return HasManyThrough<Payment, Order, $this> */
     public function payments(): HasManyThrough
     {
-        return $this->hasManyThrough(Payment::class, Order::class, 'shop_client_id');
+        return $this->hasManyThrough(Payment::class, Order::class, 'booking_client_id');
     }
 }

@@ -11,19 +11,41 @@ class OrderItem extends Model
     /** @use HasFactory<OrderItemFactory> */
     use HasFactory;
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saved(function ($item) {
+            if ($item->order) {
+                $item->order->updateTotalPrice();
+            }
+        });
+
+        static::deleted(function ($item) {
+            if ($item->order) {
+                $item->order->updateTotalPrice();
+            }
+        });
+    }
+
     /**
      * @var string
      */
-    protected $table = 'shop_order_items';
+    protected $table = 'booking_order_items';
 
     /**
      * @var list<string>
      */
     protected $fillable = [
-        'shop_order_id',
-        'shop_product_id',
+        'booking_order_id',
+        'booking_product_id',
         'qty',
         'unit_price',
         'sort',
     ];
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class, 'booking_order_id');
+    }
 }

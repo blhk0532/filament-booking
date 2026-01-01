@@ -27,7 +27,7 @@ class ListBookings extends ListRecords
         return [
             null => Tab::make('Show All'),
             'booked' => Tab::make()->query(fn ($query) => $query->where('status', 'booked')),
-            'changed' => Tab::make()->query(fn ($query) => $query->where('status', 'changed')),
+            'confirmed' => Tab::make()->query(fn ($query) => $query->where('status', 'confirmed')),
             'processing' => Tab::make()->query(fn ($query) => $query->where('status', 'processing')),
             'cancelled' => Tab::make()->query(fn ($query) => $query->where('status', 'cancelled')),
             'updated' => Tab::make()->query(fn ($query) => $query->where('status', 'updated')),

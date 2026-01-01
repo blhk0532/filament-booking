@@ -21,7 +21,22 @@ class Brand extends Model implements HasMedia
     /**
      * @var string
      */
-    protected $table = 'shop_brands';
+    protected $table = 'booking_brands';
+
+    /**
+     * @var array<string>
+     */
+    protected $fillable = [
+        'name',
+        'slug',
+        'website',
+        'description',
+        'position',
+        'is_visible',
+        'seo_title',
+        'seo_description',
+        'sort',
+    ];
 
     /**
      * @var array<string, string>
@@ -33,12 +48,12 @@ class Brand extends Model implements HasMedia
     /** @return MorphToMany<Address, $this> */
     public function addresses(): MorphToMany
     {
-        return $this->morphToMany(Address::class, 'addressable', 'addressables');
+        return $this->morphToMany(Address::class, 'booking_addressable', 'addressables');
     }
 
     /** @return HasMany<Product, $this> */
     public function products(): HasMany
     {
-        return $this->hasMany(Product::class, 'shop_brand_id');
+        return $this->hasMany(Product::class, 'booking_brand_id');
     }
 }

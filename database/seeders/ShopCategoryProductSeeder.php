@@ -13,16 +13,16 @@ class BookingCategoryProductSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('shop_category_product')->insertOrIgnore([
+        DB::table('booking_category_product')->insertOrIgnore([
             [
-                'shop_category_id' => 2,
-                'shop_product_id' => 3,
+                'booking_category_id' => 2,
+                'booking_product_id' => 3,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'shop_category_id' => 1,
-                'shop_product_id' => 3,
+                'booking_category_id' => 1,
+                'booking_product_id' => 3,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

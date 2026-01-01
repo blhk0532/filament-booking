@@ -12,7 +12,15 @@ class OrderAddress extends Model
     /** @use HasFactory<OrderAddressFactory> */
     use HasFactory;
 
-    protected $table = 'shop_order_addresses';
+    protected $table = 'booking_order_addresses';
+
+    protected $fillable = [
+        'country',
+        'street',
+        'city',
+        'state',
+        'zip',
+    ];
 
     /** @return MorphTo<Model, $this> */
     public function addressable(): MorphTo

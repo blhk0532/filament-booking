@@ -127,7 +127,7 @@ foreach ($files as $file) {
         'Adultdate' => $vendorNamespace,
         'filament-booking' => $packageName,
         'filament-booking' => $packageSlug,
-        'filament-shop_without_prefix' => $packageSlugWithoutPrefix,
+        'filament-booking_without_prefix' => $packageSlugWithoutPrefix,
         'FilamentBooking' => $className,
         'filament-booking' => $packageSlug,
         'migration_table_name' => titleSnake($packageSlug),

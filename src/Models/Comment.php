@@ -14,7 +14,7 @@ class Comment extends Model
     /** @use HasFactory<CommentFactory> */
     use HasFactory;
 
-    protected $table = 'comments';
+    protected $table = 'booking_comments';
 
     protected $guarded = [];
 

@@ -10,7 +10,7 @@ enum ServiceStatus: string implements HasColor, HasIcon, HasLabel
 {
     case Booked = 'booked';
 
-    case Changed = 'changed';
+    case Confirmed = 'confirmed';
 
     case Processing = 'processing';
 
@@ -24,7 +24,7 @@ enum ServiceStatus: string implements HasColor, HasIcon, HasLabel
     {
         return match ($this) {
             self::Booked => 'Booked',
-            self::Changed => 'Changed',
+            self::Confirmed => 'Confirmed',
             self::Processing => 'Processing',
             self::Cancelled => 'Cancelled',
             self::Updated => 'Updated',
@@ -36,7 +36,7 @@ enum ServiceStatus: string implements HasColor, HasIcon, HasLabel
     {
         return match ($this) {
             self::Booked => 'info',
-            self::Changed => 'warning',
+            self::Confirmed => 'warning',
             self::Processing => 'primary',
             self::Cancelled => 'danger',
             self::Updated => 'gray',
@@ -48,7 +48,7 @@ enum ServiceStatus: string implements HasColor, HasIcon, HasLabel
     {
         return match ($this) {
             self::Booked => 'heroicon-m-calendar-days',
-            self::Changed => 'heroicon-m-arrow-path',
+            self::Confirmed => 'heroicon-m-arrow-path',
             self::Processing => 'heroicon-m-cog-6-tooth',
             self::Cancelled => 'heroicon-m-x-circle',
             self::Updated => 'heroicon-m-pencil-square',

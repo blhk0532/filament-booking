@@ -19,7 +19,7 @@ use Illuminate\Support\Str;
 
 class PaymentsRelationManager extends RelationManager
 {
-    protected static string $relationship = 'payments';
+    protected static string $relationship = 'booking_payments';
 
     protected static ?string $recordTitleAttribute = 'reference';
 

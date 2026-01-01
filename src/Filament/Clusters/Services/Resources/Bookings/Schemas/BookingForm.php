@@ -3,10 +3,10 @@
 namespace Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings\Schemas;
 
 use Adultdate\FilamentBooking\Enums\BookingStatus;
-use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Clients\ClientResource;
 use Adultdate\FilamentBooking\Forms\Components\AddressForm;
 use Adultdate\FilamentBooking\Models\Booking\Booking;
 use Adultdate\FilamentBooking\Models\Booking\Service;
+use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Repeater\TableColumn;
@@ -20,7 +20,8 @@ use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
-
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 class BookingForm
 {
     public static function configure(Schema $schema): Schema
@@ -67,16 +68,16 @@ class BookingForm
     /** @return array<Component> */
     public static function getDetailsComponents(): array
     {
-        return [
+        return [            
             TextInput::make('number')
-                ->default('BK-' . random_int(100000, 999999))
+                ->default('OR-' . random_int(100000, 999999))
                 ->disabled()
                 ->dehydrated()
                 ->required()
                 ->maxLength(32)
                 ->unique(Booking::class, 'number', ignoreRecord: true),
-
-            Select::make('shop_client_id')
+ 
+            Select::make('booking_client_id')
                 ->relationship('client', 'name')
                 ->searchable()
                 ->required()
@@ -102,23 +103,37 @@ class BookingForm
                         ->modalWidth('lg');
                 }),
 
+            Select::make('service_id')
+                ->relationship('service', 'name')
+                ->searchable()
+                ->hidden(),
+
+            Select::make('service_user_id')
+                ->label('Service User')
+                ->options(User::where('role', 'service')->pluck('name', 'id'))
+                ->searchable()
+                ->required(),
+
+            TextInput::make('booking_user_id')
+                ->hidden()
+                ->default(Auth::id())
+                ->dehydrated(),
+
+            TextInput::make('service_date')
+                ->default(Auth::id())
+                ->dehydrated(),
+
+            TextInput::make('start_time')
+                ->default(Auth::id())
+                ->dehydrated(),
+
+            TextInput::make('end_time')
+              
+                ->default(Auth::id())
+                ->dehydrated(),
             ToggleButtons::make('status')
                 ->inline()
                 ->options(BookingStatus::class)
-                ->required(),
-
-            Select::make('currency')
-                ->searchable()
-                ->placeholder('Swedish Krona')
-                ->options([
-                    'SEK' => 'Swedish Krona (SEK)',
-                    'USD' => 'US Dollar (USD)',
-                    'EUR' => 'Euro (EUR)',
-                    'GBP' => 'British Pound (GBP)',
-                    'NOK' => 'Norwegian Krone (NOK)',
-                    'DKK' => 'Danish Krone (DKK)',
-                ])
-                ->default('SEK')
                 ->required(),
 
             AddressForm::make('address')
@@ -141,7 +156,7 @@ class BookingForm
                     ->width(110),
             ])
             ->schema([
-                Select::make('shop_service_id')
+                Select::make('booking_service_id')
                     ->label('Service')
                     ->options(Service::query()->pluck('name', 'id'))
                     ->required()
@@ -165,7 +180,6 @@ class BookingForm
             ])
             ->orderColumn('sort')
             ->defaultItems(1)
-            ->hiddenLabel()
-            ->required();
+            ->hiddenLabel();
     }
 }

@@ -21,7 +21,7 @@ class Order extends Model
     /**
      * @var string
      */
-    protected $table = 'shop_orders';
+    protected $table = 'booking_orders';
 
     /**
      * @var list<string>
@@ -43,19 +43,19 @@ class Order extends Model
     /** @return MorphOne<OrderAddress, $this> */
     public function address(): MorphOne
     {
-        return $this->morphOne(OrderAddress::class, 'addressable');
+        return $this->morphOne(OrderAddress::class, 'booking_addressable');
     }
 
     /** @return BelongsTo<Customer, $this> */
     public function customer(): BelongsTo
     {
-        return $this->belongsTo(Customer::class, 'shop_customer_id');
+        return $this->belongsTo(Customer::class, 'booking_customer_id');
     }
 
     /** @return HasMany<OrderItem, $this> */
     public function items(): HasMany
     {
-        return $this->hasMany(OrderItem::class, 'shop_order_id');
+        return $this->hasMany(OrderItem::class, 'booking_order_id');
     }
 
     /** @return HasMany<Payment, $this> */
@@ -79,6 +79,7 @@ class Order extends Model
      */
     public function updateTotalPrice(): void
     {
+        $this->load('items');
         $this->update(['total_price' => $this->calculateTotalPrice()]);
     }
 }

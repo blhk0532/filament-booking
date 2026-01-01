@@ -1,0 +1,490 @@
+<?php
+
+namespace Adultdate\FilamentBooking\Filament\Widgets;
+
+use Adultdate\FilamentBooking\Enums\BookingStatus;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings\Schemas\BookingForm;
+use Adultdate\FilamentBooking\Models\Booking\Booking;
+use Adultdate\FilamentBooking\Models\Booking\BookingLocation;
+use Adultdate\FilamentBooking\Models\Booking\Client;
+use Adultdate\FilamentBooking\Models\Booking\Service;
+use Adultdate\Schedule\Concerns\CanRefreshCalendar;
+use Adultdate\Schedule\Concerns\InteractsWithCalendar;
+use Adultdate\Schedule\Concerns\InteractsWithEventRecord;
+use Adultdate\Schedule\Filament\Widgets\Concerns\CanBeConfigured;
+use Adultdate\Schedule\Filament\Widgets\Concerns\InteractsWithRawJS;
+use Adultdate\Schedule\Filament\Widgets\Concerns\InteractsWithEvents;
+use Adultdate\Schedule\Filament\Widgets\Concerns\InteractsWithRecords;
+use Adultdate\Schedule\Filament\Widgets\FullCalendarWidget;
+use Adultdate\Schedule\ValueObjects\FetchInfo;
+use App\Models\User;
+use Carbon\Carbon;
+use Filament\Actions\Action;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\TimePicker;
+use Filament\Schemas\Components\Utilities\Set;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
+use Adultdate\Schedule\Actions;
+
+class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Schedule\Contracts\HasCalendar
+{
+    use CanBeConfigured;
+    use CanRefreshCalendar;
+    use InteractsWithCalendar {
+        InteractsWithCalendar::getOptions insteadof CanBeConfigured;
+        InteractsWithCalendar::onEventDrop insteadof InteractsWithEvents;
+        InteractsWithCalendar::onEventResize insteadof InteractsWithEvents;
+        InteractsWithCalendar::onDateSelect insteadof InteractsWithEvents;
+        InteractsWithCalendar::refreshRecords insteadof InteractsWithEvents;
+        InteractsWithEventRecord::getEloquentQuery insteadof InteractsWithRecords;
+    }
+    use InteractsWithEvents {
+        InteractsWithEvents::onEventClick insteadof InteractsWithCalendar;
+    }
+    use InteractsWithEventRecord;
+    use InteractsWithRawJS;
+    use InteractsWithRecords {
+        InteractsWithRecords::getEloquentQuery as getRecordsEloquentQuery;
+    }
+
+    protected static ?int $sort = 2;
+
+    protected static bool $isDiscovered = true;
+
+    protected static ?string $title = 'Booking Calendar';
+
+    protected static string $viewIdentifier = 'booking-calendar-widget';
+
+    protected int|string|array $columnSpan = 'full';
+
+    public function getModel(): string
+    {
+        return Booking::class;
+    }
+
+    protected function getEloquentQuery(): Builder
+    {
+        return app($this->getModel())::query();
+    }
+
+    public function config(): array
+    {
+        return [
+            'initialView' => 'timeGridWeek',
+            'headerToolbar' => [
+                'left' => 'prev,next today',
+                'center' => 'title',
+                'right' => 'dayGridMonth,timeGridWeek,timeGridDay',
+            ],
+            'nowIndicator' => true,
+            'slotMinTime' => '06:00:00',
+            'slotMaxTime' => '22:00:00',
+            'slotDuration' => '00:30:00',
+            'allDayText' => 'Location',
+            'allDaySlot' => true,
+            'views' => [
+                'timeGridDay' => [
+                    'slotMinTime' => '06:00:00',
+                    'slotMaxTime' => '22:00:00',
+                ],
+                'timeGridWeek' => [
+                    'slotMinTime' => '06:00:00',
+                    'slotMaxTime' => '22:00:00',
+                ],
+            ],
+        ];
+    }
+
+    public function getFormSchema(): array
+    {
+        return [
+            TextInput::make('number')
+                ->label('Booking #')
+                ->default(fn (): string => $this->generateNumber())
+                ->afterStateHydrated(function (Set $set, ?string $state): void {
+                    if (filled($state)) {
+                        return;
+                    }
+
+                    $set('number', $this->generateNumber());
+                })
+                ->disabled()
+                ->dehydrated()
+                ->required()
+                ->maxLength(32),
+
+            Select::make('booking_client_id')
+                ->label('Client')
+                ->options(Client::pluck('name', 'id'))
+                ->searchable()
+                ->preload()
+                ->createOptionForm([
+                    TextInput::make('name')
+                        ->required()
+                        ->maxLength(255),
+                    TextInput::make('email')
+                        ->email()
+                        ->maxLength(255),
+                    TextInput::make('phone')
+                        ->tel()
+                        ->maxLength(255),
+                    TextInput::make('address')
+                        ->maxLength(255),
+                    TextInput::make('city')
+                        ->maxLength(255),
+                    TextInput::make('postal_code')
+                        ->maxLength(20),
+                ])
+                ->createOptionUsing(function (array $data) {
+                    return Client::create($data)->id;
+                }),
+
+            Select::make('service_id')
+                ->label('Service')
+                ->options(Service::pluck('name', 'id'))
+                ->searchable()
+                ->preload()
+                ->required(),
+
+            Select::make('booking_location_id')
+                ->label('Location')
+                ->options(BookingLocation::where('is_active', true)->pluck('name', 'id'))
+                ->searchable()
+                ->preload()
+                ->required()
+                ->dehydrated(),
+
+            Select::make('service_user_id')
+                ->label('Service Technician')
+                ->options(User::pluck('name', 'id'))
+                ->searchable()
+                ->preload(),
+
+            DatePicker::make('service_date')
+                ->label('Service Date')
+                ->required()
+                ->native(false)
+                ->dehydrated(),
+
+            TimePicker::make('start_time')
+                ->label('Start Time')
+                ->required()
+                ->seconds(false)
+                ->native(false)
+                ->dehydrated(),
+
+            TimePicker::make('end_time')
+                ->label('End Time')
+                ->required()
+                ->seconds(false)
+                ->native(false)
+                ->dehydrated(),
+
+            Select::make('status')
+                ->label('Status')
+                ->options(BookingStatus::class)
+                ->default(BookingStatus::New->value)
+                ->required(),
+
+            TextInput::make('total_price')
+                ->label('Total Price')
+                ->numeric()
+                ->prefix('SEK'),
+
+            Textarea::make('notes')
+                ->label('Internal Notes')
+                ->rows(3)
+                ->columnSpanFull(),
+
+            Textarea::make('service_note')
+                ->label('Service Notes')
+                ->rows(3)
+                ->columnSpanFull(),
+            $this->getItemsRepeater(),
+        ];
+    }
+
+    protected function getItemsRepeater(): Repeater
+    {
+        return BookingForm::getItemsRepeater()
+            ->relationship(null)
+            ->defaultItems(0)
+            ->minItems(0)
+            ->dehydrated(true)
+            ->columnSpanFull();
+    }
+
+    protected function generateNumber(): string
+    {
+        return 'BK-'.now()->format('Ymd').'-'.Str::upper(Str::random(6));
+    }
+
+    /**
+     * Provide defaults for all form keys so Livewire entanglement always has data.
+     */
+    protected function getDefaultFormData(array $seed = []): array
+    {
+        return array_replace([
+            'number' => $this->generateNumber(),
+            'booking_client_id' => null,
+            'service_id' => null,
+            'booking_location_id' => null,
+            'service_user_id' => null,
+            'service_date' => null,
+            'start_time' => null,
+            'end_time' => null,
+            'status' => BookingStatus::New->value,
+            'total_price' => null,
+            'notes' => null,
+            'service_note' => null,
+            'items' => [],
+        ], $seed);
+    }
+
+    protected function normalizeBookingFormData(array $data): array
+    {
+        logger()->debug('booking.form.normalize.before', $data);
+
+        // Normalize date and time values coming from the wizard so inserts work reliably.
+        if (! empty($data['service_date']) && $data['service_date'] instanceof \Carbon\CarbonInterface) {
+            $data['service_date'] = $data['service_date']->toDateString();
+        }
+
+        if (! empty($data['start_time']) && $data['start_time'] instanceof \Carbon\CarbonInterface) {
+            $data['start_time'] = $data['start_time']->format('H:i:s');
+        }
+
+        if (! empty($data['end_time']) && $data['end_time'] instanceof \Carbon\CarbonInterface) {
+            $data['end_time'] = $data['end_time']->format('H:i:s');
+        }
+
+        // Derive missing date/time parts from calendar start/end if the form lost them.
+        if (empty($data['service_date']) && ! empty($data['start'])) {
+            $start = Carbon::parse($data['start']);
+            $data['service_date'] = $start->toDateString();
+            $data['start_time'] ??= $start->format('H:i:s');
+        }
+
+        if (empty($data['end_time']) && ! empty($data['end'])) {
+            $end = Carbon::parse($data['end']);
+            $data['end_time'] = $end->format('H:i:s');
+        }
+
+        // Ensure times include seconds for MySQL time columns.
+        if (is_string($data['start_time'] ?? null) && strlen($data['start_time']) === 5) {
+            $data['start_time'] .= ':00';
+        }
+
+        if (is_string($data['end_time'] ?? null) && strlen($data['end_time']) === 5) {
+            $data['end_time'] .= ':00';
+        }
+
+        $data['number'] = $data['number'] ?? $this->generateNumber();
+        $data['booking_user_id'] = $data['booking_user_id'] ?? Auth::id();
+        $data['is_active'] = $data['is_active'] ?? true;
+        $data['status'] = $data['status'] ?? BookingStatus::New->value;
+
+        // Only set starts_at/ends_at when the columns exist.
+        if (Schema::hasColumn('booking_bookings', 'starts_at') && isset($data['service_date'], $data['start_time'])) {
+            $data['starts_at'] = Carbon::parse($data['service_date'].' '.$data['start_time']);
+        }
+
+        if (Schema::hasColumn('booking_bookings', 'ends_at') && isset($data['service_date'], $data['end_time'])) {
+            $data['ends_at'] = Carbon::parse($data['service_date'].' '.$data['end_time']);
+        }
+
+        logger()->debug('booking.form.normalize.after', $data);
+
+        return $data;
+    }
+
+    protected function syncBookingItems(Booking $booking, array $items): void
+    {
+        $booking->items()->delete();
+
+        foreach ($items as $index => $item) {
+            if (empty($item['booking_service_id'])) {
+                continue;
+            }
+
+            $booking->items()->create([
+                'booking_service_id' => $item['booking_service_id'],
+                'qty' => $item['qty'] ?? 1,
+                'unit_price' => $item['unit_price'] ?? 0,
+                'sort' => $item['sort'] ?? $index,
+            ]);
+        }
+
+        $booking->refresh()->updateTotalPrice();
+    }
+
+    protected function getEvents(FetchInfo $info): Collection|array|Builder
+    {
+        $start = $info->start->toMutable()->startOfDay();
+        $end = $info->end->toMutable()->endOfDay();
+
+        $bookings = Booking::query()
+            ->with(['client', 'service', 'serviceUser', 'bookingUser', 'location'])
+            ->where(function ($query) use ($start, $end) {
+                $query->whereBetween('service_date', [$start, $end])
+                    ->when(
+                        Schema::hasColumn('booking_bookings', 'starts_at'),
+                        fn ($q) => $q->orWhereBetween('starts_at', [$start, $end]),
+                    );
+            })
+            ->where('is_active', true)
+            ->get();
+
+        // Transform bookings to calendar events
+        return $bookings->map(fn (Booking $booking) => $booking->toCalendarEvent());
+    }
+
+    public function fetchEvents(array $info): array
+    {
+        // FullCalendar may send `start`/`end` without `startStr`/`endStr`; ensure both for FetchInfo VO.
+        $info['startStr'] ??= $info['start'] ?? null;
+        $info['endStr'] ??= $info['end'] ?? null;
+
+        if (! ($info['startStr'] && $info['endStr'])) {
+            return [];
+        }
+
+        return $this->getEventsJs($info);
+    }
+
+    public function getHeaderActions(): array
+    {
+        return [
+            Actions\CreateAction::make('create')
+                ->label('New Booking')
+                ->icon('heroicon-o-plus')
+                ->modalHeading('Create Booking')
+                ->modalSubmitActionLabel('Create')
+                ->modalWidth('2xl')
+                ->form($this->getFormSchema())
+                ->mountUsing(function ($form, array $arguments) {
+                    $form->fill($this->getDefaultFormData([
+                        'service_date' => $arguments['service_date'] ?? null,
+                        'start_time' => $arguments['start_time'] ?? null,
+                        'end_time' => $arguments['end_time'] ?? null,
+                    ]));
+                })
+                ->using(function (array $data) {
+                    $data = $this->normalizeBookingFormData($data);
+                    logger()->debug('booking.create.using', $data);
+                    $items = $data['items'] ?? [];
+                    unset($data['items']);
+
+                    $booking = Booking::create($data);
+
+                    if (! empty($items)) {
+                        $this->syncBookingItems($booking, $items);
+                    }
+
+                    return $booking;
+                })
+                ->after(fn () => $this->dispatch('refresh-calendar'))
+                ->successNotificationTitle('Booking created successfully'),
+        ];
+    }
+
+    public function onDateSelect(string $start, ?string $end, bool $allDay, ?array $view, ?array $resource): void
+    {
+        $timezone = config('app.timezone');
+        $startDate = Carbon::parse($start, $timezone);
+
+        $data = $this->getDefaultFormData([
+            'service_date' => $startDate->format('Y-m-d'),
+        ]);
+
+        if (! $allDay && $startDate->format('H:i:s') !== '00:00:00') {
+            $data['start_time'] = $startDate->format('H:i');
+
+            if ($end) {
+                $endDate = Carbon::parse($end, $timezone);
+                if ($endDate->format('H:i:s') !== '00:00:00') {
+                    $data['end_time'] = $endDate->format('H:i');
+                }
+            }
+        }
+
+        $this->mountAction('create', ['data' => $data]);
+    }
+
+    protected function modalActions(): array
+    {
+        return [
+            Actions\EditAction::make('edit')
+                ->label('Edit')
+                ->icon('heroicon-o-pencil')
+                ->modalHeading('Edit Booking')
+                ->modalSubmitActionLabel('Save')
+                ->modalWidth('2xl')
+                ->form($this->getFormSchema())
+                ->mountUsing(function ($form) {
+                    $booking = $this->selectedRecord;
+
+                    $form->fill([
+                        'number' => $booking->number,
+                        'booking_client_id' => $booking->booking_client_id,
+                        'service_id' => $booking->service_id,
+                        'booking_location_id' => $booking->booking_location_id,
+                        'service_user_id' => $booking->service_user_id,
+                        'service_date' => $booking->service_date,
+                        'start_time' => $booking->start_time,
+                        'end_time' => $booking->end_time,
+                        'status' => $booking->status,
+                        'total_price' => $booking->total_price,
+                        'notes' => $booking->notes,
+                        'service_note' => $booking->service_note,
+                        'items' => $booking->items
+                            ->map(fn ($item) => [
+                                'id' => $item->id,
+                                'booking_service_id' => $item->booking_service_id,
+                                'qty' => $item->qty,
+                                'unit_price' => $item->unit_price,
+                                'sort' => $item->sort,
+                            ])
+                            ->toArray(),
+                    ]);
+                })
+                ->steps($this->getFormSteps())
+                ->using(function (Booking $record, array $data) {
+                    $data = $this->normalizeBookingFormData($data);
+                    logger()->debug('booking.edit.using', $data);
+                    $items = $data['items'] ?? [];
+                    unset($data['items']);
+
+                    $record->update($data);
+
+                    $this->syncBookingItems($record, $items);
+
+                    return $record;
+                })
+                ->after(fn () => $this->dispatch('refresh-calendar'))
+                ->successNotificationTitle('Booking updated successfully'),
+
+            Actions\DeleteAction::make('delete')
+                ->label('Delete')
+                ->icon('heroicon-o-trash')
+                ->color('danger')
+                ->requiresConfirmation()
+                ->modalHeading('Delete Booking')
+                ->modalDescription('Are you sure you want to delete this booking?')
+                ->action(function () {
+                    $this->selectedRecord->delete();
+                    $this->dispatch('refresh-calendar');
+                })
+                ->successNotificationTitle('Booking deleted successfully'),
+        ];
+    }
+}

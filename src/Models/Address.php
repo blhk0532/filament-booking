@@ -14,17 +14,17 @@ class Address extends Model
     /** @use HasFactory<AddressFactory> */
     use HasFactory;
 
-    protected $table = 'addresses';
+    protected $table = 'booking_addresses';
 
     /** @return MorphToMany<Customer, $this> */
     public function customers(): MorphToMany
     {
-        return $this->morphedByMany(Customer::class, 'addressable');
+        return $this->morphedByMany(Customer::class, 'booking_addressable');
     }
 
     /** @return MorphToMany<Brand, $this> */
     public function brands(): MorphToMany
     {
-        return $this->morphedByMany(Brand::class, 'addressable');
+        return $this->morphedByMany(Brand::class, 'booking_addressable');
     }
 }

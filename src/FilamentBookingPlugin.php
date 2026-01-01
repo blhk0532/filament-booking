@@ -7,8 +7,10 @@ use Filament\Panel;
 use Filament\Navigation\NavigationGroup;
 use Adultdate\FilamentBooking\Filament\Clusters\Products\ProductsCluster;
 use Adultdate\FilamentBooking\Filament\Clusters\Services\ServicesCluster;
+use Adultdate\FilamentBooking\Filament\Pages\BookingCalendar;
 use Adultdate\FilamentBooking\Filament\Resources\Booking\Customers\CustomerResource;
 use Adultdate\FilamentBooking\Filament\Resources\Booking\Orders\OrderResource;
+use Adultdate\FilamentBooking\Filament\Widgets\BookingCalendarWidget;
 use Adultdate\FilamentBooking\Filament\Widgets\CustomersChart;
 use Adultdate\FilamentBooking\Filament\Widgets\LatestOrders;
 use Adultdate\FilamentBooking\Filament\Widgets\OrdersChart;
@@ -27,13 +29,14 @@ class FilamentBookingPlugin implements Plugin
             ->discoverClusters(in: app_path('../vendor/adultdate/filament-booking/src/Filament/Clusters'), for: 'Adultdate\\FilamentBooking\\Filament\\Clusters')
             ->databaseNotifications()
             ->pages([
-
+                BookingCalendar::class,
             ])
             ->resources([
                 CustomerResource::class,
                 OrderResource::class,
             ])
             ->widgets([
+                BookingCalendarWidget::class,
                 CustomersChart::class,
                 LatestOrders::class,
                 OrdersChart::class,

@@ -34,7 +34,7 @@ class Customer extends Model
     /**
      * @var string
      */
-    protected $table = 'shop_customers';
+    protected $table = 'booking_customers';
 
     /**
      * @var string
@@ -71,7 +71,7 @@ class Customer extends Model
     /** @return MorphToMany<Address, $this> */
     public function addresses(): MorphToMany
     {
-        return $this->morphToMany(Address::class, 'addressable');
+        return $this->morphToMany(Address::class, 'booking_addressable');
     }
 
     /** @return HasMany<Comment, $this> */
@@ -83,6 +83,6 @@ class Customer extends Model
     /** @return HasManyThrough<Payment, Order, $this> */
     public function payments(): HasManyThrough
     {
-        return $this->hasManyThrough(Payment::class, Order::class, 'shop_customer_id');
+        return $this->hasManyThrough(Payment::class, Order::class, 'booking_customer_id');
     }
 }

@@ -17,7 +17,7 @@ class BookingOrderSeeder extends Seeder
             ['number' => 'OR-138334'],
             [
                 'sort' => 0,
-                'shop_customer_id' => 1,
+                'booking_customer_id' => 1,
                 'status' => 'new',
                 'currency' => 'sek',
                 'notes' => '<p></p>',

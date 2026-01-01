@@ -21,6 +21,13 @@ class CreateBooking extends CreateRecord
 
     protected static string $resource = BookingResource::class;
 
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        $data['booking_user_id'] = auth()->id();
+
+        return $data;
+    }
+
     /**
      * @return array<Step>
      */

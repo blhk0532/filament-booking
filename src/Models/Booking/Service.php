@@ -24,7 +24,7 @@ class Service extends Model implements HasMedia
     /**
      * @var string
      */
-    protected $table = 'shop_services';
+    protected $table = 'booking_services';
 
     /**
      * @var list<string>
@@ -44,6 +44,7 @@ class Service extends Model implements HasMedia
         'published_at',
         'seo_title',
         'seo_description',
+        'booking_brand_id',
     ];
 
     /**
@@ -62,13 +63,13 @@ class Service extends Model implements HasMedia
     /** @return BelongsTo<Brand, $this> */
     public function brand(): BelongsTo
     {
-        return $this->belongsTo(Brand::class, 'shop_brand_id');
+        return $this->belongsTo(Brand::class, 'booking_brand_id');
     }
 
     /** @return BelongsToMany<Category, $this> */
     public function categories(): BelongsToMany
     {
-        return $this->belongsToMany(Category::class, 'shop_category_service', 'shop_service_id', 'shop_category_id')->withTimestamps();
+        return $this->belongsToMany(Category::class, 'booking_category_service', 'booking_service_id', 'booking_category_id')->withTimestamps();
     }
 
     /** @return MorphMany<Comment, $this> */

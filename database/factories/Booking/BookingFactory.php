@@ -17,7 +17,7 @@ class BookingFactory extends Factory
     {
         return [
             'number' => 'BK-' . random_int(100000, 999999),
-            'shop_client_id' => null,
+            'booking_client_id' => null,
             'total_price' => $this->faker->randomFloat(2, 10, 500),
             'currency' => 'SEK',
             'status' => 'booked',

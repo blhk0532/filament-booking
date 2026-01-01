@@ -64,7 +64,7 @@ class ServiceForm
 
                         Section::make('Images')
                             ->schema([
-                                SpatieMediaLibraryFileUpload::make('media')
+                                SpatieMediaLibraryFileUpload::make('booking_media')
                                     ->collection('service-images')
                                     ->multiple()
                                     ->maxFiles(5)
@@ -90,11 +90,6 @@ class ServiceForm
                                     ->helperText('This service is available for booking.')
                                     ->default(true),
 
-                                ToggleButtons::make('status')
-                                    ->inline()
-                                    ->options(ServiceStatus::class)
-                                    ->required(),
-
                                 DatePicker::make('published_at')
                                     ->label('Publishing date')
                                     ->default(now())
@@ -116,11 +111,11 @@ class ServiceForm
 
                         Section::make('Associations')
                             ->schema([
-                                Select::make('shop_brand_id')
+                                Select::make('booking_brand_id')
                                     ->relationship('brand', 'name')
                                     ->searchable(),
 
-                                Select::make('categories')
+                                Select::make('booking_categories')
                                     ->relationship('categories', 'name')
                                     ->multiple()
                                     ->required(),

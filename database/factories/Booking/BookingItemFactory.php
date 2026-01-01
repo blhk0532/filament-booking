@@ -15,8 +15,8 @@ class BookingItemFactory extends Factory
     public function definition(): array
     {
         return [
-            'shop_booking_id' => null,
-            'shop_service_id' => null,
+            'booking_booking_id' => null,
+            'booking_service_id' => null,
             'qty' => 1,
             'unit_price' => $this->faker->randomFloat(2, 50, 200),
             'sort' => 0,

@@ -12,7 +12,7 @@ class Payment extends Model
     /** @use HasFactory<PaymentFactory> */
     use HasFactory;
 
-    protected $table = 'shop_payments';
+    protected $table = 'booking_payments';
 
     protected $guarded = [];
 
