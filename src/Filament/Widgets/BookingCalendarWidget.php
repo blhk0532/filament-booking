@@ -194,7 +194,7 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
             Select::make('status')
                 ->label('Status')
                 ->options(BookingStatus::class)
-                ->default(BookingStatus::New->value)
+                ->default(BookingStatus::Booked->value)
                 ->required(),
 
             TextInput::make('total_price')
@@ -244,7 +244,7 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
             'service_date' => null,
             'start_time' => null,
             'end_time' => null,
-            'status' => BookingStatus::New->value,
+            'status' => BookingStatus::Booked->value,
             'total_price' => null,
             'notes' => null,
             'service_note' => null,
@@ -293,7 +293,7 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
         $data['number'] = $data['number'] ?? $this->generateNumber();
         $data['booking_user_id'] = $data['booking_user_id'] ?? Auth::id();
         $data['is_active'] = $data['is_active'] ?? true;
-        $data['status'] = $data['status'] ?? BookingStatus::New->value;
+        $data['status'] = $data['status'] ?? BookingStatus::Booked->value;
 
         // Only set starts_at/ends_at when the columns exist.
         if (Schema::hasColumn('booking_bookings', 'starts_at') && isset($data['service_date'], $data['start_time'])) {

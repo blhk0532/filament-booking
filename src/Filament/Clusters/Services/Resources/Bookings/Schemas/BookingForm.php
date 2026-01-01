@@ -5,6 +5,7 @@ namespace Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Booking
 use Adultdate\FilamentBooking\Enums\BookingStatus;
 use Adultdate\FilamentBooking\Forms\Components\AddressForm;
 use Adultdate\FilamentBooking\Models\Booking\Booking;
+use Adultdate\FilamentBooking\Models\Booking\Client;
 use Adultdate\FilamentBooking\Models\Booking\Service;
 use App\Models\User;
 use Filament\Actions\Action;
@@ -51,7 +52,28 @@ class BookingForm
 
                         // Removed created_at / updated_at display section — not needed in modal
             ])
-            ->columns(3);
+                ->columns(3);
+            }
+
+            /**
+     * Determine if the current user may see and edit the booking `status` field.
+     */
+    public static function canShowStatus(?Booking $record): bool
+    {
+        $user = Auth::user();
+        if (! $user) {
+            return false;
+        }
+
+        if (method_exists($user, 'hasRole') && $user->hasRole('admin')) {
+            return true;
+        }
+
+        if (method_exists($user, 'isAdmin') && $user->isAdmin()) {
+            return true;
+        }
+
+        return $user->id === 3;
     }
 
     /** @return array<Component> */
@@ -65,6 +87,19 @@ class BookingForm
                 ->required()
                 ->maxLength(32)
                 ->unique(Booking::class, 'number', ignoreRecord: true),
+
+            TextInput::make('service_date')
+                ->default(Auth::id())
+                ->dehydrated(),
+
+            TextInput::make('start_time')
+                ->default(Auth::id())
+                ->dehydrated(),
+
+            TextInput::make('end_time')
+              
+                ->default(Auth::id())
+                ->dehydrated(),
  
             Select::make('booking_client_id')
                 ->relationship('client', 'name')
@@ -75,6 +110,9 @@ class BookingForm
                         ->required()
                         ->maxLength(255),
 
+                    TextInput::make('phone')
+                        ->maxLength(255),
+
                     TextInput::make('email')
                         ->label('Email address')
                         ->required()
@@ -82,14 +120,40 @@ class BookingForm
                         ->maxLength(255)
                         ->unique(),
 
-                    TextInput::make('phone')
+                    TextInput::make('street')
+                        ->label('Street address')
                         ->maxLength(255),
+
+                    TextInput::make('zip')
+                        ->label('Postal code')
+                        ->maxLength(20),
+
+                    TextInput::make('city')
+                        ->maxLength(255),
+
+                    TextInput::make('country')
+                        ->hidden()
+                        ->placeholder('Sweden'),
                 ])
                 ->createOptionAction(function (Action $action) {
                     return $action
                         ->modalHeading('Create client')
                         ->modalSubmitActionLabel('Create client')
                         ->modalWidth('lg');
+                })
+                ->createOptionUsing(function (array $data) {
+                    $country = $data['country'] ?? null;
+                    if (array_key_exists('country', $data)) {
+                        unset($data['country']);
+                    }
+
+                    $client = Client::create($data);
+
+                    if ($country) {
+                        $client->update(['address' => $country]);
+                    }
+
+                    return $client->id;
                 }),
 
             Select::make('service_id')
@@ -108,31 +172,19 @@ class BookingForm
                 ->default(Auth::id())
                 ->dehydrated(),
 
-            TextInput::make('service_date')
-                ->default(Auth::id())
-                ->dehydrated(),
-
-            TextInput::make('start_time')
-                ->default(Auth::id())
-                ->dehydrated(),
-
-            TextInput::make('end_time')
-              
-                ->default(Auth::id())
-                ->dehydrated(),
             ToggleButtons::make('status')
                 ->inline()
                 ->options(BookingStatus::class)
-                ->required(),
+                ->columnSpan('full')
+                ->required()
+                ->hidden(fn (?Booking $record) => !static::canShowStatus($record)),
 
-            AddressForm::make('address')
-                ->columnSpan('full'),
+            // Address moved to client create modal; no address field on booking form
 
             RichEditor::make('notes')
                 ->columnSpan('full'),
         ];
     }
-
     public static function getItemsRepeater(): Repeater
     {
         return Repeater::make('items')
