@@ -7,20 +7,22 @@ use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings\Sche
 use Adultdate\FilamentBooking\Models\Booking\Booking;
 use Adultdate\FilamentBooking\Models\Booking\BookingLocation;
 use Adultdate\FilamentBooking\Models\Booking\Client;
+use Adultdate\FilamentBooking\Models\Booking\DailyLocation;
 use Adultdate\FilamentBooking\Models\Booking\Service;
+use Adultdate\Schedule\Actions as ScheduleActions;
 use Adultdate\Schedule\Concerns\CanRefreshCalendar;
-use Adultdate\Schedule\Concerns\InteractsWithCalendar;
-use Adultdate\Schedule\Concerns\InteractsWithEventRecord;
+use Adultdate\Schedule\concerns\InteractsWithCalendar;
+use Adultdate\Schedule\concerns\InteractsWithEventRecord;
 use Adultdate\Schedule\Filament\Widgets\Concerns\CanBeConfigured;
-use Adultdate\Schedule\Filament\Widgets\Concerns\InteractsWithRawJS;
 use Adultdate\Schedule\Filament\Widgets\Concerns\InteractsWithEvents;
+use Adultdate\Schedule\Filament\Widgets\Concerns\InteractsWithRawJS;
 use Adultdate\Schedule\Filament\Widgets\Concerns\InteractsWithRecords;
 use Adultdate\Schedule\Filament\Widgets\FullCalendarWidget;
 use Adultdate\Schedule\ValueObjects\FetchInfo;
 use App\Models\User;
 use Carbon\Carbon;
-use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -29,34 +31,35 @@ use Filament\Forms\Components\TimePicker;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema as FilamentSchema;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Adultdate\FilamentBooking\Models\Booking\DailyLocation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
-use Adultdate\Schedule\Actions;
 
 class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Schedule\Contracts\HasCalendar
 {
     public ?int $recordId = null;
-    use CanBeConfigured;
-    use CanRefreshCalendar;
-    use InteractsWithCalendar {
-        InteractsWithCalendar::getOptions insteadof CanBeConfigured;
-        InteractsWithCalendar::onEventDrop insteadof InteractsWithEvents;
-        InteractsWithCalendar::onEventResize insteadof InteractsWithEvents;
-        InteractsWithCalendar::onDateSelect insteadof InteractsWithEvents;
-        InteractsWithCalendar::refreshRecords insteadof InteractsWithEvents;
+
+    protected bool $eventClickEnabled = true;
+
+    use CanBeConfigured, CanRefreshCalendar, InteractsWithEvents, InteractsWithRawJS, InteractsWithRecords, \Adultdate\Schedule\Concerns\InteractsWithCalendar, \Adultdate\Schedule\concerns\InteractsWithEventRecord, \Adultdate\Schedule\concerns\HasOptions, \Adultdate\Schedule\concerns\HasSchema {
+        // Prefer the contract-compatible refreshRecords (chainable) from CanRefreshCalendar
+        CanRefreshCalendar::refreshRecords insteadof InteractsWithEvents;
+
+        // Keep the frontend-only refresh available under an alias if needed
+        InteractsWithEvents::refreshRecords as refreshRecordsFrontend;
+
+        // Resolve getOptions collision: prefer HasOptions' getOptions which merges config and options
+        \Adultdate\Schedule\Concerns\HasOptions::getOptions insteadof CanBeConfigured;
+
         InteractsWithEventRecord::getEloquentQuery insteadof InteractsWithRecords;
     }
     use InteractsWithEvents {
         InteractsWithEvents::onEventClick insteadof InteractsWithCalendar;
-    }
-    use InteractsWithEventRecord;
-    use InteractsWithRawJS;
-    use InteractsWithRecords {
-        InteractsWithRecords::getEloquentQuery as getRecordsEloquentQuery;
+        InteractsWithEvents::onDateSelect insteadof InteractsWithCalendar;
+        InteractsWithEvents::onEventDrop insteadof InteractsWithCalendar;
+        InteractsWithEvents::onEventResize insteadof InteractsWithCalendar;
+        InteractsWithEvents::refreshRecords insteadof InteractsWithCalendar;
     }
 
     protected static ?int $sort = 2;
@@ -70,6 +73,10 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
     protected int|string|array $columnSpan = 'full';
 
     public function getModel(): string
+    {
+        return Booking::class;
+    }
+    public function getModelAlt(): string
     {
         return Booking::class;
     }
@@ -89,19 +96,20 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
                 'right' => 'dayGridMonth,timeGridWeek,timeGridDay',
             ],
             'nowIndicator' => true,
+            'selectable' => true,
             'slotMinTime' => '06:00:00',
             'slotMaxTime' => '22:00:00',
             'slotDuration' => '00:30:00',
-            'allDayText' => '🗓️⌯⌲',
+            'allDayText' => '🗓️',
             'allDaySlot' => true,
             'views' => [
                 'timeGridDay' => [
                     'slotMinTime' => '06:00:00',
-                    'slotMaxTime' => '22:00:00',
+                    'slotMaxTime' => '22:00',
                 ],
                 'timeGridWeek' => [
                     'slotMinTime' => '06:00:00',
-                    'slotMaxTime' => '22:00:00',
+                    'slotMaxTime' => '22:00',
                 ],
             ],
         ];
@@ -212,7 +220,34 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
                 ->label('Service Notes')
                 ->rows(3)
                 ->columnSpanFull(),
+
             $this->getItemsRepeater(),
+        ];
+    }
+
+    protected function getDailyLocationFormSchema(): array
+    {
+        return [
+            DatePicker::make('date')
+                ->label('Date')
+                ->required()
+                ->native(false)
+                ->dehydrated(),
+
+            Select::make('service_user_id')
+                ->label('Service User')
+                ->options(User::pluck('name', 'id'))
+                ->searchable()
+                ->preload()
+                ->required(),
+
+            TextInput::make('location')
+                ->label('Location')
+                ->required()
+                ->maxLength(255),
+
+            Hidden::make('created_by')
+                ->default(fn () => Auth::id()),
         ];
     }
 
@@ -231,9 +266,6 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
         return 'BK-'.now()->format('Ymd').'-'.Str::upper(Str::random(6));
     }
 
-    /**
-     * Provide defaults for all form keys so Livewire entanglement always has data.
-     */
     protected function getDefaultFormData(array $seed = []): array
     {
         return array_replace([
@@ -257,7 +289,6 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
     {
         logger()->debug('booking.form.normalize.before', $data);
 
-        // Normalize date and time values coming from the wizard so inserts work reliably.
         if (! empty($data['service_date']) && $data['service_date'] instanceof \Carbon\CarbonInterface) {
             $data['service_date'] = $data['service_date']->toDateString();
         }
@@ -270,25 +301,16 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
             $data['end_time'] = $data['end_time']->format('H:i:s');
         }
 
-        // Derive missing date/time parts from calendar start/end if the form lost them.
+        // Derive missing date/time parts from calendar start/end if form lost them.
         if (empty($data['service_date']) && ! empty($data['start'])) {
             $start = Carbon::parse($data['start']);
             $data['service_date'] = $start->toDateString();
             $data['start_time'] ??= $start->format('H:i:s');
         }
 
-        if (empty($data['end_time']) && ! empty($data['end'])) {
+        if (empty($data['end_time']) && ! empty($data['end_time'])) {
             $end = Carbon::parse($data['end']);
             $data['end_time'] = $end->format('H:i:s');
-        }
-
-        // Ensure times include seconds for MySQL time columns.
-        if (is_string($data['start_time'] ?? null) && strlen($data['start_time']) === 5) {
-            $data['start_time'] .= ':00';
-        }
-
-        if (is_string($data['end_time'] ?? null) && strlen($data['end_time']) === 5) {
-            $data['end_time'] .= ':00';
         }
 
         $data['number'] = $data['number'] ?? $this->generateNumber();
@@ -296,7 +318,7 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
         $data['is_active'] = $data['is_active'] ?? true;
         $data['status'] = $data['status'] ?? BookingStatus::Booked->value;
 
-        // Only set starts_at/ends_at when the columns exist.
+        // Only set starts_at/ends_at when columns exist.
         if (Schema::hasColumn('booking_bookings', 'starts_at') && isset($data['service_date'], $data['start_time'])) {
             $data['starts_at'] = Carbon::parse($data['service_date'].' '.$data['start_time']);
         }
@@ -330,7 +352,7 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
         $booking->refresh()->updateTotalPrice();
     }
 
-    protected function getEvents(FetchInfo $info): Collection|array|Builder
+    public function getEvents(FetchInfo $info): Collection|array|Builder
     {
         $start = $info->start->toMutable()->startOfDay();
         $end = $info->end->toMutable()->endOfDay();
@@ -338,7 +360,7 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
         $bookings = Booking::query()
             ->with(['client', 'service', 'serviceUser', 'bookingUser', 'location'])
             ->where(function ($query) use ($start, $end) {
-                $query->whereBetween('service_date', [$start, $end])
+                $query->whereBetween('service_date', [$start->toDateString(), $end->toDateString()])
                     ->when(
                         Schema::hasColumn('booking_bookings', 'starts_at'),
                         fn ($q) => $q->orWhereBetween('starts_at', [$start, $end]),
@@ -350,7 +372,7 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
         // Transform bookings to calendar events
         $bookingEvents = $bookings->map(fn (Booking $booking) => $booking->toCalendarEvent())->toArray();
 
-        // Also include DailyLocation entries as all-day events on the calendar
+        // Also include DailyLocation entries as all-day events on calendar
         $dailyLocations = DailyLocation::query()
             ->whereBetween('date', [$start, $end])
             ->with(['serviceUser'])
@@ -395,13 +417,13 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
     public function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make('create')
+            ScheduleActions\CreateAction::make('create')
                 ->label('New Booking')
                 ->icon('heroicon-o-plus')
                 ->modalHeading('Create Booking')
                 ->modalSubmitActionLabel('Create')
                 ->modalWidth('2xl')
-                ->form($this->getFormSchema())
+                ->schema(fn () => $this->getFormSchema())
                 ->mountUsing(function ($form, array $arguments) {
                     $form->fill($this->getDefaultFormData([
                         'service_date' => $arguments['service_date'] ?? null,
@@ -425,13 +447,57 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
                 })
                 ->after(fn () => $this->dispatch('refresh-calendar'))
                 ->successNotificationTitle('Booking created successfully'),
+
+            \Filament\Actions\CreateAction::make('create-daily-location')
+                ->label('Create Daily Location')
+                ->icon('heroicon-o-plus')
+                ->modalHeading('Create Daily Location')
+                ->modalSubmitActionLabel('Create')
+                ->modalWidth('md')
+                ->model(DailyLocation::class)
+                ->schema(fn () => $this->getDailyLocationFormSchema())
+                ->mountUsing(function ($form, array $arguments) {
+                    $form->fill([
+                        'date' => $arguments['date'] ?? null,
+                        'created_by' => Auth::id(),
+                    ]);
+                })
+                ->using(function (array $data) {
+                    DailyLocation::create($data);
+                    //    $this->dispatch('refresh-calendar');
+                    \Filament\Notifications\Notification::make()
+                        ->title('Daily Location created successfully')
+                        ->success()
+                        ->send();
+                })
+                ->successNotificationTitle('Daily Location created successfully'),
         ];
     }
 
     public function onDateSelect(string $start, ?string $end, bool $allDay, ?array $view, ?array $resource): void
     {
+        $allDay = (bool) $allDay;
+
+        logger()->info('BookingCalendarWidget onDateSelect', [
+            'start' => $start,
+            'end' => $end,
+            'allDay' => $allDay,
+            'view' => $view,
+            'resource' => $resource,
+        ]);
+
         $timezone = config('app.timezone');
         $startDate = Carbon::parse($start, $timezone);
+
+        if ($allDay) {
+            logger()->info('BookingCalendarWidget: ALL-DAY CLICK DETECTED!');
+
+            $this->mountAction('create-daily-location', [
+                'date' => $startDate->format('Y-m-d'),
+            ]);
+
+            return;
+        }
 
         $data = $this->getDefaultFormData([
             'service_date' => $startDate->format('Y-m-d'),
@@ -449,6 +515,9 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
         }
 
         $this->mountAction('create', ['data' => $data]);
+
+        $newIndex = max(0, count($this->mountedActions) - 1);
+        $this->dispatch('sync-action-modals', id: $this->getId(), newActionNestingIndex: $newIndex);
     }
 
     public function onEventClick(array $event): void
@@ -456,10 +525,10 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
         if ($this->getModel()) {
             $this->record = $this->resolveRecord($event['id']);
         }
-
-        if (!$this->record) {
-            // Record not found, perhaps show notification
-            $this->dispatch('notify', ['message' => 'Booking not found', 'type' => 'error']);
+        if ($this->getModelAlt()) {
+            $this->record = $this->resolveRecord($event['id']);
+        }
+        if (! $this->record) {
             return;
         }
 
@@ -470,18 +539,7 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
         $booking = $this->record;
         $user = Auth::user();
 
-        // Check if user is admin or the booking creator
         $canEdit = $user->id == $booking->booking_user_id || $this->isAdmin($user);
-
-        // Debug
-        logger()->info('BookingCalendarWidget onEventClick', [
-            'user_id' => $user->id,
-            'user_email' => $user->email,
-            'booking_user_id' => $booking->booking_user_id,
-            'service_user_id' => $booking->service_user_id,
-            'is_admin' => $this->isAdmin($user),
-            'can_edit' => $canEdit,
-        ]);
 
         $action = $canEdit ? 'edit' : 'view';
 
@@ -497,8 +555,7 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
 
     protected function isAdmin(User $user): bool
     {
-        // Define admin logic here. For now, assume admin has email ending with @admin.com or id == 1
-        return true; // Temporarily return true to test
+        return true;
     }
 
     protected function getActions(): array
@@ -511,11 +568,12 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
                 ->modalWidth('full')
                 ->model(fn () => Booking::class)
                 ->record(fn () => Booking::with('items')->find($this->recordId))
-                ->form($this->getFormSchema())
+                ->schema(fn () => $this->getFormSchema())
                 ->mountUsing(function ($form) {
                     $record = Booking::with('items')->find($this->recordId);
                     if (! $record) {
                         logger()->warning('BookingCalendarWidget: view mountUsing found no record', ['recordId' => $this->recordId]);
+
                         return;
                     }
 
@@ -534,15 +592,14 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
                 ->modalWidth('full')
                 ->model(fn () => Booking::class)
                 ->record(fn () => Booking::with('items')->find($this->recordId))
-                ->form($this->getFormSchema())
+                ->schema(fn () => $this->getFormSchema())
                 ->mountUsing(function ($form) {
                     $record = Booking::with('items')->find($this->recordId);
                     if (! $record) {
                         logger()->warning('BookingCalendarWidget: edit mountUsing found no record', ['recordId' => $this->recordId]);
+
                         return;
                     }
-
-                    logger()->debug('BookingCalendarWidget: edit mountUsing record', $record->toArray());
 
                     $data = $record->toArray();
                     $data['service_date'] = $record->service_date?->format('Y-m-d') ?? ($data['service_date'] ?? null);
@@ -557,15 +614,15 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
                     unset($data['items']);
 
                     $record->update($data);
-
                     $this->syncBookingItems($record, $items);
-
                     $this->dispatch('refresh-calendar');
                     \Filament\Notifications\Notification::make()
                         ->title('Booking updated successfully')
                         ->success()
                         ->send();
                 }),
+
+                
 
             \Filament\Actions\DeleteAction::make('delete')
                 ->label('Delete')
@@ -574,11 +631,13 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
                 ->requiresConfirmation()
                 ->modalHeading('Delete Booking')
                 ->modalDescription('Are you sure you want to delete this booking?')
-                ->model(Booking::class)
+                ->visible(fn () => $this->recordId !== null)
                 ->action(function () {
-                    $record = Booking::find($this->recordId);
-                    $record->delete();
-                    $this->dispatch('refresh-calendar');
+                    $record = Booking::with('items')->find($this->recordId);
+                    if ($record) {
+                        $record->delete();
+                        $this->dispatch('refresh-calendar');
+                    }
                 })
                 ->successNotificationTitle('Booking deleted successfully'),
         ];
@@ -587,5 +646,19 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
     public function getFormSchemaForModel(FilamentSchema $schema, ?string $model = null): FilamentSchema
     {
         return BookingForm::configure($schema);
+    }
+
+    public function cacheInteractsWithCalendarActions(): void
+    {
+        // Cache header actions
+        $this->cacheHeaderActions();
+
+        // Cache default actions
+        $this->cacheHasDefaultActions();
+
+        // Cache footer actions if the trait is used
+        if (method_exists($this, 'cacheFooterActions')) {
+            $this->cacheFooterActions();
+        }
     }
 }

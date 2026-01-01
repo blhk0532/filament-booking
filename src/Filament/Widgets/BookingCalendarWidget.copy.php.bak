@@ -91,7 +91,7 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
             'slotMinTime' => '06:00:00',
             'slotMaxTime' => '22:00:00',
             'slotDuration' => '00:30:00',
-            'allDayText' => '🗓️⌯⌲',
+            'allDayText' => '🗓️',
             'allDaySlot' => true,
             'views' => [
                 'timeGridDay' => [
