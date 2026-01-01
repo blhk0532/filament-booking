@@ -9,7 +9,7 @@ use Adultdate\FilamentBooking\Models\Booking\BookingLocation;
 use Adultdate\FilamentBooking\Models\Booking\Client;
 use Adultdate\FilamentBooking\Models\Booking\DailyLocation;
 use Adultdate\FilamentBooking\Models\Booking\Service;
-use Adultdate\Schedule\Actions as ScheduleActions;
+use Adultdate\Schedule\Actions as BookingActions;
 use Adultdate\Schedule\Concerns\CanRefreshCalendar;
 use Adultdate\Schedule\concerns\InteractsWithCalendar;
 use Adultdate\Schedule\concerns\InteractsWithEventRecord;
@@ -39,8 +39,6 @@ use Illuminate\Support\Str;
 class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Schedule\Contracts\HasCalendar
 {
     public ?int $recordId = null;
-
-    protected bool $eventClickEnabled = true;
 
     use CanBeConfigured, CanRefreshCalendar, InteractsWithEvents, InteractsWithRawJS, InteractsWithRecords, \Adultdate\Schedule\Concerns\InteractsWithCalendar, \Adultdate\Schedule\concerns\InteractsWithEventRecord, \Adultdate\Schedule\concerns\HasOptions, \Adultdate\Schedule\concerns\HasSchema {
         // Prefer the contract-compatible refreshRecords (chainable) from CanRefreshCalendar
@@ -91,9 +89,9 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
         return [
             'initialView' => 'timeGridWeek',
             'headerToolbar' => [
-                'left' => 'prev,next today list',
+                'left' => 'prev,next today',
                 'center' => 'title',
-                'right' => 'dayGridMonth,timeGridWeek,timeGridDay',
+                'right' => 'list dayGridMonth,timeGridWeek,timeGridDay',
             ],
             'nowIndicator' => true,
             'selectable' => true,
@@ -113,6 +111,11 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
                 ],
             ],
         ];
+    }
+
+    public function isEventClickEnabled(): bool
+    {
+        return true;
     }
 
     public function getFormSchema(): array
@@ -417,9 +420,10 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
     public function getHeaderActions(): array
     {
         return [
-            ScheduleActions\CreateAction::make('create')
+            BookingActions\CreateAction::make('create')
                 ->label('New Booking')
                 ->icon('heroicon-o-plus')
+                ->hidden()
                 ->modalHeading('Create Booking')
                 ->modalSubmitActionLabel('Create')
                 ->modalWidth('2xl')
@@ -446,31 +450,9 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
                     return $booking;
                 })
                 ->after(fn () => $this->dispatch('refresh-calendar'))
-                ->successNotificationTitle('Booking created successfully'),
+                ->successNotificationTitle('Booking created successfully')
 
-            \Filament\Actions\CreateAction::make('create-daily-location')
-                ->label('Create Daily Location')
-                ->icon('heroicon-o-plus')
-                ->modalHeading('Create Daily Location')
-                ->modalSubmitActionLabel('Create')
-                ->modalWidth('md')
-                ->model(DailyLocation::class)
-                ->schema(fn () => $this->getDailyLocationFormSchema())
-                ->mountUsing(function ($form, array $arguments) {
-                    $form->fill([
-                        'date' => $arguments['date'] ?? null,
-                        'created_by' => Auth::id(),
-                    ]);
-                })
-                ->using(function (array $data) {
-                    DailyLocation::create($data);
-                    //    $this->dispatch('refresh-calendar');
-                    \Filament\Notifications\Notification::make()
-                        ->title('Daily Location created successfully')
-                        ->success()
-                        ->send();
-                })
-                ->successNotificationTitle('Daily Location created successfully'),
+     
         ];
     }
 
@@ -522,6 +504,16 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
 
     public function onEventClick(array $event): void
     {
+        // Skip clicks on all-day location events to prevent 404 errors
+        if (isset($event['allDay']) && $event['allDay'] === true) {
+            return;
+        }
+
+        // Skip location events (they have IDs starting with 'location-')
+        if (isset($event['id']) && str_starts_with($event['id'], 'location-')) {
+            return;
+        }
+
         if ($this->getModel()) {
             $this->record = $this->resolveRecord($event['id']);
         }
