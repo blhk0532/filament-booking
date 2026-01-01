@@ -47,20 +47,9 @@ class BookingForm
                                 static::getItemsRepeater(),
                             ]),
                     ])
-                    ->columnSpan(['lg' => fn (?Booking $record) => $record === null ? 3 : 2]),
+                    ->columnSpan(['lg' => 3]),
 
-                Section::make()
-                    ->schema([
-                        TextEntry::make('created_at')
-                            ->label('Booking date')
-                            ->state(fn (Booking $record): ?string => $record->created_at?->diffForHumans()),
-
-                        TextEntry::make('updated_at')
-                            ->label('Last modified at')
-                            ->state(fn (Booking $record): ?string => $record->updated_at?->diffForHumans()),
-                    ])
-                    ->columnSpan(['lg' => 1])
-                    ->hidden(fn (?Booking $record) => $record === null),
+                        // Removed created_at / updated_at display section — not needed in modal
             ])
             ->columns(3);
     }

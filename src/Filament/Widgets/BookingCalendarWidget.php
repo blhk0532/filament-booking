@@ -27,6 +27,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
 use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema as FilamentSchema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -37,6 +38,7 @@ use Adultdate\Schedule\Actions;
 
 class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Schedule\Contracts\HasCalendar
 {
+    public ?int $recordId = null;
     use CanBeConfigured;
     use CanRefreshCalendar;
     use InteractsWithCalendar {
@@ -216,7 +218,7 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
     protected function getItemsRepeater(): Repeater
     {
         return BookingForm::getItemsRepeater()
-            ->relationship(null)
+            ->relationship('items')
             ->defaultItems(0)
             ->minItems(0)
             ->dehydrated(true)
@@ -420,45 +422,106 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
         $this->mountAction('create', ['data' => $data]);
     }
 
-    protected function modalActions(): array
+    public function onEventClick(array $event): void
+    {
+        if ($this->getModel()) {
+            $this->record = $this->resolveRecord($event['id']);
+        }
+
+        if (!$this->record) {
+            // Record not found, perhaps show notification
+            $this->dispatch('notify', ['message' => 'Booking not found', 'type' => 'error']);
+            return;
+        }
+
+        $this->eventRecord = $this->record;
+        $this->record->load('items');
+        $this->recordId = $this->record->id;
+
+        $booking = $this->record;
+        $user = Auth::user();
+
+        // Check if user is admin or the booking creator
+        $canEdit = $user->id == $booking->booking_user_id || $this->isAdmin($user);
+
+        // Debug
+        logger()->info('BookingCalendarWidget onEventClick', [
+            'user_id' => $user->id,
+            'user_email' => $user->email,
+            'booking_user_id' => $booking->booking_user_id,
+            'service_user_id' => $booking->service_user_id,
+            'is_admin' => $this->isAdmin($user),
+            'can_edit' => $canEdit,
+        ]);
+
+        $action = $canEdit ? 'edit' : 'view';
+
+        $payload = $this->record->toArray();
+        $payload['service_date'] = $this->record->service_date?->format('Y-m-d') ?? ($payload['service_date'] ?? null);
+
+        $this->mountAction($action, [
+            'type' => 'click',
+            'event' => $event,
+            'data' => $payload,
+        ]);
+    }
+
+    protected function isAdmin(User $user): bool
+    {
+        // Define admin logic here. For now, assume admin has email ending with @admin.com or id == 1
+        return true; // Temporarily return true to test
+    }
+
+    protected function getActions(): array
     {
         return [
-            Actions\EditAction::make('edit')
+            \Filament\Actions\Action::make('view')
+                ->label('View')
+                ->icon('heroicon-o-eye')
+                ->modalHeading('View Booking')
+                ->modalWidth('full')
+                ->model(fn () => Booking::class)
+                ->record(fn () => Booking::with('items')->find($this->recordId))
+                ->form($this->getFormSchema())
+                ->mountUsing(function ($form) {
+                    $record = Booking::with('items')->find($this->recordId);
+                    if (! $record) {
+                        logger()->warning('BookingCalendarWidget: view mountUsing found no record', ['recordId' => $this->recordId]);
+                        return;
+                    }
+
+                    $data = $record->toArray();
+                    $data['service_date'] = $record->service_date?->format('Y-m-d') ?? ($data['service_date'] ?? null);
+
+                    $form->fill($data);
+                    $form->disabled();
+                }),
+
+            \Filament\Actions\Action::make('edit')
                 ->label('Edit')
                 ->icon('heroicon-o-pencil')
                 ->modalHeading('Edit Booking')
                 ->modalSubmitActionLabel('Save')
-                ->modalWidth('2xl')
+                ->modalWidth('full')
+                ->model(fn () => Booking::class)
+                ->record(fn () => Booking::with('items')->find($this->recordId))
                 ->form($this->getFormSchema())
                 ->mountUsing(function ($form) {
-                    $booking = $this->selectedRecord;
+                    $record = Booking::with('items')->find($this->recordId);
+                    if (! $record) {
+                        logger()->warning('BookingCalendarWidget: edit mountUsing found no record', ['recordId' => $this->recordId]);
+                        return;
+                    }
 
-                    $form->fill([
-                        'number' => $booking->number,
-                        'booking_client_id' => $booking->booking_client_id,
-                        'service_id' => $booking->service_id,
-                        'booking_location_id' => $booking->booking_location_id,
-                        'service_user_id' => $booking->service_user_id,
-                        'service_date' => $booking->service_date,
-                        'start_time' => $booking->start_time,
-                        'end_time' => $booking->end_time,
-                        'status' => $booking->status,
-                        'total_price' => $booking->total_price,
-                        'notes' => $booking->notes,
-                        'service_note' => $booking->service_note,
-                        'items' => $booking->items
-                            ->map(fn ($item) => [
-                                'id' => $item->id,
-                                'booking_service_id' => $item->booking_service_id,
-                                'qty' => $item->qty,
-                                'unit_price' => $item->unit_price,
-                                'sort' => $item->sort,
-                            ])
-                            ->toArray(),
-                    ]);
+                    logger()->debug('BookingCalendarWidget: edit mountUsing record', $record->toArray());
+
+                    $data = $record->toArray();
+                    $data['service_date'] = $record->service_date?->format('Y-m-d') ?? ($data['service_date'] ?? null);
+
+                    $form->fill($data);
                 })
-                ->steps($this->getFormSteps())
-                ->using(function (Booking $record, array $data) {
+                ->action(function (array $data) {
+                    $record = Booking::find($this->recordId);
                     $data = $this->normalizeBookingFormData($data);
                     logger()->debug('booking.edit.using', $data);
                     $items = $data['items'] ?? [];
@@ -468,23 +531,32 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
 
                     $this->syncBookingItems($record, $items);
 
-                    return $record;
-                })
-                ->after(fn () => $this->dispatch('refresh-calendar'))
-                ->successNotificationTitle('Booking updated successfully'),
+                    $this->dispatch('refresh-calendar');
+                    \Filament\Notifications\Notification::make()
+                        ->title('Booking updated successfully')
+                        ->success()
+                        ->send();
+                }),
 
-            Actions\DeleteAction::make('delete')
+            \Filament\Actions\DeleteAction::make('delete')
                 ->label('Delete')
                 ->icon('heroicon-o-trash')
                 ->color('danger')
                 ->requiresConfirmation()
                 ->modalHeading('Delete Booking')
                 ->modalDescription('Are you sure you want to delete this booking?')
+                ->model(Booking::class)
                 ->action(function () {
-                    $this->selectedRecord->delete();
+                    $record = Booking::find($this->recordId);
+                    $record->delete();
                     $this->dispatch('refresh-calendar');
                 })
                 ->successNotificationTitle('Booking deleted successfully'),
         ];
+    }
+
+    public function getFormSchemaForModel(FilamentSchema $schema, ?string $model = null): FilamentSchema
+    {
+        return BookingForm::configure($schema);
     }
 }
