@@ -4,7 +4,6 @@ namespace Adultdate\FilamentShop\Database\Factories\Booking;
 
 use Adultdate\FilamentShop\Models\Booking\Booking;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 
 /**
  * @extends Factory<Booking>

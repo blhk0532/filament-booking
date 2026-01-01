@@ -2,6 +2,8 @@
 
 namespace Adultdate\FilamentShop;
 
+use Adultdate\FilamentShop\Commands\FilamentShopCommand;
+use Adultdate\FilamentShop\Testing\TestsFilamentShop;
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Assets\Asset;
 use Filament\Support\Assets\Css;
@@ -15,8 +17,6 @@ use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use Adultdate\FilamentShop\Commands\FilamentShopCommand;
-use Adultdate\FilamentShop\Testing\TestsFilamentShop;
 
 class FilamentShopServiceProvider extends PackageServiceProvider
 {
@@ -114,8 +114,8 @@ class FilamentShopServiceProvider extends PackageServiceProvider
 
         if (is_dir($distPath)) {
             return [
-            // AlpineComponent::make('filament-shop', __DIR__ . '/../resources/dist/components/filament-shop.js'),
-                Css::make('filament-shop-styles',  $distPath . '/resources/dist/filament-shop.css'),
+                // AlpineComponent::make('filament-shop', __DIR__ . '/../resources/dist/components/filament-shop.js'),
+                Css::make('filament-shop-styles', $distPath . '/resources/dist/filament-shop.css'),
                 Js::make('filament-shop-scripts', $distPath . '/resources/dist/filament-shop.js'),
             ];
         }
@@ -164,23 +164,23 @@ class FilamentShopServiceProvider extends PackageServiceProvider
     protected function getMigrations(): array
     {
         return [
-            'create_addressable_table', 
-            'create_addresses_table', 
-            'create_comments_table', 
-            'create_exports_table', 
-            'create_failed_import_rows_table', 
-            'create_imports_table', 
-            'create_media_table', 
-            'create_notifications_table', 
-            'create_payments_table', 
-            'create_settings_table', 
-            'create_shop_brands_table', 
-            'create_shop_categories_table', 
-            'create_shop_category_product_table', 
-            'create_shop_customers_table', 
-            'create_shop_order_items_table', 
-            'create_shop_orders_table', 
-            'create_shop_products_table', 
+            'create_addressable_table',
+            'create_addresses_table',
+            'create_comments_table',
+            'create_exports_table',
+            'create_failed_import_rows_table',
+            'create_imports_table',
+            'create_media_table',
+            'create_notifications_table',
+            'create_payments_table',
+            'create_settings_table',
+            'create_shop_brands_table',
+            'create_shop_categories_table',
+            'create_shop_category_product_table',
+            'create_shop_customers_table',
+            'create_shop_order_items_table',
+            'create_shop_orders_table',
+            'create_shop_products_table',
             'create_tag_tables',
         ];
     }
@@ -196,7 +196,7 @@ class FilamentShopServiceProvider extends PackageServiceProvider
         $filesystem = app(Filesystem::class);
 
         foreach ($directories as $directory) {
-            if (!$filesystem->exists($directory)) {
+            if (! $filesystem->exists($directory)) {
                 $filesystem->makeDirectory($directory, 0755, true);
             }
         }
@@ -233,7 +233,7 @@ class FilamentShopServiceProvider extends PackageServiceProvider
         $productImagesLink = public_path('storage/product-images');
         $productImagesTarget = storage_path('app/product-images');
 
-        if (!$filesystem->exists($productImagesLink)) {
+        if (! $filesystem->exists($productImagesLink)) {
             $filesystem->link($productImagesTarget, $productImagesLink);
         }
     }

@@ -3,7 +3,6 @@
 namespace Adultdate\FilamentShop\Models\Booking;
 
 use Adultdate\FilamentShop\Enums\BookingStatus;
-use Adultdate\FilamentShop\Models\Booking\OrderAddress as OrderAddress;
 use Database\Factories\Booking\BookingFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

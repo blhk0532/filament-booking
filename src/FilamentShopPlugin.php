@@ -2,17 +2,14 @@
 
 namespace Adultdate\FilamentShop;
 
-use Filament\Contracts\Plugin;
-use Filament\Panel;
-use Filament\Navigation\NavigationGroup;
-use Adultdate\FilamentShop\Filament\Clusters\Products\ProductsCluster;
-use Adultdate\FilamentShop\Filament\Clusters\Services\ServicesCluster;
 use Adultdate\FilamentShop\Filament\Resources\Shop\Customers\CustomerResource;
 use Adultdate\FilamentShop\Filament\Resources\Shop\Orders\OrderResource;
 use Adultdate\FilamentShop\Filament\Widgets\CustomersChart;
 use Adultdate\FilamentShop\Filament\Widgets\LatestOrders;
 use Adultdate\FilamentShop\Filament\Widgets\OrdersChart;
 use Adultdate\FilamentShop\Filament\Widgets\StatsOverviewWidget;
+use Filament\Contracts\Plugin;
+use Filament\Panel;
 
 class FilamentShopPlugin implements Plugin
 {
@@ -23,7 +20,7 @@ class FilamentShopPlugin implements Plugin
 
     public function register(Panel $panel): void
     {
-            $panel
+        $panel
             ->discoverClusters(in: app_path('../vendor/adultdate/filament-shop/src/Filament/Clusters'), for: 'Adultdate\\FilamentShop\\Filament\\Clusters')
             ->databaseNotifications()
             ->pages([
@@ -38,7 +35,7 @@ class FilamentShopPlugin implements Plugin
                 LatestOrders::class,
                 OrdersChart::class,
                 StatsOverviewWidget::class,
-            ]); 
+            ]);
     }
 
     public function boot(Panel $panel): void

@@ -2,7 +2,6 @@
 
 namespace Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Brands;
 
-use Adultdate\FilamentShop\Filament\Clusters\Services\ServicesCluster;
 use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Brands\Pages\CreateBrand;
 use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Brands\Pages\EditBrand;
 use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Brands\Pages\ListBrands;
@@ -10,6 +9,7 @@ use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Brands\RelationM
 use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Brands\RelationManagers\ServicesRelationManager;
 use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Brands\Schemas\BrandForm;
 use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Brands\Tables\BrandsTable;
+use Adultdate\FilamentShop\Filament\Clusters\Services\ServicesCluster;
 use Adultdate\FilamentShop\Models\Booking\Brand;
 use BackedEnum;
 use Filament\Resources\Resource;

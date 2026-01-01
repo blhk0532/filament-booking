@@ -4,7 +4,6 @@ namespace Adultdate\FilamentShop\Models\Shop;
 
 use Adultdate\FilamentShop\Models\Address;
 use Adultdate\FilamentShop\Models\Comment;
-use Database\Factories\Shop\ClientFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;

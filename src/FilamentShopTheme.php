@@ -5,7 +5,6 @@ namespace Adultdate\FilamentShop;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 use Filament\Support\Assets\Theme;
-use Filament\Support\Colors;
 use Filament\Support\Facades\FilamentAsset;
 
 class FilamentShop implements Plugin

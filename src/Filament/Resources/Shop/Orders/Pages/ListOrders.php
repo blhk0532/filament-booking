@@ -21,8 +21,6 @@ class ListOrders extends ListRecords
         ];
     }
 
-
-
     public function getTabs(): array
     {
         return [
@@ -35,7 +33,7 @@ class ListOrders extends ListRecords
         ];
     }
 
-        protected function getHeaderWidgets(): array
+    protected function getHeaderWidgets(): array
     {
         return OrderResource::getWidgets();
     }

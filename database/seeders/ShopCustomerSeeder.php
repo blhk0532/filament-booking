@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use Adultdate\FilamentShop\Models\Shop\Customer;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class ShopCustomerSeeder extends Seeder

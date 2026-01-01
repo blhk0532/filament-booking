@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use Adultdate\FilamentShop\Models\Shop\Category;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class ShopCategorySeeder extends Seeder

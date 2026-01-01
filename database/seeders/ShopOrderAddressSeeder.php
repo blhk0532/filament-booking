@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use Adultdate\FilamentShop\Models\Shop\OrderAddress;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class ShopOrderAddressSeeder extends Seeder

@@ -4,14 +4,12 @@ namespace Adultdate\FilamentShop\Models\Booking;
 
 use Adultdate\FilamentShop\Models\Address;
 use Adultdate\FilamentShop\Models\Comment;
-use Database\Factories\Booking\ClientFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Str;
 
 class Client extends Model
 {

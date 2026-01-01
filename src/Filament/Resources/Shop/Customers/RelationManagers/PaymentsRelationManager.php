@@ -2,8 +2,8 @@
 
 namespace Adultdate\FilamentShop\Filament\Resources\Shop\Customers\RelationManagers;
 
-use Akaunting\Money\Currency;
 use Adultdate\FilamentShop\Filament\Resources\Shop\Orders\OrderResource;
+use Akaunting\Money\Currency;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;

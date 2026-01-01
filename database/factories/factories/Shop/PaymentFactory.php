@@ -2,8 +2,8 @@
 
 namespace Database\Factories\Shop;
 
-use Akaunting\Money\Currency;
 use Adultdate\FilamentShop\Models\Shop\Payment;
+use Akaunting\Money\Currency;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

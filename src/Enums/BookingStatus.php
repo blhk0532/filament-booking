@@ -2,9 +2,6 @@
 
 namespace Adultdate\FilamentShop\Enums;
 
-use Filament\Support\Colors\Color;
-use Filament\Tables\Columns\Enums\BadgeColor;
-
 enum BookingStatus: string
 {
     case Booked = 'booked';
