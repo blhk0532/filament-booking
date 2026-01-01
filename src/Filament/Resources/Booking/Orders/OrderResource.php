@@ -1,15 +1,15 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\Resources\Shop\Orders;
+namespace Adultdate\FilamentBooking\Filament\Resources\Booking\Orders;
 
-use Adultdate\FilamentShop\Filament\Resources\Shop\Orders\Pages\CreateOrder;
-use Adultdate\FilamentShop\Filament\Resources\Shop\Orders\Pages\EditOrder;
-use Adultdate\FilamentShop\Filament\Resources\Shop\Orders\Pages\ListOrders;
-use Adultdate\FilamentShop\Filament\Resources\Shop\Orders\RelationManagers\PaymentsRelationManager;
-use Adultdate\FilamentShop\Filament\Resources\Shop\Orders\Schemas\OrderForm;
-use Adultdate\FilamentShop\Filament\Resources\Shop\Orders\Tables\OrdersTable;
-use Adultdate\FilamentShop\Filament\Resources\Shop\Orders\Widgets\OrderStats;
-use Adultdate\FilamentShop\Models\Shop\Order;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\Orders\Pages\CreateOrder;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\Orders\Pages\EditOrder;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\Orders\Pages\ListOrders;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\Orders\RelationManagers\PaymentsRelationManager;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\Orders\Schemas\OrderForm;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\Orders\Tables\OrdersTable;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\Orders\Widgets\OrderStats;
+use Adultdate\FilamentBooking\Models\Booking\Order;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -23,11 +23,11 @@ class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
 
-    protected static ?string $slug = 'shop/orders';
+    protected static ?string $slug = 'booking/orders';
 
     protected static ?string $recordTitleAttribute = 'number';
 
-    protected static string | UnitEnum | null $navigationGroup = 'Shop';
+    protected static string | UnitEnum | null $navigationGroup = 'Booking';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-shopping-bag';
 

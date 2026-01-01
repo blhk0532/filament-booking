@@ -1,6 +1,6 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\Pages\Auth;
+namespace Adultdate\FilamentBooking\Filament\Pages\Auth;
 
 class Login extends \Filament\Auth\Pages\Login
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Services\Pages;
+namespace Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Services\Pages;
 
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Services\ServiceResource;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Services\ServiceResource;
 use Filament\Actions;
 use Filament\Pages\Concerns\ExposesTableToWidgets;
 use Filament\Resources\Pages\ListRecords;

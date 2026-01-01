@@ -1,8 +1,8 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Clients\Pages;
+namespace Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Clients\Pages;
 
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Clients\ClientResource;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Clients\ClientResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 

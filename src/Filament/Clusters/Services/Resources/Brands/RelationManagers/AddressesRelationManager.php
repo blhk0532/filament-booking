@@ -1,6 +1,6 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Brands\RelationManagers;
+namespace Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Brands\RelationManagers;
 
 use Filament\Actions\AttachAction;
 use Filament\Actions\CreateAction;

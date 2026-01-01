@@ -1,6 +1,6 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\Resources\Shop\Customers\Tables;
+namespace Adultdate\FilamentBooking\Filament\Resources\Booking\Customers\Tables;
 
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;

@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use Adultdate\FilamentShop\Models\Shop\Brand;
+use Adultdate\FilamentBooking\Models\Booking\Brand;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class ShopBrandSeeder extends Seeder
+class BookingBrandSeeder extends Seeder
 {
     /**
      * Run the database seeds.

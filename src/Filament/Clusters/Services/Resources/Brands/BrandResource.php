@@ -1,16 +1,16 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Brands;
+namespace Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Brands;
 
-use Adultdate\FilamentShop\Filament\Clusters\Services\ServicesCluster;
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Brands\Pages\CreateBrand;
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Brands\Pages\EditBrand;
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Brands\Pages\ListBrands;
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Brands\RelationManagers\AddressesRelationManager;
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Brands\RelationManagers\ServicesRelationManager;
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Brands\Schemas\BrandForm;
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Brands\Tables\BrandsTable;
-use Adultdate\FilamentShop\Models\Booking\Brand;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\ServicesCluster;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Brands\Pages\CreateBrand;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Brands\Pages\EditBrand;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Brands\Pages\ListBrands;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Brands\RelationManagers\AddressesRelationManager;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Brands\RelationManagers\ServicesRelationManager;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Brands\Schemas\BrandForm;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Brands\Tables\BrandsTable;
+use Adultdate\FilamentBooking\Models\Booking\Brand;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;

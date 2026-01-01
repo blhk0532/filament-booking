@@ -1,30 +1,35 @@
 <?php
 
-namespace Adultdate\FilamentShop\Database\Factories\Booking;
+namespace Adultdate\FilamentBooking\Database\Factories\Booking;
 
-use Adultdate\FilamentShop\Models\Booking\Client;
+use Adultdate\FilamentBooking\Models\Booking\Client;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
- * @extends Factory<Client>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Adultdate\FilamentBooking\Models\Booking\Client>
  */
 class ClientFactory extends Factory
 {
-    /**
-     * @var string
-     */
     protected $model = Client::class;
 
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
     public function definition(): array
     {
         return [
-            'ulid' => (string) \Illuminate\Support\Str::ulid(),
+            'ulid' => (string) Str::ulid(),
             'name' => $this->faker->name(),
-            'email' => $this->faker->unique()->safeEmail(),
+            'address' => $this->faker->address(),
             'phone' => $this->faker->phoneNumber(),
-            'birthday' => $this->faker->dateTimeBetween('-35 years', '-18 years'),
-            'created_at' => $this->faker->dateTimeBetween('-1 year', '-6 month'),
-            'updated_at' => $this->faker->dateTimeBetween('-5 month', 'now'),
+            'email' => $this->faker->unique()->safeEmail(),
+            'birthday' => $this->faker->date(),
+            'photo' => $this->faker->imageUrl(),
+            'notes' => $this->faker->sentence(),
+            'type' => 'person',
         ];
     }
 }

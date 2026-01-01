@@ -1,16 +1,16 @@
 {
-    "name": "adultdate/filament-shop",
-    "description": "adultdate filament-shop",
+    "name": "adultdate/filament-booking",
+    "description": "adultdate filament-booking",
     "keywords": [
         "adultdate",
         "laravel",
         "filament",
-        "filament-shop"
+        "filament-booking"
     ],
-    "homepage": "https://github.com/adultdate/filament-shop",
+    "homepage": "https://github.com/adultdate/filament-booking",
     "support": {
-        "issues": "https://github.com/adultdate/filament-shop/issues",
-        "source": "https://github.com/adultdate/filament-shop"
+        "issues": "https://github.com/adultdate/filament-booking/issues",
+        "source": "https://github.com/adultdate/filament-booking"
     },
     "license": "MIT",
     "authors": [
@@ -49,13 +49,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Adultdate\\FilamentShop\\": "src/",
-            "Adultdate\\FilamentShop\\Database\\Factories\\": "database/factories/"
+            "Adultdate\\FilamentBooking\\": "src/",
+            "Adultdate\\FilamentBooking\\Database\\Factories\\": "database/factories/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Adultdate\\FilamentShop\\Tests\\": "tests/"
+            "Adultdate\\FilamentBooking\\Tests\\": "tests/"
         }
     },
     "scripts": {
@@ -75,10 +75,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Adultdate\\FilamentShop\\FilamentShopServiceProvider"
+                "Adultdate\\FilamentBooking\\FilamentBookingServiceProvider"
             ],
             "aliases": {
-                "FilamentShop": "Adultdate\\FilamentShop\\Facades\\FilamentShop"
+                "FilamentBooking": "Adultdate\\FilamentBooking\\Facades\\FilamentBooking"
             }
         }
     },

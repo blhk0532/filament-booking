@@ -1,8 +1,8 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\Exports\Shop;
+namespace Adultdate\FilamentBooking\Filament\Exports\Booking;
 
-use Adultdate\FilamentShop\Models\Shop\Brand;
+use Adultdate\FilamentBooking\Models\Booking\Brand;
 use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\Exports\Exporter;
 use Filament\Actions\Exports\Models\Export;

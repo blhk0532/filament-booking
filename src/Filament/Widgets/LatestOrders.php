@@ -1,9 +1,9 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\Widgets;
+namespace Adultdate\FilamentBooking\Filament\Widgets;
 
-use Adultdate\FilamentShop\Filament\Resources\Shop\Orders\OrderResource;
-use Adultdate\FilamentShop\Models\Shop\Order;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\Orders\OrderResource;
+use Adultdate\FilamentBooking\Models\Booking\Order;
 use Filament\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;

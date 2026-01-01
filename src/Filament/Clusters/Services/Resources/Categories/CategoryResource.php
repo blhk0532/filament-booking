@@ -1,15 +1,15 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Categories;
+namespace Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Categories;
 
-use Adultdate\FilamentShop\Filament\Clusters\Services\ServicesCluster;
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Categories\Pages\CreateCategory;
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Categories\Pages\EditCategory;
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Categories\Pages\ListCategories;
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Categories\RelationManagers\ServicesRelationManager;
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Categories\Schemas\CategoryForm;
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Categories\Tables\CategoriesTable;
-use Adultdate\FilamentShop\Models\Booking\Category;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\ServicesCluster;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Categories\Pages\CreateCategory;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Categories\Pages\EditCategory;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Categories\Pages\ListCategories;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Categories\RelationManagers\ServicesRelationManager;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Categories\Schemas\CategoryForm;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Categories\Tables\CategoriesTable;
+use Adultdate\FilamentBooking\Models\Booking\Category;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;

@@ -1,9 +1,9 @@
 <?php
 
-namespace Adultdate\FilamentShop\Models\Booking;
+namespace Adultdate\FilamentBooking\Models\Booking;
 
-use Adultdate\FilamentShop\Models\Address;
-use Adultdate\FilamentShop\Models\Comment;
+use Adultdate\FilamentBooking\Models\Address;
+use Adultdate\FilamentBooking\Models\Comment;
 use Database\Factories\Booking\ClientFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,14 +15,14 @@ use Illuminate\Support\Str;
 
 class Client extends Model
 {
-    /** @use HasFactory<\Adultdate\FilamentShop\Database\Factories\Booking\ClientFactory> */
+    /** @use HasFactory<\Adultdate\FilamentBooking\Database\Factories\Booking\ClientFactory> */
     use HasFactory;
 
     use SoftDeletes;
 
     protected static function newFactory()
     {
-        return \Adultdate\FilamentShop\Database\Factories\Booking\ClientFactory::new();
+        return \Adultdate\FilamentBooking\Database\Factories\Booking\ClientFactory::new();
     }
 
     /**

@@ -1,9 +1,9 @@
 <?php
 
-namespace Adultdate\FilamentShop\Models\Booking;
+namespace Adultdate\FilamentBooking\Models\Booking;
 
-use Adultdate\FilamentShop\Enums\ServiceStatus;
-use Adultdate\FilamentShop\Models\Comment;
+use Adultdate\FilamentBooking\Enums\ServiceStatus;
+use Adultdate\FilamentBooking\Models\Comment;
 use Database\Factories\Booking\ServiceFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

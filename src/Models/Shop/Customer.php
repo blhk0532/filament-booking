@@ -1,10 +1,10 @@
 <?php
 
-namespace Adultdate\FilamentShop\Models\Shop;
+namespace Adultdate\FilamentBooking\Models\Booking;
 
-use Adultdate\FilamentShop\Models\Address;
-use Adultdate\FilamentShop\Models\Comment;
-use Database\Factories\Shop\CustomerFactory;
+use Adultdate\FilamentBooking\Models\Address;
+use Adultdate\FilamentBooking\Models\Comment;
+use Database\Factories\Booking\CustomerFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;

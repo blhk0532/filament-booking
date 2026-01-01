@@ -1,15 +1,15 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Clients;
+namespace Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Clients;
 
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Clients\Pages\CreateClient;
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Clients\Pages\EditClient;
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Clients\Pages\ListClients;
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Clients\RelationManagers\AddressesRelationManager;
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Clients\RelationManagers\PaymentsRelationManager;
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Clients\Schemas\ClientForm;
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Clients\Tables\ClientsTable;
-use Adultdate\FilamentShop\Models\Booking\Client;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Clients\Pages\CreateClient;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Clients\Pages\EditClient;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Clients\Pages\ListClients;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Clients\RelationManagers\AddressesRelationManager;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Clients\RelationManagers\PaymentsRelationManager;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Clients\Schemas\ClientForm;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Clients\Tables\ClientsTable;
+use Adultdate\FilamentBooking\Models\Booking\Client;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;

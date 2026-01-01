@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use Adultdate\FilamentShop\Models\Shop\OrderAddress;
+use Adultdate\FilamentBooking\Models\Booking\OrderAddress;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class ShopOrderAddressSeeder extends Seeder
+class BookingOrderAddressSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -15,7 +15,7 @@ class ShopOrderAddressSeeder extends Seeder
     {
         OrderAddress::firstOrCreate(
             [
-                'addressable_type' => 'Adultdate\\FilamentShop\\Models\\Shop\\Order',
+                'addressable_type' => 'Adultdate\\FilamentBooking\\Models\\Booking\\Order',
                 'addressable_id' => 1,
             ],
             [

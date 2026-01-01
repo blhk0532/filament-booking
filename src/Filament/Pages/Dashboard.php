@@ -1,6 +1,6 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\Pages;
+namespace Adultdate\FilamentBooking\Filament\Pages;
 
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;

@@ -1,14 +1,14 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Bookings;
+namespace Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings;
 
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Bookings\Pages\CreateBooking;
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Bookings\Pages\EditBooking;
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Bookings\Pages\ListBookings;
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Bookings\Schemas\BookingForm;
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Bookings\Tables\BookingsTable;
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Bookings\Widgets\BookingStats;
-use Adultdate\FilamentShop\Models\Booking\Booking;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings\Pages\CreateBooking;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings\Pages\EditBooking;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings\Pages\ListBookings;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings\Schemas\BookingForm;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings\Tables\BookingsTable;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings\Widgets\BookingStats;
+use Adultdate\FilamentBooking\Models\Booking\Booking;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;

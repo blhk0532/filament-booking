@@ -1,8 +1,8 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Brands\RelationManagers;
+namespace Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Brands\RelationManagers;
 
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Services\ServiceResource;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Services\ServiceResource;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;

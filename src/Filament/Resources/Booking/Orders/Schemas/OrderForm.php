@@ -1,12 +1,12 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\Resources\Shop\Orders\Schemas;
+namespace Adultdate\FilamentBooking\Filament\Resources\Booking\Orders\Schemas;
 
-use Adultdate\FilamentShop\Enums\OrderStatus;
-use Adultdate\FilamentShop\Filament\Clusters\Products\Resources\Products\ProductResource;
-use Adultdate\FilamentShop\Forms\Components\AddressForm;
-use Adultdate\FilamentShop\Models\Shop\Order;
-use Adultdate\FilamentShop\Models\Shop\Product;
+use Adultdate\FilamentBooking\Enums\OrderStatus;
+use Adultdate\FilamentBooking\Filament\Clusters\Products\Resources\Products\ProductResource;
+use Adultdate\FilamentBooking\Forms\Components\AddressForm;
+use Adultdate\FilamentBooking\Models\Booking\Order;
+use Adultdate\FilamentBooking\Models\Booking\Product;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Repeater\TableColumn;

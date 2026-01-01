@@ -1,10 +1,10 @@
 <?php
 
-namespace Adultdate\FilamentShop\Models\Shop;
+namespace Adultdate\FilamentBooking\Models\Booking;
 
-use Adultdate\FilamentShop\Enums\BookingStatus;
-use Adultdate\FilamentShop\Models\Shop\OrderAddress as OrderAddress;
-use Database\Factories\Shop\BookingFactory;
+use Adultdate\FilamentBooking\Enums\BookingStatus;
+use Adultdate\FilamentBooking\Models\Booking\OrderAddress as OrderAddress;
+use Database\Factories\Booking\BookingFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -58,7 +58,7 @@ class Booking extends Model
 
     protected static function newFactory()
     {
-        return \Adultdate\FilamentShop\Database\Factories\Shop\BookingFactory::new();
+        return \Adultdate\FilamentBooking\Database\Factories\Booking\BookingFactory::new();
     }
 
     /**

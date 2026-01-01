@@ -1,6 +1,6 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\App\Pages;
+namespace Adultdate\FilamentBooking\Filament\App\Pages;
 
 use BackedEnum;
 use Filament\Pages\Page;

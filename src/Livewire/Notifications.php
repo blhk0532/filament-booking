@@ -1,6 +1,6 @@
 <?php
 
-namespace Adultdate\FilamentShop\Livewire;
+namespace Adultdate\FilamentBooking\Livewire;
 
 use Illuminate\View\View;
 use Livewire\Component;

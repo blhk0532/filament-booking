@@ -1,6 +1,6 @@
 <?php
 
-namespace Adultdate\FilamentShop\Enums;
+namespace Adultdate\FilamentBooking\Enums;
 
 use Filament\Support\Colors\Color;
 use Filament\Tables\Columns\Enums\BadgeColor;

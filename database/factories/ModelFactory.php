@@ -1,6 +1,6 @@
 <?php
 
-namespace Adultdate\FilamentShop\Database\Factories;
+namespace Adultdate\FilamentBooking\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 

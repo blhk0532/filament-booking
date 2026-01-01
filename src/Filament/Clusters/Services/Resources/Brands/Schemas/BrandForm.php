@@ -1,8 +1,8 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Brands\Schemas;
+namespace Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Brands\Schemas;
 
-use Adultdate\FilamentShop\Models\Booking\Brand;
+use Adultdate\FilamentBooking\Models\Booking\Brand;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;

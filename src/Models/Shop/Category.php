@@ -1,8 +1,8 @@
 <?php
 
-namespace Adultdate\FilamentShop\Models\Shop;
+namespace Adultdate\FilamentBooking\Models\Booking;
 
-use Database\Factories\Shop\CategoryFactory;
+use Database\Factories\Booking\CategoryFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

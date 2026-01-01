@@ -1,8 +1,8 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\Resources\Shop\Customers\Schemas;
+namespace Adultdate\FilamentBooking\Filament\Resources\Booking\Customers\Schemas;
 
-use Adultdate\FilamentShop\Models\Shop\Customer;
+use Adultdate\FilamentBooking\Models\Booking\Customer;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;

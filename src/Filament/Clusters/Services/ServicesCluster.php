@@ -1,6 +1,6 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\Clusters\Services;
+namespace Adultdate\FilamentBooking\Filament\Clusters\Services;
 
 use BackedEnum;
 use Filament\Clusters\Cluster;
@@ -14,5 +14,5 @@ class ServicesCluster extends Cluster
 
     protected static ?int $navigationSort = 1;
 
-    protected static ?string $slug = 'shop/services';
+    protected static ?string $slug = 'booking/services';
 }

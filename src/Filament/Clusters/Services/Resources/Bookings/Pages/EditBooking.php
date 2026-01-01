@@ -1,8 +1,8 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Bookings\Pages;
+namespace Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings\Pages;
 
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Bookings\BookingResource;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings\BookingResource;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;

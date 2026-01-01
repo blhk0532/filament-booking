@@ -1,6 +1,6 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\Widgets;
+namespace Adultdate\FilamentBooking\Filament\Widgets;
 
 use Carbon\Carbon;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;

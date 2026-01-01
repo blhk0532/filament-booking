@@ -1,6 +1,6 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\Panels\App\Pages;
+namespace Adultdate\FilamentBooking\Filament\Panels\App\Pages;
 
 use BackedEnum;
 use Filament\Forms\Components\DatePicker;

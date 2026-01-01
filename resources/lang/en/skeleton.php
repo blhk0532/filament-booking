@@ -1,6 +1,6 @@
 <?php
 
-// translations for Adultdate/FilamentShop
+// translations for Adultdate/FilamentBooking
 return [
     //
 ];

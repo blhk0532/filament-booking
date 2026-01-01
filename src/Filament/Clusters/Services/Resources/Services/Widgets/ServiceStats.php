@@ -1,8 +1,8 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Services\Widgets;
+namespace Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Services\Widgets;
 
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Services\Pages\ListServices;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Services\Pages\ListServices;
 use Filament\Widgets\Concerns\InteractsWithPageTable;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;

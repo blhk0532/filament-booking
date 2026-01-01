@@ -1,6 +1,6 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\Resources\Shop\Orders\RelationManagers;
+namespace Adultdate\FilamentBooking\Filament\Resources\Booking\Orders\RelationManagers;
 
 use Akaunting\Money\Currency;
 use Filament\Actions\CreateAction;

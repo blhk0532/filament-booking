@@ -1,8 +1,8 @@
 <?php
 
-namespace Adultdate\FilamentShop\Models;
+namespace Adultdate\FilamentBooking\Models;
 
-use Adultdate\FilamentShop\Models\Shop\Customer;
+use Adultdate\FilamentBooking\Models\Booking\Customer;
 use Database\Factories\CommentFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

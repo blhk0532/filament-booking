@@ -1,6 +1,6 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\Widgets;
+namespace Adultdate\FilamentBooking\Filament\Widgets;
 
 use Filament\Widgets\ChartWidget;
 

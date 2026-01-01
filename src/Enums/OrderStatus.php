@@ -1,6 +1,6 @@
 <?php
 
-namespace Adultdate\FilamentShop\Enums;
+namespace Adultdate\FilamentBooking\Enums;
 
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasIcon;

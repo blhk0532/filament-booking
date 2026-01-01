@@ -1,8 +1,8 @@
 <?php
 
-namespace Adultdate\FilamentShop\Database\Factories\Booking;
+namespace Adultdate\FilamentBooking\Database\Factories\Booking;
 
-use Adultdate\FilamentShop\Models\Booking\Booking;
+use Adultdate\FilamentBooking\Models\Booking\Booking;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 

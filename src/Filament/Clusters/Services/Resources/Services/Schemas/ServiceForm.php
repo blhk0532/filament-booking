@@ -1,10 +1,10 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Services\Schemas;
+namespace Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Services\Schemas;
 
-use Adultdate\FilamentShop\Enums\ServiceStatus;
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Services\ServiceResource;
-use Adultdate\FilamentShop\Models\Booking\Service;
+use Adultdate\FilamentBooking\Enums\ServiceStatus;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Services\ServiceResource;
+use Adultdate\FilamentBooking\Models\Booking\Service;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\RichEditor;

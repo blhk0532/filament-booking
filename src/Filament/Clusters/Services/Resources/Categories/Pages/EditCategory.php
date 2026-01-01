@@ -1,8 +1,8 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Categories\Pages;
+namespace Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Categories\Pages;
 
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Categories\CategoryResource;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Categories\CategoryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 

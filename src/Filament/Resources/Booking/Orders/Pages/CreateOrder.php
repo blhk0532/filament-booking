@@ -1,11 +1,11 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\Resources\Shop\Orders\Pages;
+namespace Adultdate\FilamentBooking\Filament\Resources\Booking\Orders\Pages;
 
-use Adultdate\FilamentShop\Filament\Resources\Shop\Orders\OrderResource;
-use Adultdate\FilamentShop\Filament\Resources\Shop\Orders\Schemas\OrderForm;
-use Adultdate\FilamentShop\Models\Shop\Order;
-use Adultdate\FilamentShop\Models\User;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\Orders\OrderResource;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\Orders\Schemas\OrderForm;
+use Adultdate\FilamentBooking\Models\Booking\Order;
+use Adultdate\FilamentBooking\Models\User;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;

@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use Adultdate\FilamentShop\Models\User;
+use Adultdate\FilamentBooking\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 

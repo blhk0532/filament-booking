@@ -1,9 +1,9 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Bookings\Widgets;
+namespace Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings\Widgets;
 
-use Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Bookings\Pages\ListBookings;
-use Adultdate\FilamentShop\Models\Booking\Booking;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings\Pages\ListBookings;
+use Adultdate\FilamentBooking\Models\Booking\Booking;
 use Filament\Widgets\Concerns\InteractsWithPageTable;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;

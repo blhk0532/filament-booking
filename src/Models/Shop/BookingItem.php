@@ -1,8 +1,8 @@
 <?php
 
-namespace Adultdate\FilamentShop\Models\Shop;
+namespace Adultdate\FilamentBooking\Models\Booking;
 
-use Database\Factories\Shop\BookingItemFactory;
+use Database\Factories\Booking\BookingItemFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -23,6 +23,6 @@ class BookingItem extends Model
 
     protected static function newFactory()
     {
-        return \Database\Factories\Shop\BookingItemFactory::new();
+        return \Database\Factories\Booking\BookingItemFactory::new();
     }
 }

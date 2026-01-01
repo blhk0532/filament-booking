@@ -1,6 +1,6 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Services\RelationManagers;
+namespace Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Services\RelationManagers;
 
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;

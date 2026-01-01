@@ -1,6 +1,6 @@
 <?php
 
-namespace Adultdate\FilamentShop\Livewire;
+namespace Adultdate\FilamentBooking\Livewire;
 
 use Filament\Forms\Components\Builder;
 use Filament\Forms\Components\Builder\Block;

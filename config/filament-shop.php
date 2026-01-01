@@ -1,13 +1,13 @@
 <?php
 
-// config for Adultdate/FilamentShop
+// config for Adultdate/FilamentBooking
 return [
     /*
     |--------------------------------------------------------------------------
     | Default Currency
     |--------------------------------------------------------------------------
     |
-    | The default currency for the shop. This will be used for displaying
+    | The default currency for the booking. This will be used for displaying
     | prices and formatting monetary values.
     |
     */
@@ -18,7 +18,7 @@ return [
     | Default Locale
     |--------------------------------------------------------------------------
     |
-    | The default locale for the shop. This affects number formatting,
+    | The default locale for the booking. This affects number formatting,
     | dates, and other locale-specific features.
     |
     */
@@ -40,7 +40,7 @@ return [
     | Enable Features
     |--------------------------------------------------------------------------
     |
-    | Enable or disable specific features of the shop.
+    | Enable or disable specific features of the booking.
     |
     */
     'features' => [

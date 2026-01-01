@@ -1,6 +1,6 @@
 <?php
 
-namespace Adultdate\FilamentShop\Console\Commands;
+namespace Adultdate\FilamentBooking\Console\Commands;
 
 use Database\Seeders\LocalImages;
 use Illuminate\Console\Command;

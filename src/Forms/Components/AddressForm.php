@@ -1,6 +1,6 @@
 <?php
 
-namespace Adultdate\FilamentShop\Forms\Components;
+namespace Adultdate\FilamentBooking\Forms\Components;
 
 use Filament\Forms\Components\Field;
 use Filament\Forms\Components\Select;

@@ -1,15 +1,15 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\Resources\Shop\Customers;
+namespace Adultdate\FilamentBooking\Filament\Resources\Booking\Customers;
 
-use Adultdate\FilamentShop\Filament\Resources\Shop\Customers\Pages\CreateCustomer;
-use Adultdate\FilamentShop\Filament\Resources\Shop\Customers\Pages\EditCustomer;
-use Adultdate\FilamentShop\Filament\Resources\Shop\Customers\Pages\ListCustomers;
-use Adultdate\FilamentShop\Filament\Resources\Shop\Customers\RelationManagers\AddressesRelationManager;
-use Adultdate\FilamentShop\Filament\Resources\Shop\Customers\RelationManagers\PaymentsRelationManager;
-use Adultdate\FilamentShop\Filament\Resources\Shop\Customers\Schemas\CustomerForm;
-use Adultdate\FilamentShop\Filament\Resources\Shop\Customers\Tables\CustomersTable;
-use Adultdate\FilamentShop\Models\Shop\Customer;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\Customers\Pages\CreateCustomer;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\Customers\Pages\EditCustomer;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\Customers\Pages\ListCustomers;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\Customers\RelationManagers\AddressesRelationManager;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\Customers\RelationManagers\PaymentsRelationManager;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\Customers\Schemas\CustomerForm;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\Customers\Tables\CustomersTable;
+use Adultdate\FilamentBooking\Models\Booking\Customer;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -22,11 +22,11 @@ class CustomerResource extends Resource
 {
     protected static ?string $model = Customer::class;
 
-    protected static ?string $slug = 'shop/customers';
+    protected static ?string $slug = 'booking/customers';
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static string | UnitEnum | null $navigationGroup = 'Shop';
+    protected static string | UnitEnum | null $navigationGroup = 'Booking';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-user-group';
 

@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use Adultdate\FilamentShop\PhoneQueue;
+use Adultdate\FilamentBooking\PhoneQueue;
 use Illuminate\Database\Seeder;
 
 class PhoneQueueSeeder extends Seeder

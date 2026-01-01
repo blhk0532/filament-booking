@@ -1,9 +1,9 @@
 <?php
 
-namespace Adultdate\FilamentShop\Filament\Clusters\Services\Resources\Clients\RelationManagers;
+namespace Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Clients\RelationManagers;
 
 use Akaunting\Money\Currency;
-use Adultdate\FilamentShop\Filament\Resources\Booking\Orders\OrderResource;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\Orders\OrderResource;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;

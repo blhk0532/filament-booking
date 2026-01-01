@@ -1,6 +1,6 @@
 <?php
 
-namespace Adultdate\FilamentShop\Models\Booking;
+namespace Adultdate\FilamentBooking\Models\Booking;
 
 use Database\Factories\Booking\OrderAddressFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
