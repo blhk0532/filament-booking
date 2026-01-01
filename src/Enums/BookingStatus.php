@@ -15,7 +15,7 @@ enum BookingStatus: string
     case Problem = 'problem';
     case Updated = 'updated';
     case Incomplete = 'incomplete';
-    case Completed = 'completed';
+    case Complete = 'completed';
 
     public function getLabel(): string
     {
@@ -28,7 +28,7 @@ enum BookingStatus: string
             self::Problem => 'Problem',
             self::Updated => 'Updated',
             self::Incomplete => 'Incomplete',
-            self::Completed => 'Completed',
+            self::Complete => 'Completed',
         };
     }
 

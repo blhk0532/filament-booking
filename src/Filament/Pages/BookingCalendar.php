@@ -31,4 +31,12 @@ class BookingCalendar extends Page
             BookingCalendarWidget::class,
         ];
     }
+
+//    protected function getHeaderActions(): array
+//    {
+//        return [            
+//            \Filament\Actions\CreateAction::make('create-new-booking')::make()
+//                ->label('New schedule')
+//                ->icon('heroicon-o-calendar'),];
+//    }
 }
