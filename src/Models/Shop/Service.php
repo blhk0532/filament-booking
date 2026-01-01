@@ -1,0 +1,94 @@
+<?php
+
+namespace Adultdate\FilamentShop\Models\Shop;
+
+use Adultdate\FilamentShop\Enums\ServiceStatus;
+use Adultdate\FilamentShop\Models\Comment;
+use Database\Factories\Shop\ServiceFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+
+class Service extends Model implements HasMedia
+{
+    /** @use HasFactory<ServiceFactory> */
+    use HasFactory;
+
+    use InteractsWithMedia;
+
+    /**
+     * @var string
+     */
+    protected $table = 'shop_services';
+
+    /**
+     * @var list<string>
+     */
+    protected $fillable = [
+        'name',
+        'slug',
+        'service_code',
+        'description',
+        'price',
+        'cost',
+        'is_available',
+        'time_duration',
+        'status',
+        'featured',
+        'is_visible',
+        'published_at',
+        'seo_title',
+        'seo_description',
+    ];
+
+    /**
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'featured' => 'boolean',
+        'is_visible' => 'boolean',
+        'is_available' => 'boolean',
+        'status' => ServiceStatus::class,
+        'published_at' => 'date',
+        'price' => 'decimal:2',
+        'cost' => 'decimal:2',
+    ];
+
+    /** @return BelongsTo<Brand, $this> */
+    public function brand(): BelongsTo
+    {
+        return $this->belongsTo(Brand::class, 'shop_brand_id');
+    }
+
+    /** @return BelongsToMany<Category, $this> */
+    public function categories(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class, 'shop_category_service', 'shop_service_id', 'shop_category_id')->withTimestamps();
+    }
+
+    /** @return MorphMany<Comment, $this> */
+    public function comments(): MorphMany
+    {
+        return $this->morphMany(Comment::class, 'commentable');
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this
+            ->addMediaCollection('service-images')
+            ->useDisk('service-images')
+            ->acceptsMimeTypes(['image/jpeg'])
+            ->registerMediaConversions(function (Media $media): void {
+                $this
+                    ->addMediaConversion('thumb')
+                    ->width(40)
+                    ->height(40)
+                    ->performOnCollections('service-images');
+            });
+    }
+}
