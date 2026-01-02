@@ -15,6 +15,11 @@ trait HandlesDateClick
      */
     protected bool $dateClickEnabled = false;
 
+    public function setDateClickEnabled(bool $enabled): void
+    {
+        $this->dateClickEnabled = $enabled;
+    }
+
     /**
      * Implement your date click logic here.
      *

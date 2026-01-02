@@ -90,12 +90,15 @@ class FilamentBookingServiceProvider extends PackageServiceProvider
             \Livewire\Livewire::component('adultdate.filament-booking.filament.widgets.full-calendar-widget', \Adultdate\FilamentBooking\Filament\Widgets\FullCalendarWidget::class);
             \Livewire\Livewire::component('adultdate.filament-booking.filament.widgets.booking-calendar-widget', \Adultdate\FilamentBooking\Filament\Widgets\BookingCalendarWidget::class);
             \Livewire\Livewire::component('adultdate.filament-booking.filament.widgets.event-calendar', \Adultdate\FilamentBooking\Filament\Widgets\LocationCalendarWidget::class);
+            \Livewire\Livewire::component('adultdate.filament-booking.filament.resources.booking.daily-locations.widgets.event-calendar', \Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Widgets\EventCalendar::class);
             // Register resource-scoped widget alias so Livewire can resolve
             // widgets referenced by their Filament resource path.
             \Livewire\Livewire::component(
                 'adultdate.filament-booking.filament.resources.booking.daily-locations.widgets.location-calendar-widget',
                 \Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Widgets\LocationCalendarWidget::class
             );
+            \Livewire\Livewire::component('adultdate.schedule.filament.widgets.event-calendar', \Adultdate\Schedule\Filament\Widgets\EventCalendar::class);
+
         }
 
         // Ensure views are available under the legacy namespace used across the package
@@ -107,7 +110,7 @@ class FilamentBookingServiceProvider extends PackageServiceProvider
         // Migration Publishing
         $this->publishes([
             __DIR__ . '/../database/migrations' => database_path('migrations'),
-        ], 'adultdate-filament-booking-migrations');
+        ], 'adultdate/filament-booking-migrations');
 
         // Testing
         Testable::mixin(new TestsFilamentBooking);
@@ -128,6 +131,15 @@ class FilamentBookingServiceProvider extends PackageServiceProvider
 
         if (is_dir($distPath)) {
             return [
+                // Ensure EventCalendar runtime is loaded first so it exposes a global
+                Js::make(
+                    'event-calendar-script',
+                    'https://cdn.jsdelivr.net/npm/@event-calendar/build@4.5.0/dist/event-calendar.min.js'
+                ),
+                Css::make(
+                    'event-calendar-styles',
+                    'https://cdn.jsdelivr.net/npm/@event-calendar/build@4.5.0/dist/event-calendar.min.css'
+                ),
                 // Calendar Alpine components
                 AlpineComponent::make(
                     'calendar',
@@ -145,14 +157,6 @@ class FilamentBookingServiceProvider extends PackageServiceProvider
                     'filament-fullcalendar-alpine',
                     $distPath . '/filament-fullcalendar.js'
                 ),
-                Css::make(
-                    'event-calendar-styles',
-                    'https://cdn.jsdelivr.net/npm/@event-calendar/build@4.5.0/dist/event-calendar.min.css'
-                ),
-                Js::make(
-                    'event-calendar-script',
-                    'https://cdn.jsdelivr.net/npm/@event-calendar/build@4.5.0/dist/event-calendar.min.js'
-                )
             ];
         }
 

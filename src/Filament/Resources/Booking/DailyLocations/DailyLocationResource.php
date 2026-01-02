@@ -18,7 +18,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use Adultdate\FilamentBooking\Filament\Widgets\BookingCalendarWidget;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Widgets\LocationCalendarWidget;
 
 class DailyLocationResource extends Resource
 {
@@ -67,7 +67,7 @@ class DailyLocationResource extends Resource
     public static function getWidgets(): array
     {
         return [
-            BookingCalendarWidget::class,
+            LocationCalendarWidget::class,
         ];
     }
 

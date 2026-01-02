@@ -54,13 +54,19 @@
                 eventAssetUrl: @js(FilamentAsset::getAlpineComponentSrc('calendar-event', 'adultdate/filament-booking')),
             })"
             @class(FilamentColor::getComponentClasses(ButtonComponent::class, 'primary'))
+            style="min-height:420px;"
         >
-            <div data-calendar></div>
+            <div data-calendar style="min-height:360px;">
+                <div class="p-4 text-sm text-gray-600 dark:text-gray-400">Loading calendar…</div>
+            </div>
+            {{-- Fallback: ensure the built calendar assets are loaded if FilamentAsset registration failed --}}
+            <script defer src="{{ asset('vendor/adultdate/filament-booking/calendar.js') }}"></script>
+            <script defer src="{{ asset('vendor/adultdate/filament-booking/calendar-event.js') }}"></script>
+            <script defer src="{{ asset('vendor/adultdate/filament-booking/calendar-context-menu.js') }}"></script>
             @if($this->hasContextMenu())
-                <x-filament-booking::context-menu/>
+                <x-adultdate/filament-booking::context-menu/>
             @endif
         </div>
     </x-filament::section>
         <x-filament-actions::modals/>
 </x-filament-widgets::widget>
- 

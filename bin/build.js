@@ -45,6 +45,30 @@ const defaultOptions = {
 
 compile({
     ...defaultOptions,
+    entryPoints: ['./resources/js/index.js'],
+    outfile: './resources/dist/filament-booking.js',
+})
+
+compile({
+    ...defaultOptions,
     entryPoints: ['./resources/js/calendar.js'],
-    outfile: './resources/dist/filament-fullcalendar.js',
+    outfile: './dist/js/calendar.js',
+})
+
+compile({
+    ...defaultOptions,
+    entryPoints: ['./resources/js/calendar-context-menu.js'],
+    outfile: './dist/js/calendar-context-menu.js',
+})
+
+compile({
+    ...defaultOptions,
+    entryPoints: ['./resources/js/calendar-event.js'],
+    outfile: './dist/js/calendar-event.js',
+})
+
+compile({
+    ...defaultOptions,
+    entryPoints: ['./resources/js/components/filament-fullcalendar.js'],
+    outfile: './dist/js/filament-fullcalendar.js',
 })

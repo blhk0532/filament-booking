@@ -2,17 +2,17 @@
 
 namespace Adultdate\FilamentBooking\Filament\Widgets\Concerns;
 
-use Carbon\Carbon;
 use Adultdate\FilamentBooking\FilamentBookingPlugin;
+use Carbon\Carbon;
 
 trait InteractsWithEvents
 {
     /**
-     * Triggered when the user clicks an event.
-     * @param array $event An Event Object that holds information about the event (date, title, etc).
-     * @return void
+     * Triggered when user clicks an event.
+     *
+     * @param  array  $event  An Event Object that holds information about the event (date, title, etc).
      */
-    public function onEventClick(array $event): void
+    public function onEventClickLegacy(array $event): void
     {
         if ($this->getModel()) {
             $this->record = $this->resolveRecord($event['id']);
@@ -26,15 +26,16 @@ trait InteractsWithEvents
 
     /**
      * Triggered when dragging stops and the event has moved to a different day/time.
-     * @param array $event An Event Object that holds information about the event (date, title, etc) after the drop.
-     * @param array $oldEvent An Event Object that holds information about the event before the drop.
-     * @param array $relatedEvents An array of other related Event Objects that were also dropped. An event might have other recurring event instances or might be linked to other events with the same groupId
-     * @param array $delta A Duration Object that represents the amount of time the event was moved by.
-     * @param ?array $oldResource A Resource Object that represents the previously assigned resource.
-     * @param ?array $newResource A Resource Object that represents the newly assigned resource.
+     *
+     * @param  array  $event  An Event Object that holds information about the event (date, title, etc) after the drop.
+     * @param  array  $oldEvent  An Event Object that holds information about the event before the drop.
+     * @param  array  $relatedEvents  An array of other related Event Objects that were also dropped. An event might have other recurring event instances or might be linked to other events with the same groupId
+     * @param  array  $delta  A Duration Object that represents the amount of time the event was moved by.
+     * @param  ?array  $oldResource  A Resource Object that represents the previously assigned resource.
+     * @param  ?array  $newResource  A Resource Object that represents the newly assigned resource.
      * @return bool Whether to revert the drop action.
      */
-    public function onEventDrop(array $event, array $oldEvent, array $relatedEvents, array $delta, ?array $oldResource, ?array $newResource): bool
+    public function onEventDropLegacy(array $event, array $oldEvent, array $relatedEvents, array $delta, ?array $oldResource, ?array $newResource): bool
     {
         if ($this->getModel()) {
             $this->record = $this->resolveRecord($event['id']);
@@ -55,14 +56,15 @@ trait InteractsWithEvents
 
     /**
      * Triggered when resizing stops and the event has changed in duration.
-     * @param array $event An Event Object that holds information about the event (date, title, etc) after the drop.
-     * @param array $oldEvent An Event Object that holds information about the event before the drop.
-     * @param array $relatedEvents An array of other related Event Objects that were also dropped. An event might have other recurring event instances or might be linked to other events with the same groupId
-     * @param array $startDelta A Duration Object that represents the amount of time the event’s start date was moved by.
-     * @param array $endDelta A Duration Object that represents the amount of time the event’s end date was moved by.
+     *
+     * @param  array  $event  An Event Object that holds information about the event (date, title, etc) after the drop.
+     * @param  array  $oldEvent  An Event Object that holds information about the event before the drop.
+     * @param  array  $relatedEvents  An array of other related Event Objects that were also dropped. An event might have other recurring event instances or might be linked to other events with the same groupId
+     * @param  array  $startDelta  A Duration Object that represents the amount of time the event's start date was moved by.
+     * @param  array  $endDelta  A Duration Object that represents the amount of time the event's end date was moved by.
      * @return mixed Whether to revert the resize action.
      */
-    public function onEventResize(array $event, array $oldEvent, array $relatedEvents, array $startDelta, array $endDelta): bool
+    public function onEventResizeLegacy(array $event, array $oldEvent, array $relatedEvents, array $startDelta, array $endDelta): bool
     {
         if ($this->getModel()) {
             $this->record = $this->resolveRecord($event['id']);
@@ -82,14 +84,14 @@ trait InteractsWithEvents
 
     /**
      * Triggered when a date/time selection is made (single or multiple days).
-     * @param string $start An ISO8601 string representation of the start date. It will have a timezone offset similar to the calendar’s timeZone. If selecting day cells, it won’t have a time nor timezone part.
-     * @param ?string $end An ISO8601 string representation of the end date. It will have a timezone offset similar to the calendar’s timeZone. If selecting day cells, it won’t have a time nor timezone part.
-     * @param bool $allDay Whether the selection happened on day cells.
-     * @param ?array $view A View array that contains information about a calendar view, such as title and date range.
-     * @param ?array $resource A Resource Object that represents the selected resource.
-     * @return void
+     *
+     * @param  string  $start  An ISO8601 string representation of the start date. It will have a timezone offset similar to the calendar's timeZone. If selecting day cells, it won't have a time nor timezone part.
+     * @param  ?string  $end  An ISO8601 string representation of the end date. It will have a timezone offset similar to the calendar's timeZone. If selecting day cells, it won't have a time nor timezone part.
+     * @param  bool  $allDay  Whether the selection happened on day cells.
+     * @param  ?array  $view  A View array that contains information about a calendar view, such as title and date range.
+     * @param  ?array  $resource  A Resource Object that represents the selected resource.
      */
-    public function onDateSelect(string $start, ?string $end, bool $allDay, ?array $view, ?array $resource): void
+    public function onDateSelectLegacy(string $start, ?string $end, bool $allDay, ?array $view, ?array $resource): void
     {
         [$start, $end] = $this->calculateTimezoneOffset($start, $end, $allDay);
 

@@ -2,14 +2,13 @@
 
 namespace Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Schemas;
 
-use Filament\Schemas\Schema;
+use App\Models\User;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Hidden;
 use Filament\Schemas\Components\Section;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
+use Filament\Schemas\Schema;
 
 class DailyLocationForm
 {

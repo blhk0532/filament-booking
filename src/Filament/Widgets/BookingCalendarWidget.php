@@ -2,25 +2,28 @@
 
 namespace Adultdate\FilamentBooking\Filament\Widgets;
 
+use Adultdate\FilamentBooking\Actions as BookingActions;
+use Adultdate\FilamentBooking\Concerns\CanRefreshCalendar;
+use Adultdate\FilamentBooking\Concerns\HasOptions;
+use Adultdate\FilamentBooking\Concerns\HasSchema;
+use Adultdate\FilamentBooking\Concerns\InteractsWithCalendar;
+use Adultdate\FilamentBooking\Concerns\InteractsWithEventRecord;
+use Adultdate\FilamentBooking\Contracts\HasCalendar;
 use Adultdate\FilamentBooking\Enums\BookingStatus;
 use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings\Schemas\BookingForm;
+use Adultdate\FilamentBooking\Filament\Widgets\Concerns\CanBeConfigured;
+use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithEvents;
+use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithRawJS;
+use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithRecords;
 use Adultdate\FilamentBooking\Models\Booking\Booking;
 use Adultdate\FilamentBooking\Models\Booking\BookingLocation;
 use Adultdate\FilamentBooking\Models\Booking\Client;
 use Adultdate\FilamentBooking\Models\Booking\DailyLocation;
 use Adultdate\FilamentBooking\Models\Booking\Service;
-use Adultdate\FilamentBooking\Actions as BookingActions;
-use Adultdate\FilamentBooking\Concerns\CanRefreshCalendar;
-use Adultdate\FilamentBooking\Concerns\InteractsWithCalendar;
-use Adultdate\FilamentBooking\Concerns\InteractsWithEventRecord;
-use Adultdate\FilamentBooking\Filament\Widgets\Concerns\CanBeConfigured;
-use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithEvents;
-use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithRawJS;
-use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithRecords;
-use Adultdate\FilamentBooking\Filament\Widgets\FullCalendarWidget;
 use Adultdate\FilamentBooking\ValueObjects\FetchInfo;
 use App\Models\User;
 use Carbon\Carbon;
+use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
@@ -29,22 +32,18 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Set;
-use Filament\Actions\Action;
 use Filament\Schemas\Schema as FilamentSchema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
-use Adultdate\FilamentBooking\Concerns\HasOptions;
-use Adultdate\FilamentBooking\Concerns\HasSchema;
-use Adultdate\FilamentBooking\Contracts\HasCalendar;
 
 class BookingCalendarWidget extends FullCalendarWidget implements HasCalendar
 {
     public ?int $recordId = null;
 
-    use CanBeConfigured, CanRefreshCalendar, InteractsWithEvents, InteractsWithRawJS, InteractsWithRecords, InteractsWithCalendar, InteractsWithEventRecord, HasOptions, HasSchema {
+    use CanBeConfigured, CanRefreshCalendar, HasOptions, HasSchema, InteractsWithCalendar, InteractsWithEventRecord, InteractsWithEvents, InteractsWithRawJS, InteractsWithRecords {
         // Prefer the contract-compatible refreshRecords (chainable) from CanRefreshCalendar
         CanRefreshCalendar::refreshRecords insteadof InteractsWithEvents;
 
@@ -57,10 +56,10 @@ class BookingCalendarWidget extends FullCalendarWidget implements HasCalendar
         InteractsWithEventRecord::getEloquentQuery insteadof InteractsWithRecords;
     }
     use InteractsWithEvents {
-        InteractsWithEvents::onEventClick insteadof InteractsWithCalendar;
-        InteractsWithEvents::onDateSelect insteadof InteractsWithCalendar;
-        InteractsWithEvents::onEventDrop insteadof InteractsWithCalendar;
-        InteractsWithEvents::onEventResize insteadof InteractsWithCalendar;
+        InteractsWithEvents::onEventClickLegacy insteadof InteractsWithCalendar;
+        InteractsWithEvents::onDateSelectLegacy insteadof InteractsWithCalendar;
+        InteractsWithEvents::onEventDropLegacy insteadof InteractsWithCalendar;
+        InteractsWithEvents::onEventResizeLegacy insteadof InteractsWithCalendar;
         InteractsWithEvents::refreshRecords insteadof InteractsWithCalendar;
     }
 
@@ -78,6 +77,7 @@ class BookingCalendarWidget extends FullCalendarWidget implements HasCalendar
     {
         return Booking::class;
     }
+
     public function getModelAlt(): string
     {
         return Booking::class;
@@ -464,9 +464,8 @@ class BookingCalendarWidget extends FullCalendarWidget implements HasCalendar
                     return $booking;
                 })
                 ->after(fn () => $this->dispatch('refresh-calendar'))
-                ->successNotificationTitle('Booking created successfully')
+                ->successNotificationTitle('Booking created successfully'),
 
-     
         ];
     }
 
@@ -660,6 +659,7 @@ class BookingCalendarWidget extends FullCalendarWidget implements HasCalendar
                     $record = $this->record;
                     if (! $record) {
                         logger()->warning('BookingCalendarWidget: edit action found no record', ['recordId' => $this->recordId]);
+
                         return;
                     }
 
@@ -676,8 +676,6 @@ class BookingCalendarWidget extends FullCalendarWidget implements HasCalendar
                         ->success()
                         ->send();
                 }),
-
-                
 
             \Filament\Actions\DeleteAction::make('delete')
                 ->label('Delete')

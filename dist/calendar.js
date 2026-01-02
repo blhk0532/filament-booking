@@ -1,4 +1,4 @@
-const Calendar = window.EventCalendar;
+import { Calendar } from '@fullcalendar/core';
 
 export default function calendar({
                                      view = 'dayGridMonth',
@@ -41,7 +41,6 @@ export default function calendar({
         },
 
         mountCalendar: function () {
-     
             return Calendar.create(
                 this.$el.querySelector('[data-calendar]'),
                 this.getSettings(),

@@ -5,7 +5,7 @@ namespace Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Pa
 use Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\DailyLocationResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
-use Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Widgets\LocationCalendarWidget;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Widgets\EventCalendar;
 
 class ListDailyLocations extends ListRecords
 {
@@ -21,7 +21,7 @@ class ListDailyLocations extends ListRecords
     protected function getHeaderWidgets(): array
     {
         return [
-           LocationCalendarWidget::class,
+           EventCalendar::class,
         ];
     }
 }

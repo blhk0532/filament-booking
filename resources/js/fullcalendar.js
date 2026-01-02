@@ -1,6 +1,6 @@
-const Calendar = window.EventCalendar;
+import { Calendar } from '@fullcalendar/core';
 
-export default function calendar({
+export default function fullcalendar({
                                      view = 'dayGridMonth',
                                      locale = 'en',
                                      firstDay = 1, 
@@ -41,7 +41,9 @@ export default function calendar({
         },
 
         mountCalendar: function () {
-     
+            if (typeof Calendar === 'undefined') {
+                console.error('Calendar is not defined. Please check that fullcalendar packages are properly installed.');
+            }
             return Calendar.create(
                 this.$el.querySelector('[data-calendar]'),
                 this.getSettings(),
@@ -324,3 +326,6 @@ export default function calendar({
         }
     }
 }
+
+window.realCalendar = fullcalendar;
+window.calendar = fullcalendar;

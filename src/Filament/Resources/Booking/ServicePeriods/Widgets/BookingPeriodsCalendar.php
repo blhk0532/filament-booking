@@ -1,18 +1,24 @@
 <?php
 
-namespace Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Widgets;
+namespace Adultdate\FilamentBooking\Filament\Resources\Booking\ServicePeriods\Widgets;
 
+use Adultdate\FilamentBooking\Models\BookingServicePeriod;
+use App\Models\User;
+use Filament\Widgets\Widget;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\HtmlString;
 use Adultdate\FilamentBooking\Concerns\HasEvents;
 use Adultdate\FilamentBooking\Filament\Widgets\FullCalendarWidget;
 use Adultdate\FilamentBooking\Models\Booking\DailyLocation;
 use Adultdate\FilamentBooking\ValueObjects\FetchInfo;
 use Illuminate\Database\Eloquent\Builder;
 
-class LocationCalendarWidget extends FullCalendarWidget
+class BookingPeriodsCalendar extends FullCalendarWidget
 {
     use HasEvents;
 
-    protected string $view = 'adultdate/filament-booking::calendar-widget';
+    protected string $view = 'adultdate/filament-booking::service-periods-fullcalendar';
 
     protected function getHeading(): ?string
     {

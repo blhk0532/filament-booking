@@ -207,7 +207,7 @@ final class LocationCalendarWidget extends FullCalendarWidget implements HasActi
             ->get();
 
       $locationEvents = $dailyLocations->map(function (DailyLocation $loc) {
-            $title = $loc->location ?: ($loc->serviceUser?->name ?? 'Location');
+      $title = $loc->location ?: ($loc->serviceUser?->name ?? 'Location');
 
             return [
                 'id' => 'location-'.$loc->id,

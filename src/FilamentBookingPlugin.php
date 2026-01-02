@@ -6,6 +6,8 @@ use Closure;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 use Filament\Support\Assets\AlpineComponent;
+use Filament\Support\Assets\Css;
+use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
 use Filament\Navigation\NavigationGroup;
 use Filament\Support\Concerns\EvaluatesClosures;
@@ -20,6 +22,8 @@ use Adultdate\FilamentBooking\Filament\Widgets\LatestOrders;
 use Adultdate\FilamentBooking\Filament\Widgets\OrdersChart;
 use Adultdate\FilamentBooking\Filament\Widgets\StatsOverviewWidget;
 use Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\DailyLocationResource;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\ServicePeriods\BookingServicePeriodResource;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Widgets\EventCalendar;
 
 class FilamentBookingPlugin implements Plugin
 {
@@ -47,6 +51,10 @@ class FilamentBookingPlugin implements Plugin
     public function register(Panel $panel): void
     {
         $panel
+            ->assets([
+                Js::make('event-calendar', 'https://cdn.jsdelivr.net/npm/@event-calendar/build@4.5.0/dist/event-calendar.min.js'),
+                Css::make('event-calendar', 'https://cdn.jsdelivr.net/npm/@event-calendar/build@4.5.0/dist/event-calendar.min.css'),
+            ])
             ->discoverClusters(in: app_path('../vendor/adultdate/filament-booking/src/Filament/Clusters'), for: 'Adultdate\\FilamentBooking\\Filament\\Clusters')
             ->databaseNotifications()
             ->pages([
@@ -56,6 +64,7 @@ class FilamentBookingPlugin implements Plugin
                 CustomerResource::class,
                 OrderResource::class,
                 DailyLocationResource::class,
+                BookingServicePeriodResource::class,
             ])
             ->widgets([
                 BookingCalendarWidget::class,
@@ -63,6 +72,7 @@ class FilamentBookingPlugin implements Plugin
                 LatestOrders::class,
                 OrdersChart::class,
                 StatsOverviewWidget::class,
+                EventCalendar::class,
             ]);
 
         FilamentAsset::register([

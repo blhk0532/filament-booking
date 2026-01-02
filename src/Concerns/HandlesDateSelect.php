@@ -14,6 +14,11 @@ trait HandlesDateSelect
      */
     protected bool $dateSelectEnabled = false;
 
+    public function setDateSelectEnabled(bool $enabled): void
+    {
+        $this->dateSelectEnabled = $enabled;
+    }
+
     /**
      * Implement your date select logic here.
      *
