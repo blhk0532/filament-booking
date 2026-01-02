@@ -1,4 +1,4 @@
-export default function calendar({
+export default function fullcalendar({
                                      view = 'dayGridMonth',
                                      locale = 'en',
                                      firstDay = 1, 

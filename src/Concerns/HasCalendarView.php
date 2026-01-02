@@ -1,8 +1,8 @@
 <?php
 
-namespace Adultdate\Schedule\Concerns;
+namespace Adultdate\FilamentBooking\Concerns;
 
-use Adultdate\Schedule\Enums\CalendarViewType;
+use Adultdate\FilamentBooking\Enums\CalendarViewType;
 
 trait HasCalendarView
 {

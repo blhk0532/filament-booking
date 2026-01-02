@@ -1,9 +1,9 @@
 <?php
 
-namespace Adultdate\Schedule\Concerns;
+namespace Adultdate\FilamentBooking\Concerns;
 
-use Adultdate\Schedule\Enums\Context;
-use Adultdate\Schedule\ValueObjects\EventClickInfo;
+use Adultdate\FilamentBooking\Enums\Context;
+use Adultdate\FilamentBooking\ValueObjects\EventClickInfo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 

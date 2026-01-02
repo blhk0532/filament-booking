@@ -1,8 +1,8 @@
 <?php
 
-namespace Adultdate\Schedule\Concerns;
+namespace Adultdate\FilamentBooking\Concerns;
 
-use Adultdate\Schedule\Attributes\CalendarEventContent;
+use Adultdate\FilamentBooking\Attributes\CalendarEventContent;
 use Illuminate\Contracts\Support\Htmlable;
 use ReflectionClass;
 

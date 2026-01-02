@@ -1,6 +1,6 @@
 <?php
 
-namespace Adultdate\Schedule\Concerns;
+namespace Adultdate\FilamentBooking\Concerns;
 
 use Illuminate\Support\HtmlString;
 
@@ -15,7 +15,7 @@ trait HasHeading
         }
 
         if ($this->heading === true) {
-            return __('adultdate-booking::translations.heading');
+            return __('filament-booking::translations.heading');
         }
 
         return $this->heading;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Adultdate\Schedule\ValueObjects;
+namespace Adultdate\FilamentBooking\ValueObjects;
 
 use Carbon\Carbon;
 use Filament\Support\Facades\FilamentTimezone;
@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
-use function Adultdate\Schedule\utc_to_user_local_time;
+use function Adultdate\FilamentBooking\utc_to_user_local_time;
 
 class CalendarEvent
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace Adultdate\Schedule\Contracts;
+namespace Adultdate\FilamentBooking\Contracts;
 
-use Adultdate\Schedule\Enums\Context;
+use Adultdate\FilamentBooking\Enums\Context;
 
 interface ContextualInfo
 {

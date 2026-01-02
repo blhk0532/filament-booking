@@ -1,9 +1,9 @@
 <?php
 
-namespace Adultdate\Schedule\Concerns;
+namespace Adultdate\FilamentBooking\Concerns;
 
-use Adultdate\Schedule\Contracts\Resourceable;
-use Adultdate\Schedule\ValueObjects\CalendarResource;
+use Adultdate\FilamentBooking\Contracts\Resourceable;
+use Adultdate\FilamentBooking\ValueObjects\CalendarResource;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 

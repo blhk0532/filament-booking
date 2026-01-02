@@ -1,6 +1,6 @@
 <?php
 
-namespace Adultdate\Schedule\Filament\Widgets\Concerns;
+namespace Adultdate\FilamentBooking\Filament\Widgets\Concerns;
 
 trait IsBackwardCompatible
 {

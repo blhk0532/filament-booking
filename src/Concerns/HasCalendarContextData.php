@@ -1,15 +1,15 @@
 <?php
 
-namespace Adultdate\Schedule\Concerns;
+namespace Adultdate\FilamentBooking\Concerns;
 
-use Adultdate\Schedule\Contracts\ContextualInfo;
-use Adultdate\Schedule\Enums\Context;
-use Adultdate\Schedule\ValueObjects\DateClickInfo;
-use Adultdate\Schedule\ValueObjects\DateSelectInfo;
-use Adultdate\Schedule\ValueObjects\EventClickInfo;
-use Adultdate\Schedule\ValueObjects\EventDropInfo;
-use Adultdate\Schedule\ValueObjects\EventResizeInfo;
-use Adultdate\Schedule\ValueObjects\NoEventsClickInfo;
+use Adultdate\FilamentBooking\Contracts\ContextualInfo;
+use Adultdate\FilamentBooking\Enums\Context;
+use Adultdate\FilamentBooking\ValueObjects\DateClickInfo;
+use Adultdate\FilamentBooking\ValueObjects\DateSelectInfo;
+use Adultdate\FilamentBooking\ValueObjects\EventClickInfo;
+use Adultdate\FilamentBooking\ValueObjects\EventDropInfo;
+use Adultdate\FilamentBooking\ValueObjects\EventResizeInfo;
+use Adultdate\FilamentBooking\ValueObjects\NoEventsClickInfo;
 
 trait HasCalendarContextData
 {

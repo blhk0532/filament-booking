@@ -1,9 +1,9 @@
 <?php
 
-namespace Adultdate\Schedule\Concerns;
+namespace Adultdate\FilamentBooking\Concerns;
 
 use Filament\Actions\Action;
-use Adultdate\Schedule\Enums\Context;
+use Adultdate\FilamentBooking\Enums\Context;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 

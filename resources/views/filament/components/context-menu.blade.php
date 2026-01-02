@@ -1,13 +1,13 @@
 @php
     use Filament\Support\Facades\FilamentAsset;
-    use Adultdate\Schedule\Enums\Context;
+    use Adultdate\FilamentBooking\Enums\Context;
 
     use function Filament\Support\generate_loading_indicator_html;
 @endphp
 
 <div x-ignore
      x-load
-     x-load-src="{{ FilamentAsset::getAlpineComponentSrc('calendar-context-menu', 'adultdate-schedule') }}"
+     x-load-src="{{ FilamentAsset::getAlpineComponentSrc('calendar-context-menu', 'adultdate/filament-booking') }}"
      x-data="calendarContextMenu({
             getContextMenuActionsUsing: async (context, data) => {
                 return await $wire.getContextMenuActionsUsing(context, data)

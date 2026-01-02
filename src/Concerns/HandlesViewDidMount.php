@@ -1,8 +1,8 @@
 <?php
 
-namespace Adultdate\Schedule\Concerns;
+namespace Adultdate\FilamentBooking\Concerns;
 
-use Adultdate\Schedule\ValueObjects\ViewDidMountInfo;
+use Adultdate\FilamentBooking\ValueObjects\ViewDidMountInfo;
 
 trait HandlesViewDidMount
 {

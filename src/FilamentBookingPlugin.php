@@ -5,6 +5,8 @@ namespace Adultdate\FilamentBooking;
 use Closure;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use Filament\Support\Assets\AlpineComponent;
+use Filament\Support\Facades\FilamentAsset;
 use Filament\Navigation\NavigationGroup;
 use Filament\Support\Concerns\EvaluatesClosures;
 use Adultdate\FilamentBooking\Filament\Clusters\Products\ProductsCluster;
@@ -62,6 +64,13 @@ class FilamentBookingPlugin implements Plugin
                 OrdersChart::class,
                 StatsOverviewWidget::class,
             ]);
+
+        FilamentAsset::register([
+            AlpineComponent::make('calendar', __DIR__ . '/../dist/js/calendar.js'),
+            AlpineComponent::make('calendar-context-menu', __DIR__ . '/../dist/js/calendar-context-menu.js'),
+            AlpineComponent::make('calendar-event', __DIR__ . '/../dist/js/calendar-event.js'),
+            AlpineComponent::make('filament-fullcalendar-alpine', __DIR__ . '/../dist/js/filament-fullcalendar.js'),
+        ], 'adultdate/filament-booking');
     }
 
     public function boot(Panel $panel): void

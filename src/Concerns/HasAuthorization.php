@@ -1,6 +1,6 @@
 <?php
 
-namespace Adultdate\Schedule\Concerns;
+namespace Adultdate\FilamentBooking\Concerns;
 
 use Illuminate\Auth\Access\Response;
 use Illuminate\Database\Eloquent\Model;

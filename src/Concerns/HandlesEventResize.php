@@ -1,9 +1,9 @@
 <?php
 
-namespace Adultdate\Schedule\Concerns;
+namespace Adultdate\FilamentBooking\Concerns;
 
-use Adultdate\Schedule\Enums\Context;
-use Adultdate\Schedule\ValueObjects\EventResizeInfo;
+use Adultdate\FilamentBooking\Enums\Context;
+use Adultdate\FilamentBooking\ValueObjects\EventResizeInfo;
 use Illuminate\Database\Eloquent\Model;
 
 trait HandlesEventResize

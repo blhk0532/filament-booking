@@ -1,10 +1,10 @@
 <?php
 
-namespace Adultdate\Schedule\Concerns;
+namespace Adultdate\FilamentBooking\Concerns;
 
-use Adultdate\Schedule\Contracts\Eventable;
-use Adultdate\Schedule\ValueObjects\CalendarEvent;
-use Adultdate\Schedule\ValueObjects\FetchInfo;
+use Adultdate\FilamentBooking\Contracts\Eventable;
+use Adultdate\FilamentBooking\ValueObjects\CalendarEvent;
+use Adultdate\FilamentBooking\ValueObjects\FetchInfo;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 

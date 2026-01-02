@@ -1,11 +1,11 @@
 <?php
 
-namespace Adultdate\Schedule;
+namespace Adultdate\FilamentBooking;
 
 use Carbon\CarbonImmutable;
 use Filament\Support\Facades\FilamentTimezone;
 
-if (! function_exists('Adultdate\Schedule\browser_date_to_user_date')) {
+if (! function_exists('Adultdate\FilamentBooking\browser_date_to_user_date')) {
     /**
      * The underlying EventCalendar does not support timezones and thus all times in the calendar
      * are provided in either UTC or their local browser locale.
@@ -24,7 +24,7 @@ if (! function_exists('Adultdate\Schedule\browser_date_to_user_date')) {
     }
 }
 
-if (! function_exists('Adultdate\Schedule\browser_date_to_app_date')) {
+if (! function_exists('Adultdate\FilamentBooking\browser_date_to_app_date')) {
     /**
      * The underlying EventCalendar does not support timezones and thus all times in the calendar
      * are provided in either UTC or their local browser locale.
@@ -43,7 +43,7 @@ if (! function_exists('Adultdate\Schedule\browser_date_to_app_date')) {
     }
 }
 
-if (! function_exists('Adultdate\Schedule\utc_to_user_local_time')) {
+if (! function_exists('Adultdate\FilamentBooking\utc_to_user_local_time')) {
     /**
      * The underlying EventCalendar does not support timezones and thus all times in the calendar
      * are provided in either UTC or their local browser locale.
@@ -74,7 +74,7 @@ if (! function_exists('Adultdate\Schedule\utc_to_user_local_time')) {
     }
 }
 
-if (! function_exists('Adultdate\Schedule\array_merge_recursive_unique')) {
+if (! function_exists('Adultdate\FilamentBooking\array_merge_recursive_unique')) {
     function array_merge_recursive_unique(array $array1, array $array2): array
     {
         foreach ($array2 as $key => $value) {

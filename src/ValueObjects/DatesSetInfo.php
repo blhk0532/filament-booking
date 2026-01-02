@@ -1,10 +1,10 @@
 <?php
 
-namespace Adultdate\Schedule\ValueObjects;
+namespace Adultdate\FilamentBooking\ValueObjects;
 
 use Carbon\CarbonImmutable;
 
-use function Adultdate\Schedule\utc_to_user_local_time;
+use function Adultdate\FilamentBooking\utc_to_user_local_time;
 
 readonly class DatesSetInfo
 {

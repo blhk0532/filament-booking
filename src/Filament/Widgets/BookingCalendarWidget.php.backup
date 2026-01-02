@@ -8,16 +8,16 @@ use Adultdate\FilamentBooking\Models\Booking\BookingLocation;
 use Adultdate\FilamentBooking\Models\Booking\BookingSchedule;
 use Adultdate\FilamentBooking\Models\Booking\Client;
 use Adultdate\FilamentBooking\Models\Booking\Service;
-use Adultdate\Schedule\Actions;
-use Adultdate\Schedule\Concerns\CanRefreshCalendar;
-use Adultdate\Schedule\Concerns\HasHeaderActions;
-use Adultdate\Schedule\Concerns\HasSchema;
-use Adultdate\Schedule\Concerns\InteractsWithCalendar;
-use Adultdate\Schedule\Concerns\InteractsWithEventRecord;
-use Adultdate\Schedule\Filament\Widgets\Concerns\CanBeConfigured;
-use Adultdate\Schedule\Filament\Widgets\Concerns\InteractsWithRawJS;
-use Adultdate\Schedule\Filament\Widgets\FullCalendarWidget;
-use Adultdate\Schedule\ValueObjects\FetchInfo;
+use Adultdate\FilamentBooking\Actions;
+use Adultdate\FilamentBooking\Concerns\CanRefreshCalendar;
+use Adultdate\FilamentBooking\Concerns\HasHeaderActions;
+use Adultdate\FilamentBooking\Concerns\HasSchema;
+use Adultdate\FilamentBooking\Concerns\InteractsWithCalendar;
+use Adultdate\FilamentBooking\Concerns\InteractsWithEventRecord;
+use Adultdate\FilamentBooking\Filament\Widgets\Concerns\CanBeConfigured;
+use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithRawJS;
+use Adultdate\FilamentBooking\Filament\Widgets\FullCalendarWidget;
+use Adultdate\FilamentBooking\ValueObjects\FetchInfo;
 use App\Models\User;
 use Carbon\Carbon;
 use Filament\Actions\Action;
@@ -35,7 +35,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
-class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Schedule\Contracts\HasCalendar
+class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\FilamentBooking\Contracts\HasCalendar
 {
     use CanBeConfigured;
     use CanRefreshCalendar;

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-class Comment extends Model
+class BookingComment extends Model
 {
     /** @use HasFactory<CommentFactory> */
     use HasFactory;

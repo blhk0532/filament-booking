@@ -1,6 +1,6 @@
 @php
     use Filament\Support\Facades\FilamentAsset;
-    use Adultdate\Schedule\Enums\Context;
+    use Adultdate\FilamentBooking\Enums\Context;
     use Filament\Support\Facades\FilamentColor;
     use Filament\Support\View\Components\ButtonComponent;
 @endphp
@@ -27,7 +27,7 @@
         <div
             wire:ignore
             x-load
-            x-load-src="{{ FilamentAsset::getAlpineComponentSrc('calendar', 'adultdate-schedule') }}"
+            x-load-src="{{ FilamentAsset::getAlpineComponentSrc('calendar', 'adultdate/filament-booking') }}"
             x-data="calendar({
                 view: @js($this->getCalendarView()),
                 locale: @js($this->getLocale()),
@@ -51,17 +51,17 @@
                 resourceLabelContent: @js($this->getResourceLabelContentJs()),
                 theme: @js($this->getTheme()),
                 options: @js($this->getOptions()),
-                eventAssetUrl: @js(FilamentAsset::getAlpineComponentSrc('calendar-event', 'adultdate-schedule')),
+                eventAssetUrl: @js(FilamentAsset::getAlpineComponentSrc('calendar-event', 'adultdate/filament-booking')),
             })"
             @class(FilamentColor::getComponentClasses(ButtonComponent::class, 'primary'))
         >
             <div data-calendar></div>
             {{-- Fallback: ensure the built calendar assets are loaded if FilamentAsset registration failed --}}
-            <script defer src="{{ asset('vendor/adultdate-schedule/calendar.js') }}"></script>
-            <script defer src="{{ asset('vendor/adultdate-schedule/calendar-event.js') }}"></script>
-            <script defer src="{{ asset('vendor/adultdate-schedule/calendar-context-menu.js') }}"></script>
+            <script defer src="{{ asset('vendor/adultdate/filament-booking/calendar.js') }}"></script>
+            <script defer src="{{ asset('vendor/adultdate/filament-booking/calendar-event.js') }}"></script>
+            <script defer src="{{ asset('vendor/adultdate/filament-booking/calendar-context-menu.js') }}"></script>
             @if($this->hasContextMenu())
-                <x-adultdate-schedule::context-menu/>
+                <x-adultdate/filament-booking::context-menu/>
             @endif
         </div>
     </x-filament::section>

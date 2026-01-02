@@ -1,10 +1,8 @@
 <?php
 
-namespace Adultdate\Schedule\ValueObjects;
-
+namespace Adultdate\FilamentBooking\ValueObjects;
+use Filament\Support\Facades\FilamentTimezone;
 use Carbon\CarbonImmutable;
-
-use function Adultdate\Schedule\browser_date_to_app_date;
 
 readonly class FetchInfo
 {
@@ -22,3 +20,22 @@ readonly class FetchInfo
         $this->end = browser_date_to_app_date(CarbonImmutable::make($data['endStr']));
     }
 }
+
+
+    function browser_date_to_app_date(CarbonImmutable | string $date): CarbonImmutable
+    {
+        if (is_string($date)) {
+            $date = CarbonImmutable::make($date);
+        }
+
+        return browser_date_to_user_date($date)->setTimezone(config('app.timezone'));
+    }
+
+    function browser_date_to_user_date(CarbonImmutable | string $date): CarbonImmutable
+    {
+        if (is_string($date)) {
+            $date = CarbonImmutable::make($date);
+        }
+
+        return $date->shiftTimezone(FilamentTimezone::get());
+    }

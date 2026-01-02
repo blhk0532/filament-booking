@@ -1,12 +1,12 @@
 <?php
 
-namespace Adultdate\Schedule\Concerns;
+namespace Adultdate\FilamentBooking\Concerns;
 
 use Filament\Actions\Action;
-use Adultdate\Schedule\Filament\Actions\CreateAction;
-use Adultdate\Schedule\Filament\Actions\DeleteAction;
-use Adultdate\Schedule\Filament\Actions\EditAction;
-use Adultdate\Schedule\Filament\Actions\ViewAction;
+use Adultdate\FilamentBooking\Filament\Actions\CreateAction;
+use Adultdate\FilamentBooking\Filament\Actions\DeleteAction;
+use Adultdate\FilamentBooking\Filament\Actions\EditAction;
+use Adultdate\FilamentBooking\Filament\Actions\ViewAction;
 use Illuminate\Support\Str;
 
 trait HasDefaultActions
@@ -59,13 +59,13 @@ trait HasDefaultActions
     {
         // Cache common create actions used by the calendar widgets.
         try {
-            $this->cacheAction($this->createAction(\Adultdate\Schedule\Models\Meeting::class, 'ctxCreateMeeting'));
+            $this->cacheAction($this->createAction(\Adultdate\FilamentBooking\Models\Meeting::class, 'ctxCreateMeeting'));
         } catch (\Throwable $e) {
             // Swallow - caching is best-effort during boot.
         }
 
         try {
-            $this->cacheAction($this->createAction(\Adultdate\Schedule\Models\Sprint::class, 'ctxCreateSprint'));
+            $this->cacheAction($this->createAction(\Adultdate\FilamentBooking\Models\Sprint::class, 'ctxCreateSprint'));
         } catch (\Throwable $e) {
             // Swallow
         }

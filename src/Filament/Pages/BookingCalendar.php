@@ -12,7 +12,7 @@ class BookingCalendar extends Page
 {
     protected string $view = 'filament-booking::pages.booking-calendar';
 
-    protected static ?string $navigationLabel = 'Booking Calendar';
+    protected static ?string $navigationLabel = 'Calendar';
 
     protected static BackedEnum | string | null $navigationIcon = 'heroicon-o-calendar';
 

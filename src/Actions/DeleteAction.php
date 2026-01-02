@@ -1,9 +1,9 @@
 <?php
 
-namespace Adultdate\Schedule\Actions;
+namespace Adultdate\FilamentBooking\Actions;
 
 use Filament\Actions\DeleteAction as BaseDeleteAction;
-use Adultdate\Schedule\Filament\Widgets\FullCalendarWidget;
+use Adultdate\FilamentBooking\Filament\Widgets\FullCalendarWidget;
 
 class DeleteAction extends BaseDeleteAction
 {

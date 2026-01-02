@@ -1,6 +1,6 @@
 <?php
 
-namespace Adultdate\Schedule\ValueObjects;
+namespace Adultdate\FilamentBooking\ValueObjects;
 
 readonly class ViewDidMountInfo
 {

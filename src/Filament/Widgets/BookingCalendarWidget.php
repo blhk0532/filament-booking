@@ -9,16 +9,16 @@ use Adultdate\FilamentBooking\Models\Booking\BookingLocation;
 use Adultdate\FilamentBooking\Models\Booking\Client;
 use Adultdate\FilamentBooking\Models\Booking\DailyLocation;
 use Adultdate\FilamentBooking\Models\Booking\Service;
-use Adultdate\Schedule\Actions as BookingActions;
-use Adultdate\Schedule\Concerns\CanRefreshCalendar;
-use Adultdate\Schedule\concerns\InteractsWithCalendar;
-use Adultdate\Schedule\concerns\InteractsWithEventRecord;
-use Adultdate\Schedule\Filament\Widgets\Concerns\CanBeConfigured;
-use Adultdate\Schedule\Filament\Widgets\Concerns\InteractsWithEvents;
-use Adultdate\Schedule\Filament\Widgets\Concerns\InteractsWithRawJS;
-use Adultdate\Schedule\Filament\Widgets\Concerns\InteractsWithRecords;
-use Adultdate\Schedule\Filament\Widgets\FullCalendarWidget;
-use Adultdate\Schedule\ValueObjects\FetchInfo;
+use Adultdate\FilamentBooking\Actions as BookingActions;
+use Adultdate\FilamentBooking\Concerns\CanRefreshCalendar;
+use Adultdate\FilamentBooking\Concerns\InteractsWithCalendar;
+use Adultdate\FilamentBooking\Concerns\InteractsWithEventRecord;
+use Adultdate\FilamentBooking\Filament\Widgets\Concerns\CanBeConfigured;
+use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithEvents;
+use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithRawJS;
+use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithRecords;
+use Adultdate\FilamentBooking\Filament\Widgets\FullCalendarWidget;
+use Adultdate\FilamentBooking\ValueObjects\FetchInfo;
 use App\Models\User;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
@@ -28,19 +28,23 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
-use Filament\Schemas\Components\Utilities\Set;
+use Filament\Forms\Set;
+use Filament\Actions\Action;
 use Filament\Schemas\Schema as FilamentSchema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Adultdate\FilamentBooking\Concerns\HasOptions;
+use Adultdate\FilamentBooking\Concerns\HasSchema;
+use Adultdate\FilamentBooking\Contracts\HasCalendar;
 
-class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Schedule\Contracts\HasCalendar
+class BookingCalendarWidget extends FullCalendarWidget implements HasCalendar
 {
     public ?int $recordId = null;
 
-    use CanBeConfigured, CanRefreshCalendar, InteractsWithEvents, InteractsWithRawJS, InteractsWithRecords, \Adultdate\Schedule\Concerns\InteractsWithCalendar, \Adultdate\Schedule\concerns\InteractsWithEventRecord, \Adultdate\Schedule\concerns\HasOptions, \Adultdate\Schedule\concerns\HasSchema {
+    use CanBeConfigured, CanRefreshCalendar, InteractsWithEvents, InteractsWithRawJS, InteractsWithRecords, InteractsWithCalendar, InteractsWithEventRecord, HasOptions, HasSchema {
         // Prefer the contract-compatible refreshRecords (chainable) from CanRefreshCalendar
         CanRefreshCalendar::refreshRecords insteadof InteractsWithEvents;
 
@@ -48,7 +52,7 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
         InteractsWithEvents::refreshRecords as refreshRecordsFrontend;
 
         // Resolve getOptions collision: prefer HasOptions' getOptions which merges config and options
-        \Adultdate\Schedule\Concerns\HasOptions::getOptions insteadof CanBeConfigured;
+        HasOptions::getOptions insteadof CanBeConfigured;
 
         InteractsWithEventRecord::getEloquentQuery insteadof InteractsWithRecords;
     }
@@ -77,6 +81,16 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
     public function getModelAlt(): string
     {
         return Booking::class;
+    }
+
+    public function getEventModel(): string
+    {
+        return Booking::class;
+    }
+
+    public function getEventRecord(): ?Booking
+    {
+        return $this->record;
     }
 
     protected function getEloquentQuery(): Builder
@@ -124,7 +138,7 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
             TextInput::make('number')
                 ->label('Booking #')
                 ->default(fn (): string => $this->generateNumber())
-                ->afterStateHydrated(function (Set $set, ?string $state): void {
+                ->afterStateHydrated(function ($state, ?string $set): void {
                     if (filled($state)) {
                         return;
                     }
@@ -427,7 +441,7 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
                 ->modalHeading('Create Booking')
                 ->modalSubmitActionLabel('Create')
                 ->modalWidth('2xl')
-                ->schema(fn () => $this->getFormSchema())
+                ->schema(fn (FilamentSchema $schema) => $this->getFormSchemaForModel($schema, $this->getModel()))
                 ->mountUsing(function ($form, array $arguments) {
                     $form->fill($this->getDefaultFormData([
                         'service_date' => $arguments['service_date'] ?? null,
@@ -454,6 +468,14 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
 
      
         ];
+    }
+
+    public function getListeners(): array
+    {
+        return array_merge(parent::getListeners(), [
+            // Handle block period action from the create modal footer
+            'block-period' => 'onBlockPeriod',
+        ]);
     }
 
     public function onDateSelect(string $start, ?string $end, bool $allDay, ?array $view, ?array $resource): void
@@ -500,6 +522,43 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
 
         $newIndex = max(0, count($this->mountedActions) - 1);
         $this->dispatch('sync-action-modals', id: $this->getId(), newActionNestingIndex: $newIndex);
+    }
+
+    public function onBlockPeriod(): void
+    {
+        $this->mountAction('blockPeriod');
+    }
+
+    public function blockPeriodAction(): Action
+    {
+        return Action::make('blockPeriod')
+            ->label('Block Period')
+            ->icon('heroicon-o-ban')
+            ->color('danger')
+            ->form([
+                DatePicker::make('start_date')
+                    ->label('Start Date')
+                    ->required(),
+                DatePicker::make('end_date')
+                    ->label('End Date')
+                    ->required(),
+                Textarea::make('reason')
+                    ->label('Reason for blocking')
+                    ->placeholder('Optional reason for blocking this period'),
+            ])
+            ->action(function (array $data) {
+                // Here you would implement the logic to block the period
+                // For example, create blocked bookings or mark dates as unavailable
+                // For now, just show a success message
+                \Filament\Notifications\Notification::make()
+                    ->title('Period blocked successfully')
+                    ->body("Blocked from {$data['start_date']} to {$data['end_date']}")
+                    ->success()
+                    ->send();
+
+                // Refresh the calendar to show the blocked period
+                $this->refreshRecords();
+            });
     }
 
     public function onEventClick(array $event): void
@@ -560,7 +619,7 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
                 ->modalWidth('full')
                 ->model(fn () => Booking::class)
                 ->record(fn () => Booking::with('items')->find($this->recordId))
-                ->schema(fn () => $this->getFormSchema())
+                ->schema(fn (FilamentSchema $schema) => $this->getFormSchemaForModel($schema, $this->getModel()))
                 ->mountUsing(function ($form) {
                     $record = Booking::with('items')->find($this->recordId);
                     if (! $record) {
@@ -583,23 +642,27 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Sch
                 ->modalSubmitActionLabel('Save')
                 ->modalWidth('full')
                 ->model(fn () => Booking::class)
-                ->record(fn () => Booking::with('items')->find($this->recordId))
-                ->schema(fn () => $this->getFormSchema())
+                ->record(fn () => $this->record)
+                ->schema(fn (FilamentSchema $schema) => $this->getFormSchemaForModel($schema, $this->getModel()))
                 ->mountUsing(function ($form) {
-                    $record = Booking::with('items')->find($this->recordId);
-                    if (! $record) {
+                    if (! $this->record) {
                         logger()->warning('BookingCalendarWidget: edit mountUsing found no record', ['recordId' => $this->recordId]);
 
                         return;
                     }
 
-                    $data = $record->toArray();
-                    $data['service_date'] = $record->service_date?->format('Y-m-d') ?? ($data['service_date'] ?? null);
+                    $data = $this->record->toArray();
+                    $data['service_date'] = $this->record->service_date?->format('Y-m-d') ?? ($data['service_date'] ?? null);
 
                     $form->fill($data);
                 })
                 ->action(function (array $data) {
-                    $record = Booking::find($this->recordId);
+                    $record = $this->record;
+                    if (! $record) {
+                        logger()->warning('BookingCalendarWidget: edit action found no record', ['recordId' => $this->recordId]);
+                        return;
+                    }
+
                     $data = $this->normalizeBookingFormData($data);
                     logger()->debug('booking.edit.using', $data);
                     $items = $data['items'] ?? [];

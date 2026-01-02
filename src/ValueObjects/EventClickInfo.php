@@ -1,9 +1,9 @@
 <?php
 
-namespace Adultdate\Schedule\ValueObjects;
+namespace Adultdate\FilamentBooking\ValueObjects;
 
-use Adultdate\Schedule\Contracts\ContextualInfo;
-use Adultdate\Schedule\Enums\Context;
+use Adultdate\FilamentBooking\Contracts\ContextualInfo;
+use Adultdate\FilamentBooking\Enums\Context;
 use Illuminate\Database\Eloquent\Model;
 
 readonly class EventClickInfo implements ContextualInfo

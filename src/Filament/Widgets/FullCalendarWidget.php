@@ -22,7 +22,7 @@ class FullCalendarWidget extends Widget implements HasForms, HasActions
     /**
      * Blade view used by this widget (NON-static in Filament v3)
      */
-    protected string $view = 'adultdate-booking::fullcalendar';
+    protected string $view = 'filament-booking::fullcalendar';
     protected static ?int $sort = 4;
     /**
      * Widget width

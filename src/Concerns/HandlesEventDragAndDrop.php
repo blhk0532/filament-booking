@@ -1,9 +1,9 @@
 <?php
 
-namespace Adultdate\Schedule\Concerns;
+namespace Adultdate\FilamentBooking\Concerns;
 
-use Adultdate\Schedule\Enums\Context;
-use Adultdate\Schedule\ValueObjects\EventDropInfo;
+use Adultdate\FilamentBooking\Enums\Context;
+use Adultdate\FilamentBooking\ValueObjects\EventDropInfo;
 use Illuminate\Database\Eloquent\Model;
 
 trait HandlesEventDragAndDrop

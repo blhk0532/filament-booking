@@ -1,6 +1,6 @@
 <?php
 
-namespace Adultdate\Schedule\Concerns;
+namespace Adultdate\FilamentBooking\Concerns;
 
 trait HasOptions
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace Adultdate\Schedule\Contracts;
+namespace Adultdate\FilamentBooking\Contracts;
 
-use Adultdate\Schedule\ValueObjects\CalendarResource;
+use Adultdate\FilamentBooking\ValueObjects\CalendarResource;
 
 interface Resourceable
 {

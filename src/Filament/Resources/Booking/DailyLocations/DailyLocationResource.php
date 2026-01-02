@@ -18,6 +18,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Adultdate\FilamentBooking\Filament\Widgets\BookingCalendarWidget;
 
 class DailyLocationResource extends Resource
 {
@@ -25,9 +26,9 @@ class DailyLocationResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'location';
 
-    protected static ?string $navigationLabel = 'Daily locations';
+    protected static ?string $navigationLabel = 'Locations';
 
-    protected static string | UnitEnum | null $navigationGroup = 'Services';
+    protected static string | UnitEnum | null $navigationGroup = 'Bookings';
 
     protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
@@ -60,6 +61,13 @@ class DailyLocationResource extends Resource
     {
         return [
             //
+        ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            BookingCalendarWidget::class,
         ];
     }
 

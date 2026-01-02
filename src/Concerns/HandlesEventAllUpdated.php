@@ -1,8 +1,8 @@
 <?php
 
-namespace Adultdate\Schedule\Concerns;
+namespace Adultdate\FilamentBooking\Concerns;
 
-use Adultdate\Schedule\ValueObjects\EventAllUpdatedInfo;
+use Adultdate\FilamentBooking\ValueObjects\EventAllUpdatedInfo;
 
 trait HandlesEventAllUpdated
 {

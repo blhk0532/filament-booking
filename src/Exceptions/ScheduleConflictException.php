@@ -1,6 +1,6 @@
 <?php
 
-namespace Adultdate\Schedule\Exceptions;
+namespace Adultdate\FilamentBooking\Exceptions;
 
 class ScheduleConflictException extends ZapException
 {

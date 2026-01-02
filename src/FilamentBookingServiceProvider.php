@@ -74,11 +74,6 @@ class FilamentBookingServiceProvider extends PackageServiceProvider
     public function packageBooted(): void
     {
         // Asset Registration
-        FilamentAsset::register(
-            $this->getAssets(),
-            $this->getAssetPackageName()
-        );
-
         FilamentAsset::registerScriptData(
             $this->getScriptData(),
             $this->getAssetPackageName()
@@ -94,6 +89,19 @@ class FilamentBookingServiceProvider extends PackageServiceProvider
         if (class_exists('\Livewire\Livewire')) {
             \Livewire\Livewire::component('adultdate.filament-booking.filament.widgets.full-calendar-widget', \Adultdate\FilamentBooking\Filament\Widgets\FullCalendarWidget::class);
             \Livewire\Livewire::component('adultdate.filament-booking.filament.widgets.booking-calendar-widget', \Adultdate\FilamentBooking\Filament\Widgets\BookingCalendarWidget::class);
+            \Livewire\Livewire::component('adultdate.filament-booking.filament.widgets.event-calendar', \Adultdate\FilamentBooking\Filament\Widgets\LocationCalendarWidget::class);
+            // Register resource-scoped widget alias so Livewire can resolve
+            // widgets referenced by their Filament resource path.
+            \Livewire\Livewire::component(
+                'adultdate.filament-booking.filament.resources.booking.daily-locations.widgets.location-calendar-widget',
+                \Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Widgets\LocationCalendarWidget::class
+            );
+        }
+
+        // Ensure views are available under the legacy namespace used across the package
+        $viewsPath = __DIR__ . '/../resources/views';
+        if (is_dir($viewsPath)) {
+            $this->loadViewsFrom($viewsPath, 'adultdate/filament-booking');
         }
 
         // Migration Publishing

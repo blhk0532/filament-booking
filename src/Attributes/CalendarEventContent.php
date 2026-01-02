@@ -1,6 +1,6 @@
 <?php
 
-namespace Adultdate\Schedule\Attributes;
+namespace Adultdate\FilamentBooking\Attributes;
 
 use Illuminate\Database\Eloquent\Model;
 

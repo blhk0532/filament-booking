@@ -26,7 +26,7 @@ class BookingResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'number';
 
-    protected static string | UnitEnum | null $navigationGroup = 'Services';
+    protected static string | UnitEnum | null $navigationGroup = 'Bookings';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-calendar-days';
 

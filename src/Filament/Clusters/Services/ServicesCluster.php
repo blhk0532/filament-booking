@@ -10,7 +10,7 @@ class ServicesCluster extends Cluster
 {
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-wrench-screwdriver';
 
-    protected static string | UnitEnum | null $navigationGroup = 'Services';
+    protected static string | UnitEnum | null $navigationGroup = 'Bookings';
 
     protected static ?int $navigationSort = 1;
 

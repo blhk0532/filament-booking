@@ -1,9 +1,9 @@
 <?php
 
-namespace Adultdate\Schedule\Filament\Widgets\Concerns;
+namespace Adultdate\FilamentBooking\Filament\Widgets\Concerns;
 
 use Carbon\Carbon;
-use Adultdate\Schedule\SchedulePlugin;
+use Adultdate\FilamentBooking\FilamentBookingPlugin;
 
 trait InteractsWithEvents
 {
@@ -109,7 +109,7 @@ trait InteractsWithEvents
 
     protected function calculateTimezoneOffset(string $start, ?string $end, bool $allDay): array
     {
-        $timezone = SchedulePlugin::make()->getTimezone();
+        $timezone = FilamentBookingPlugin::make()->getTimezone();
 
         $start = Carbon::parse($start, $timezone);
 

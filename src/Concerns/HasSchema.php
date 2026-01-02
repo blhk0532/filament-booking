@@ -1,12 +1,12 @@
 <?php
 
-namespace Adultdate\Schedule\Concerns;
+namespace Adultdate\FilamentBooking\Concerns;
 
 use Filament\Facades\Filament;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Adultdate\Schedule\Attributes\CalendarSchema;
-use Adultdate\Schedule\Exceptions\SchemaNotFoundException;
+use Adultdate\FilamentBooking\Attributes\CalendarSchema;
+use Adultdate\FilamentBooking\Exceptions\SchemaNotFoundException;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionMethod;

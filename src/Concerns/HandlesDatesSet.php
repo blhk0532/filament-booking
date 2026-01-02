@@ -1,8 +1,8 @@
 <?php
 
-namespace Adultdate\Schedule\Concerns;
+namespace Adultdate\FilamentBooking\Concerns;
 
-use Adultdate\Schedule\ValueObjects\DatesSetInfo;
+use Adultdate\FilamentBooking\ValueObjects\DatesSetInfo;
 
 trait HandlesDatesSet
 {

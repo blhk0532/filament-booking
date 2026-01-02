@@ -1,11 +1,11 @@
 <?php
 
-namespace Adultdate\Schedule\ValueObjects;
+namespace Adultdate\FilamentBooking\ValueObjects;
 
 use Carbon\CarbonImmutable;
-use Adultdate\Schedule\Enums\CalendarViewType;
+use Adultdate\FilamentBooking\Enums\CalendarViewType;
 
-use function Adultdate\Schedule\utc_to_user_local_time;
+use function Adultdate\FilamentBooking\utc_to_user_local_time;
 
 readonly class CalendarView
 {

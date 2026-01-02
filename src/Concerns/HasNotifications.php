@@ -1,6 +1,6 @@
 <?php
 
-namespace Adultdate\Schedule\Concerns;
+namespace Adultdate\FilamentBooking\Concerns;
 
 use Filament\Notifications\Notification;
 use Illuminate\Auth\Access\Response;

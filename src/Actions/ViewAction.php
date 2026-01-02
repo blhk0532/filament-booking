@@ -1,9 +1,9 @@
 <?php
 
-namespace Adultdate\Schedule\Actions;
+namespace Adultdate\FilamentBooking\Actions;
 
 use Filament\Actions\ViewAction as BaseViewAction;
-use Adultdate\Schedule\Filament\Widgets\FullCalendarWidget;
+use Adultdate\FilamentBooking\Filament\Widgets\FullCalendarWidget;
 
 class ViewAction extends BaseViewAction
 {

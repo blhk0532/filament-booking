@@ -1,6 +1,6 @@
 <?php
 
-namespace Adultdate\Schedule\Concerns;
+namespace Adultdate\FilamentBooking\Concerns;
 
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Schemas\Concerns\InteractsWithSchemas;

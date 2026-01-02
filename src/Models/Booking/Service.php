@@ -3,7 +3,7 @@
 namespace Adultdate\FilamentBooking\Models\Booking;
 
 use Adultdate\FilamentBooking\Enums\ServiceStatus;
-use Adultdate\FilamentBooking\Models\Comment;
+use Adultdate\FilamentBooking\Models\BookingComment;
 use Database\Factories\Booking\ServiceFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -75,7 +75,7 @@ class Service extends Model implements HasMedia
     /** @return MorphMany<Comment, $this> */
     public function comments(): MorphMany
     {
-        return $this->morphMany(Comment::class, 'commentable');
+        return $this->morphMany(BookingComment::class, 'commentable');
     }
 
     public function registerMediaCollections(): void

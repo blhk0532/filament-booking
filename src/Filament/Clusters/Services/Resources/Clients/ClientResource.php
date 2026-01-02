@@ -26,7 +26,7 @@ class ClientResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static string | UnitEnum | null $navigationGroup = 'Services';
+    protected static string | UnitEnum | null $navigationGroup = 'Bookings';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-user-group';
 

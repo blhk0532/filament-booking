@@ -1,12 +1,12 @@
 <?php
 
-namespace Adultdate\Schedule\ValueObjects;
+namespace Adultdate\FilamentBooking\ValueObjects;
 
 use Carbon\CarbonImmutable;
-use Adultdate\Schedule\Contracts\ContextualInfo;
-use Adultdate\Schedule\Enums\Context;
+use Adultdate\FilamentBooking\Contracts\ContextualInfo;
+use Adultdate\FilamentBooking\Enums\Context;
 
-use function Adultdate\Schedule\utc_to_user_local_time;
+use function Adultdate\FilamentBooking\utc_to_user_local_time;
 
 readonly class DateSelectInfo implements ContextualInfo
 {

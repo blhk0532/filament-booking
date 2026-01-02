@@ -1,5 +1,5 @@
 @php
-    $plugin = \Adultdate\Schedule\SchedulePlugin::get();
+    $plugin = \Adultdate\FilamentBooking\FilamentBookingPlugin::get();
 @endphp
 
 <x-filament-widgets::widget>
@@ -9,10 +9,10 @@
         </div>
 
         {{-- Ensure the built Alpine component is available (fallback to public/vendor) --}}
-        <script defer src="{{ asset('vendor/adultdate-schedule/filament-fullcalendar.js') }}"></script>
+        <script defer src="{{ asset('vendor/adultdate/filament-booking/filament-fullcalendar.js') }}"></script>
 
         <div wire:ignore x-load
-            x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('filament-fullcalendar-alpine', 'adultdate-schedule') }}"
+            x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('filament-fullcalendar-alpine', 'adultdate/filament-booking') }}"
             x-ignore x-data="fullcalendar({
                 locale: @js($plugin->getLocale()),
                 plugins: @js($plugin->getPlugins()),
