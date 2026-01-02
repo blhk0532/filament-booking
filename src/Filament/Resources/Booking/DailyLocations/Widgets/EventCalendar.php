@@ -3,6 +3,7 @@
 namespace Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Widgets;
 
 use Adultdate\FilamentBooking\Attributes\CalendarEventContent;
+use Adultdate\FilamentBooking\Attributes\CalendarSchema;
 use Adultdate\FilamentBooking\Concerns\CanRefreshCalendar;
 use Adultdate\FilamentBooking\Concerns\HasOptions;
 use Adultdate\FilamentBooking\Concerns\HasSchema;
@@ -17,6 +18,7 @@ use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithRecords;
 use Adultdate\FilamentBooking\Filament\Widgets\SimpleCalendarWidget;
 use Adultdate\FilamentBooking\Models\BookingMeeting;
 use Adultdate\FilamentBooking\Models\BookingSprint;
+use Adultdate\FilamentBooking\Models\Booking\DailyLocation;
 // use Adultdate\FilamentBooking\Filament\Actions\CreateAction;
 use Adultdate\FilamentBooking\Models\CalendarSettings;
 use Adultdate\FilamentBooking\ValueObjects\DateClickInfo;
@@ -25,6 +27,7 @@ use Adultdate\FilamentBooking\ValueObjects\EventDropInfo;
 use Adultdate\FilamentBooking\ValueObjects\EventResizeInfo;
 use Adultdate\FilamentBooking\ValueObjects\FetchInfo;
 use Filament\Actions\CreateAction;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
@@ -45,7 +48,6 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
         HasOptions::getOptions insteadof CanBeConfigured;
 
         InteractsWithEventRecord::getEloquentQuery insteadof InteractsWithRecords;
-
         InteractsWithEvents::onEventClickLegacy insteadof InteractsWithCalendar;
         InteractsWithEvents::onDateSelectLegacy insteadof InteractsWithCalendar;
         InteractsWithEvents::onEventDropLegacy insteadof InteractsWithCalendar;
@@ -54,17 +56,41 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
 
     protected static ?int $sort = 1;
 
-    public function getOptions(): array {}
-
-    public function getConfig(): array
+    public function schema(Schema $schema): Schema
     {
-        return array_replace_recursive(
-            $this->config(),
-            \Adultdate\FilamentBooking\FilamentBookingPlugin::get()->getConfig(),
-        );
+        return $schema->schema([]);
     }
 
-    public function config(): array
+    public function getOptions(): array
+    {
+        return $this->getConfig();
+    }
+
+    #[CalendarSchema(model: DailyLocation::class)]
+    protected function dailyLocationSchema(Schema $schema): Schema
+    {
+        return $schema->schema([
+            TextInput::make('location')->required(),
+        ]);
+    }
+
+    #[CalendarSchema(model: BookingMeeting::class)]
+    protected function bookingMeetingSchema(Schema $schema): Schema
+    {
+        return $schema->schema([
+            TextInput::make('title')->required(),
+        ]);
+    }
+
+    #[CalendarSchema(model: BookingSprint::class)]
+    protected function bookingSprintSchema(Schema $schema): Schema
+    {
+        return $schema->schema([
+            TextInput::make('title')->required(),
+        ]);
+    }
+
+    public function getConfig(): array
     {
         $settings = CalendarSettings::where('user_id', Auth::id())->first();
 
@@ -108,6 +134,11 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
 
         \Illuminate\Support\Facades\Log::info('getEvents called', ['start' => $start, 'end' => $end]);
 
+        $dailyLocations = DailyLocation::query()    
+            ->whereBetween('date', [$start, $end])
+            ->with(['serviceUser'])
+            ->get();
+
         $meetings = BookingMeeting::query()
             ->withCount('users')
             ->whereDate('ends_at', '>=', $start)
@@ -120,6 +151,7 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
             ->get();
 
         $events = collect()
+            ->push(...$dailyLocations)
             ->push(...$meetings)
             ->push(...$sprints);
 
@@ -141,6 +173,21 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
     protected function getDateClickContextMenuActions(): array
     {
         return [
+            $this->createAction(DailyLocation::class, 'ctxCreateDailyLocation')
+                ->label('Create Daily Location')
+                ->icon('heroicon-o-map-pin')
+                ->modalHeading('Create Daily Location')
+                ->modalWidth('2xl')
+                ->mountUsing(function (CreateAction $action, ?Schema $schema, ?DateClickInfo $info): void {
+                    if (! $schema || ! $info) {
+                        return;
+                    }
+
+                    $schema->fill([
+                        'date' => $info->date->toDateString(),
+                        'created_by' => \Illuminate\Support\Facades\Auth::id(),
+                    ]);
+                }),
             $this->createAction(BookingMeeting::class, 'ctxCreateMeeting')
                 ->label('Schedule meeting')
                 ->icon('heroicon-o-calendar-days')
@@ -248,6 +295,12 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
     protected function sprintEventContent(): string
     {
         return view('adultdate/filament-booking::components.calendar.events.sprint')->render();
+    }
+
+    #[CalendarEventContent(model: BookingSprint::class)]
+    protected function locationEventContent(): string
+    {
+        return view('adultdate/filament-booking::components.calendar.events.location')->render();
     }
 
     public function mount(): void

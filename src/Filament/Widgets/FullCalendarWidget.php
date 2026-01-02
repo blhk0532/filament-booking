@@ -93,4 +93,16 @@ class FullCalendarWidget extends Widget implements HasForms, HasActions
         // Use a non-colliding action name so it doesn't overwrite the widget's `$view` property
         return \Filament\Actions\Action::make('viewEvent');
     }
+
+    public function onDateClickJs(array $data): void
+    {
+        if (method_exists($this, 'onDateClick')) {
+            $this->onDateClick(
+                $data['dateStr'] ?? $data['date'],
+                $data['allDay'] ?? false,
+                $data['view'] ?? null,
+                $data['resource'] ?? null
+            );
+        }
+    }
 }

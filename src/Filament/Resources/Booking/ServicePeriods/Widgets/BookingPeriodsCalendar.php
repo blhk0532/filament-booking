@@ -51,4 +51,13 @@ class BookingPeriodsCalendar extends FullCalendarWidget
             ->whereBetween('date', [$start, $end])
             ->with(['serviceUser']);
     }
+
+    public function onDateClick(string $date, bool $allDay, ?array $view, ?array $resource): void
+    {
+        $startDate = \Carbon\Carbon::parse($date);
+
+        $this->mountAction('create', [
+            'service_date' => $startDate->format('Y-m-d'),
+        ]);
+    }
 }

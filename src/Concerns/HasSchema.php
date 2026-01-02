@@ -18,6 +18,10 @@ trait HasSchema
      */
     public function getSchemaForModel(Schema $schema, ?string $model = null): Schema
     {
+        if ($model === null) {
+            throw new SchemaNotFoundException;
+        }
+
         // Try finding a method with a ForModel attribute
         $reflectionClass = new ReflectionClass($this);
 
@@ -37,6 +41,7 @@ trait HasSchema
             ->append('Schema')
             ->toString()
         ;
+
         if (method_exists($this, $methodName)) {
             return $this->{$methodName}($schema);
         }
