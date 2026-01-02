@@ -186,7 +186,7 @@ final class EventCalendar extends CalendarWidget
                     Section::make('Booking Details')
                         ->schema([
                             TextInput::make('number')
-                                ->default('OR-' . random_int(100000, 999999))
+                                ->default('BK-' . random_int(100000, 999999))
                                 ->disabled()
                                 ->dehydrated()
                                 ->required()
@@ -226,7 +226,7 @@ final class EventCalendar extends CalendarWidget
                                 ->label('Status')
                                 ->inline()
                                 ->options(BookingStatus::class)
-                                ->default(BookingStatus::Booked)
+                                ->default(BookingStatus::Booked )
                                 ->required()
                                 ->columnSpanFull(),
 

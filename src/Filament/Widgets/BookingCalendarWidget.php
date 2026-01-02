@@ -235,7 +235,7 @@ class BookingCalendarWidget extends FullCalendarWidget implements \Adultdate\Fil
         return [
             Actions\CreateAction::make()
                 ->label('New Booking')
-                ->form($this->getFormSchema())
+                ->schema($this->getFormSchema())
                 ->mountUsing(function ($formOrSchema, array $arguments) {
                     if ($formOrSchema instanceof Schema) {
                         $formOrSchema->fill([]);

@@ -24,6 +24,9 @@ class DailyLocation extends Model implements Eventable
 
     protected $casts = [
         'date' => 'date',
+        'service_user_id',
+        'service_date',
+        'location',
     ];
 
     public function serviceUser()

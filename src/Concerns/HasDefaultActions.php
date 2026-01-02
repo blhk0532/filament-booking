@@ -59,13 +59,32 @@ trait HasDefaultActions
     {
         // Cache common create actions used by the calendar widgets.
         try {
-            $this->cacheAction($this->createAction(\Adultdate\FilamentBooking\Models\Meeting::class, 'ctxCreateMeeting'));
+            $this->cacheAction($this->createAction(\Adultdate\FilamentBooking\Models\BookingMeeting::class, 'ctxCreateMeeting'));
         } catch (\Throwable $e) {
             // Swallow - caching is best-effort during boot.
         }
 
         try {
-            $this->cacheAction($this->createAction(\Adultdate\FilamentBooking\Models\Sprint::class, 'ctxCreateSprint'));
+            $this->cacheAction($this->createAction(\Adultdate\FilamentBooking\Models\BookingSprint::class, 'ctxCreateSprint'));
+        } catch (\Throwable $e) {
+            // Swallow
+        }
+        
+        try {
+            $this->cacheAction($this->createAction(\Adultdate\FilamentBooking\Models\Booking\DailyLocation::class, 'ctxCreateDailyLocation'));
+        } catch (\Throwable $e) {
+            // Swallow - caching is best-effort during boot.
+        }
+
+        try {
+            $this->cacheAction($this->createAction(\Adultdate\FilamentBooking\Models\Booking\Booking::class, 'ctxCreateBooking'));
+        } catch (\Throwable $e) {
+            // Swallow
+        }
+
+
+        try {
+            $this->cacheAction($this->createAction(\Adultdate\FilamentBooking\Models\BookingServicePeriod::class, 'ctxCreateServicePeriod'));
         } catch (\Throwable $e) {
             // Swallow
         }
