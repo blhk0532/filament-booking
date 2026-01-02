@@ -18,6 +18,7 @@ use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithRecords;
 use Adultdate\FilamentBooking\Filament\Widgets\SimpleCalendarWidget;
 use Adultdate\FilamentBooking\Models\BookingMeeting;
 use Adultdate\FilamentBooking\Models\BookingSprint;
+use Adultdate\FilamentBooking\Models\BookingServicePeriod;
 use Adultdate\FilamentBooking\Models\Booking\DailyLocation;
 // use Adultdate\FilamentBooking\Filament\Actions\CreateAction;
 use Adultdate\FilamentBooking\Models\CalendarSettings;
@@ -27,16 +28,21 @@ use Adultdate\FilamentBooking\ValueObjects\EventDropInfo;
 use Adultdate\FilamentBooking\ValueObjects\EventResizeInfo;
 use Adultdate\FilamentBooking\ValueObjects\FetchInfo;
 use Filament\Actions\CreateAction;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\TimePicker;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\HtmlString;
 final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
 {
+
+    
+
     use CanBeConfigured, CanRefreshCalendar, HasOptions, HasSchema, InteractsWithCalendar, InteractsWithEventRecord, InteractsWithEvents, InteractsWithRawJS, InteractsWithRecords {
         // Prefer the contract-compatible refreshRecords (chainable) from CanRefreshCalendar
         CanRefreshCalendar::refreshRecords insteadof InteractsWithEvents;
@@ -87,6 +93,32 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
     {
         return $schema->schema([
             TextInput::make('title')->required(),
+        ]);
+    }
+
+    #[CalendarSchema(model: BookingServicePeriod::class)]
+    protected function bookingServicePeriodSchema(Schema $schema): Schema
+    {
+        return $schema->schema([
+            Select::make('service_user_id')
+                ->label('Service User')
+                ->relationship('serviceUser', 'name')
+                ->required(),
+            TextInput::make('service_location')
+                ->label('Location')
+                ->required(),
+            TimePicker::make('start_time')
+                ->label('Start Time')
+                ->seconds(false)
+                ->required(),
+            TimePicker::make('end_time')
+                ->label('End Time')
+                ->seconds(false)
+                ->required(),
+            TextInput::make('period_type')
+                ->label('Period Type')
+                ->default('unavailable')
+                ->required(),
         ]);
     }
 
@@ -188,6 +220,40 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
                         'created_by' => \Illuminate\Support\Facades\Auth::id(),
                     ]);
                 }),
+            $this->createAction(BookingServicePeriod::class, 'ctxCreateServicePeriod')
+                ->label('Add Service Period')
+                ->icon('heroicon-o-clock')
+                ->modalHeading('Add Service Period')
+                ->modalWidth('sm')
+                ->mountUsing(function (CreateAction $action, ?Schema $schema, ?DateClickInfo $info): void {
+                    if (! $schema || ! $info) {
+                        return;
+                    }
+
+                    $schema->fill([
+                        'service_date' => $info->date->toDateString(),
+                        'created_by' => \Illuminate\Support\Facades\Auth::id(),
+                    ]);
+                }),
+            $this->createAction(BookingSprint::class, 'ctxCreateSprintClick')
+                ->label('Plan sprint')
+                ->icon('heroicon-o-flag')
+                ->modalHeading('Plan sprint')
+                ->modalWidth('sm')
+                ->mountUsing(function (CreateAction $action, ?Schema $schema, ?DateClickInfo $info): void {
+                    if (! $schema || ! $info) {
+                        return;
+                    }
+
+                    $start = $info->date->toMutable();
+
+                    $schema->fill([
+                        'title' => '',
+                        'priority' => Priority::Medium->value,
+                        'starts_at' => $start->format('Y-m-d'),
+                        'ends_at' => $start->copy()->addDay()->format('Y-m-d'),
+                    ]);
+                }),
             $this->createAction(BookingMeeting::class, 'ctxCreateMeeting')
                 ->label('Schedule meeting')
                 ->icon('heroicon-o-calendar-days')
@@ -233,6 +299,36 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
                         'priority' => Priority::Medium->value,
                         'starts_at' => $start->format('Y-m-d'),
                         'ends_at' => ($end->greaterThan($start) ? $end : $start->copy()->addDay())->format('Y-m-d'),
+                    ]);
+                }),
+                            $this->createAction(DailyLocation::class, 'ctxCreateDailyLocation')
+                ->label('Create Daily Location')
+                ->icon('heroicon-o-map-pin')
+                ->modalHeading('Create Daily Location')
+                ->modalWidth('2xl')
+                ->mountUsing(function (CreateAction $action, ?Schema $schema, ?DateClickInfo $info): void {
+                    if (! $schema || ! $info) {
+                        return;
+                    }
+
+                    $schema->fill([
+                        'date' => $info->date->toDateString(),
+                        'created_by' => \Illuminate\Support\Facades\Auth::id(),
+                    ]);
+                }),
+            $this->createAction(BookingServicePeriod::class, 'ctxCreateServicePeriod')
+                ->label('Add Service Period')
+                ->icon('heroicon-o-clock')
+                ->modalHeading('Add Service Period')
+                ->modalWidth('sm')
+                ->mountUsing(function (CreateAction $action, ?Schema $schema, ?DateClickInfo $info): void {
+                    if (! $schema || ! $info) {
+                        return;
+                    }
+
+                    $schema->fill([
+                        'service_date' => $info->date->toDateString(),
+                        'created_by' => \Illuminate\Support\Facades\Auth::id(),
                     ]);
                 }),
         ];
@@ -310,5 +406,13 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
         $this->eventDragEnabled = true;
         $this->eventResizeEnabled = true;
         $this->dateSelectEnabled = true;
+    }
+
+    /**
+     * Override the widget heading to hide the default header.
+     */
+    public function getHeading(): ?string
+    {
+        return null;
     }
 }

@@ -268,6 +268,7 @@ final class LocationCalendarWidget extends FullCalendarWidget implements HasActi
                     }
 
                     $schema->fill([
+                        'title' => '',
                         'priority' => Priority::Medium->value,
                         'starts_at' => $start->format('Y-m-d'),
                         'ends_at' => ($end->greaterThan($start) ? $end : $start->copy()->addDay())->format('Y-m-d'),

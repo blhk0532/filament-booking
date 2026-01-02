@@ -247,7 +247,7 @@ export default function calendar({
                 info.el.setAttribute('x-load-src', eventAssetUrl)
                 info.el.setAttribute('x-data', `calendarEvent({
                     event: ${JSON.stringify(info.event)},
-                    timeText: "${info.timeText}",
+                    timeText: "${info.timeText ?? ''}",
                     view: ${JSON.stringify(info.view)},
                     hasContextMenu: ${hasEventClickContextMenu},
                 })`)

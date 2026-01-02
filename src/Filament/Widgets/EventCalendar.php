@@ -4,6 +4,7 @@ namespace Adultdate\FilamentBooking\Filament\Widgets;
 
 use Adultdate\FilamentBooking\Enums\CalendarViewType;
 use Adultdate\FilamentBooking\Enums\Priority;
+use Adultdate\FilamentBooking\Models\Booking\Booking;
 use Adultdate\FilamentBooking\Models\BookingMeeting;
 use Adultdate\FilamentBooking\Models\BookingSprint;
 use Adultdate\FilamentBooking\Models\CalendarSettings;
@@ -22,6 +23,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Repeater;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\ToggleButtons;
+use Adultdate\FilamentBooking\Enums\BookingStatus;
 
 final class EventCalendar extends CalendarWidget
 {
@@ -117,14 +127,19 @@ final class EventCalendar extends CalendarWidget
             ->whereDate('starts_at', '<=', $end)
             ->get();
 
+        $bookings = Booking::query()
+            ->whereDate('ends_at', '>=', $start)
+            ->whereDate('starts_at', '<=', $end)
+            ->get();
+
         $events = collect()
             ->push(...$meetings)
-            ->push(...$sprints);
+            ->push(...$sprints)
+            ->push(...$bookings);
 
         \Illuminate\Support\Facades\Log::info('Events returned', ['count' => $events->count()]);
 
         return $events;
-
     }
 
     protected function getEventClickContextMenuActions(): array
@@ -162,6 +177,90 @@ final class EventCalendar extends CalendarWidget
     protected function getDateSelectContextMenuActions(): array
     {
         return [
+            $this->createAction(Booking::class, 'ctxCreateBooking')
+                ->label('Create booking')
+                ->icon('heroicon-o-calendar')
+                ->modalHeading('Create booking')
+                ->modalWidth('6xl')
+                ->schema([
+                    Section::make('Booking Details')
+                        ->schema([
+                            TextInput::make('number')
+                                ->default('OR-' . random_int(100000, 999999))
+                                ->disabled()
+                                ->dehydrated()
+                                ->required()
+                                ->maxLength(32)
+                                ->columnSpanFull(),
+
+                            Select::make('booking_client_id')
+                                ->label('Client')
+                                ->relationship('client', 'name')
+                                ->searchable()
+                                ->required()
+                                ->columnSpanFull(),
+
+                            Select::make('service_user_id')
+                                ->label('Service User')
+                                ->options(\App\Models\User::where('role', 'service')->pluck('name', 'id'))
+                                ->searchable()
+                                ->required()
+                                ->columnSpanFull(),
+
+                            DateTimePicker::make('starts_at')
+                                ->label('Start Date & Time')
+                                ->required()
+                                ->native(false)
+                                ->seconds(false)
+                                ->columnSpanFull(),
+
+                            DateTimePicker::make('ends_at')
+                                ->label('End Date & Time')
+                                ->required()
+                                ->native(false)
+                                ->seconds(false)
+                                ->rule('after:starts_at')
+                                ->columnSpanFull(),
+
+                            ToggleButtons::make('status')
+                                ->label('Status')
+                                ->inline()
+                                ->options(BookingStatus::class)
+                                ->default(BookingStatus::Booked)
+                                ->required()
+                                ->columnSpanFull(),
+
+                            Textarea::make('notes')
+                                ->label('Notes')
+                                ->rows(3)
+                                ->columnSpanFull(),
+                        ]),
+                ])
+                ->mutateFormDataUsing(function (array $data): array {
+                    $data['booking_user_id'] = Auth::id();
+                    return $data;
+                })
+                ->mountUsing(function (CreateAction $action, ?Schema $schema, ?DateSelectInfo $info): void {
+                    if (! $schema || ! $info) {
+                        return;
+                    }
+
+                    $start = $info->start->toMutable();
+                    $end = $info->end->toMutable();
+
+                    if ($info->allDay) {
+                        $start->startOfDay();
+                        $end->subDay()->endOfDay();
+                    }
+
+                    $schema->fill([
+                        'number' => 'OR-' . random_int(100000, 999999),
+                        'starts_at' => $start->toDateTimeString(),
+                        'ends_at' => $end->toDateTimeString(),
+                    ]);
+                })
+                ->after(fn () => $this->refreshRecords()),
+
             $this->createAction(BookingSprint::class, 'ctxCreateSprint')
                 ->label('Plan sprint')
                 ->icon('heroicon-o-flag')
@@ -181,6 +280,7 @@ final class EventCalendar extends CalendarWidget
                     }
 
                     $schema->fill([
+                        'title' => '',
                         'priority' => Priority::Medium->value,
                         'starts_at' => $start->format('Y-m-d'),
                         'ends_at' => ($end->greaterThan($start) ? $end : $start->copy()->addDay())->format('Y-m-d'),
@@ -191,7 +291,7 @@ final class EventCalendar extends CalendarWidget
 
     protected function onEventDrop(EventDropInfo $info, Model $event): bool
     {
-        if (! $event instanceof BookingMeeting && ! $event instanceof BookingSprint) {
+        if (! $event instanceof BookingMeeting && ! $event instanceof BookingSprint && ! $event instanceof Booking) {
             return false;
         }
 
@@ -212,9 +312,9 @@ final class EventCalendar extends CalendarWidget
 
     public function onEventResize(EventResizeInfo $info, Model $event): bool
     {
-        if (! $event instanceof BookingSprint) {
+        if (! $event instanceof BookingSprint && ! $event instanceof Booking) {
             Notification::make()
-                ->title('Only sprints can be resized')
+                ->title('Only sprints and bookings can be resized')
                 ->warning()
                 ->send();
 
@@ -227,7 +327,7 @@ final class EventCalendar extends CalendarWidget
         ])->save();
 
         Notification::make()
-            ->title('Sprint duration updated')
+            ->title('Duration updated')
             ->success()
             ->send();
 
@@ -246,5 +346,11 @@ final class EventCalendar extends CalendarWidget
     protected function sprintEventContent(): string
     {
         return view('adultdate/filament-booking::components.calendar.events.sprint')->render();
+    }
+
+    #[CalendarEventContent(model: Booking::class)]
+    protected function bookingEventContent(): string
+    {
+        return view('adultdate/filament-booking::components.calendar.events.booking')->render();
     }
 }
