@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace Database\Seeders;
+
 use Adultdate\FilamentBooking\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -23,11 +24,8 @@ final class DatabaseSeeder extends Seeder
         $this->call([
             BookingBrandSeeder::class,
             BookingCategorySeeder::class,
-            BookingCategoryProductSeeder::class,
-            BookingProductSeeder::class,
-            BookingCustomerSeeder::class,
-            BookingOrderSeeder::class,
-            BookingOrderAddressSeeder::class,
+            BookingClientSeeder::class,
+            BookingServiceSeeder::class,
         ]);
     }
 }

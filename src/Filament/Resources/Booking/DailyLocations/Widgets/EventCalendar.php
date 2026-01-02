@@ -52,7 +52,7 @@ use Adultdate\FilamentBooking\Models\Booking\Client;
 use Adultdate\FilamentBooking\Models\Booking\Service;
 use App\Models\User;
 use Carbon\Carbon;
-
+use Livewire\Attributes\Locked;
 
 final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
 {
@@ -77,13 +77,6 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
     }
 
     protected static ?int $sort = 1;
- // public Model|string|null $model = Booking::class;
-
- //  public function getModel(): string
- //  {
- //      $model = Booking::class;
- //      return $model;
- //  }
 
     public function schema(Schema $schema): Schema
     {
@@ -95,11 +88,25 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
         return $this->getConfig();
     }
 
+    public function getModel(): ?string
+    {
+        return Booking::class;
+    }
+
     #[CalendarSchema(model: DailyLocation::class)]
     protected function dailyLocationSchema(Schema $schema): Schema
     {
         return $schema->schema([
+            DatePicker::make('date')
+                ->label('Date')
+                ->required()
+                ->native(false),
+            Select::make('service_user_id')
+                ->label('Service User')
+                ->relationship('serviceUser', 'name')
+                ->required(),
             TextInput::make('location')->required(),
+            Hidden::make('created_by'),
         ]);
     }
 
@@ -123,6 +130,9 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
     protected function bookingServicePeriodSchema(Schema $schema): Schema
     {
         return $schema->schema([
+            // Ensure service_date is present in the form data even if hidden
+            Hidden::make('service_date')
+                ->required(),
             Select::make('service_user_id')
                 ->label('Service User')
                 ->relationship('serviceUser', 'name')
@@ -350,7 +360,7 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
     protected function getDateClickContextMenuActions(): array
     {
         return [
-            CreateAction::make()
+            $this->createAction(Booking::class, 'ctxCreateBooking')
                 ->label('New Booking')
                 ->schema($this->getFormSchema())
                 ->mountUsing(function ($formOrSchema, array $arguments) {
@@ -365,7 +375,7 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
                     }
 
                     $timezone = config('app.timezone');
-                    
+                     
                     if (isset($arguments['service_date']) || isset($arguments['start_time'])) {
                         $values = [
                             'service_date' => $arguments['service_date'] ?? null,
@@ -467,6 +477,7 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
                 ->icon('heroicon-o-calendar-days')
                 ->modalHeading('Create Bookings')
                 ->modalWidth('4xl')
+                ->schema($this->getFormSchema())
                 ->mountUsing(function (CreateAction $action, ?Schema $schema, ?DateSelectInfo $info): void {
                     if (! $schema || ! $info) {
                         return;
@@ -486,7 +497,7 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
                         'ends_at' => ($end->greaterThan($start) ? $end : $start->copy()->addDay())->format('Y-m-d'),
                     ]);
                 }),
-             DailyLocationCreateAction::make()
+            $this->createAction(DailyLocation::class, 'ctxCreateDailyLocation')
                 ->label('Service Location')
                 ->icon('heroicon-o-map-pin')
                 ->modalHeading('Service Location')
@@ -498,6 +509,7 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
 
                     $schema->fill([
                         'date' => $info->date->toDateString(),
+                        'service_user_id' => \Illuminate\Support\Facades\Auth::id(),
                         'created_by' => \Illuminate\Support\Facades\Auth::id(),
                     ]);
                 }),

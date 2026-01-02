@@ -56,7 +56,7 @@ class DailyLocation extends Model implements Eventable
         return CalendarEvent::make($this)
             ->title($title)
             ->start($this->date)
-            ->end(Carbon::parse($this->date)->endOfDay())
+            ->end(Carbon::parse($this->date)->addDay()->startOfDay())
             ->allDay(true)
             ->backgroundColor('#f3f4f6')
             ->textColor('#111827')

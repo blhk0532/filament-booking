@@ -31,6 +31,7 @@ use Filament\Actions\CreateAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
+use Filament\Forms\Components\Hidden;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
@@ -97,6 +98,7 @@ final class LocationCalendarWidget extends SimpleCalendarWidget implements HasCa
     protected function bookingServicePeriodSchema(Schema $schema): Schema
     {
         return $schema->schema([
+            Hidden::make('service_date')->required(),
             Select::make('service_user_id')
                 ->label('Service User')
                 ->relationship('serviceUser', 'name')
