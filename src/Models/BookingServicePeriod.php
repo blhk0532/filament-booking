@@ -21,7 +21,7 @@ class BookingServicePeriod extends Model
         'end_time',
         'period_type',
         'created_by',
-    ];
+    ]; 
 
     /**
      * Casts
@@ -30,6 +30,7 @@ class BookingServicePeriod extends Model
         'service_date' => 'date',
         'start_time' => 'string',
         'end_time' => 'string',
+        'id', 
     ];
 
     /**
@@ -46,6 +47,15 @@ class BookingServicePeriod extends Model
     public function creator(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
+     * The bookings for this period.
+     */
+    public function items(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(\Adultdate\FilamentBooking\Models\Booking\Booking::class, 'service_user_id', 'service_user_id')
+            ->where('service_date', $this->service_date);
     }
 
         public function toCalendarEvent(): array
@@ -73,7 +83,7 @@ class BookingServicePeriod extends Model
             'start' => $start,
             'end' => $end,
             'backgroundColor' => $this->status?->getColor() ?? '#f3f4f6',
-            'borderColor' => $this->status?->getColor() ?? '#f3f4f6',
+            'borderColor' => $this->status?->getColor() ?? 'transparent',
             'extendedProps' => [
                 'key' => $this->id,  // Required: Record ID for event resolution
                 'booking_id' => $this->id,

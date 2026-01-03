@@ -64,14 +64,14 @@ trait InteractsWithRecords
 
     public function resolveRecordRouteBinding(int | string $key): ?Model
     {
-        return app($this->getModel())
-            ->resolveRouteBindingQuery($this->getEloquentQuery(), $key, $this->getRecordRouteKeyName())
+        return $this->getEloquentQuery()
+            ->where($this->getRecordRouteKeyName(), $key)
             ->first();
     }
 
     protected function getEloquentQuery(): Builder
     {
-        $query = app($this->getModel())::query();
+        $query = $this->getModel()::query();
 
         // TODO: Scope query to tenant.
 
@@ -80,7 +80,7 @@ trait InteractsWithRecords
 
     protected function getRecordRouteKeyName(): ?string
     {
-        return static::$recordRouteKeyName;
+        return app($this->getModel())->getRouteKeyName();
     }
 
     protected function getModelLabel(): string

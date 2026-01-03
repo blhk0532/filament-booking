@@ -32,6 +32,11 @@ class BookingCalendar extends Page
         ];
     }
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
 //    protected function getHeaderActions(): array
 //    {
 //        return [            

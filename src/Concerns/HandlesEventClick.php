@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 
 trait HandlesEventClick
 {
-    protected bool $eventClickEnabled = false;
+    protected bool $eventClickEnabled = true;
 
     protected ?string $defaultEventClickAction = 'view';
 

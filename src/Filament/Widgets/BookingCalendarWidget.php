@@ -98,7 +98,7 @@ class BookingCalendarWidget extends FullCalendarWidget implements HasCalendar
 
     protected function getEloquentQuery(): Builder
     {
-        return app($this->getModel())::query();
+        return $this->getModel()::query();
     }
 
     public function config(): array

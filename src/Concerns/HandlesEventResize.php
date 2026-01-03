@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 trait HandlesEventResize
 {
-    protected bool $eventResizeEnabled = false;
+    protected bool $eventResizeEnabled = true;
 
     // TODO: Add a default implementation
     // TODO: for that we need to add two methods to Eventable interface:

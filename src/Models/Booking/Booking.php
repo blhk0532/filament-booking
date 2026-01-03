@@ -54,6 +54,7 @@ class Booking extends Model
         'confirmed_at' => 'datetime',
         'completed_at' => 'datetime',
         'service_date' => 'date',
+        'booking_user_id',
         'start_time',
         'end_time',
     ];
@@ -157,7 +158,7 @@ class Booking extends Model
 
         return [
             'id' => $this->id,
-            'title' => $this->client?->name ?? 'Booking #' . ($this->number ?? 'New'),
+            'title' => $this->bookingUser?->name ?? 'Booking #' . ($this->number ?? 'New'),
             'start' => $start,
             'end' => $end,
             'backgroundColor' => $this->status?->getColor() ?? '#3788d8',
@@ -171,6 +172,7 @@ class Booking extends Model
                 'service_name' => $this->service?->name,
                 'service_user' => $this->serviceUser?->name,
                 'booking_user' => $this->bookingUser?->name,
+                'booking_user_id' => $this->bookingUser?->id,
                 'location' => $this->location?->name,
                 'displayLocation' => $this->location?->name,
                 // Model FQCN used by calendar to select custom event content

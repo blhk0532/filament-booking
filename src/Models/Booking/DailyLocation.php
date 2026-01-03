@@ -27,6 +27,8 @@ class DailyLocation extends Model implements Eventable
         'service_user_id',
         'service_date',
         'location',
+        'created_by',
+        'id', 
     ];
 
     public function serviceUser()
@@ -60,6 +62,7 @@ class DailyLocation extends Model implements Eventable
             ->backgroundColor('#f3f4f6')
             ->textColor('#111827')
             ->extendedProps([
+                'id' => $this->id,
                 'is_location' => true,
                 'daily_location_id' => $this->id,
                 'service_user_id' => $this->service_user_id,

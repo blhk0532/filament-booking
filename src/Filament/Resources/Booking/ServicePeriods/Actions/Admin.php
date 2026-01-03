@@ -13,12 +13,12 @@ class AdminAction extends Action
         parent::setUp();
     }
 
-public function adminAction(): Action
-{
-    return Action::make('admin')
-        ->requiresConfirmation()
-        ->action(function (array $arguments) {
-            dd('Admin action called', $arguments);
-        });
-}
+    public function adminAction(): Action
+    {
+        return Action::make('admin')
+            ->requiresConfirmation()
+            ->action(function (array $arguments) {
+                dd('Admin action called', $arguments);
+            });
+    }
 }

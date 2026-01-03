@@ -111,3 +111,6 @@
         }
     }
 }
+div.fc-timegrid-divider{
+    position:absolute;
+}

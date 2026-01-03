@@ -180,7 +180,7 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
 
         $config = [
             'timeZone' => config('app.timezone'), // Set the calendar timezone
-            'view' => 'timeGridWeek',
+            'view' => 'dayGridMonth',
             'headerToolbar' => [
                 'start' => 'prev,next today',
                 'center' => 'title',
@@ -240,11 +240,11 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
             ->whereDate('starts_at', '<=', $end)
             ->get();
 
-        $events = collect()
-            ->push(...$dailyLocations)
-            ->push(...$bookings)
-            ->push(...$meetings)
-            ->push(...$sprints);
+        $events = collect();
+        //    ->push(...$dailyLocations)
+        //    ->push(...$bookings)
+        //    ->push(...$meetings)
+        //    ->push(...$sprints);
 
         \Illuminate\Support\Facades\Log::info('Events returned', ['count' => $events->count()]);
 

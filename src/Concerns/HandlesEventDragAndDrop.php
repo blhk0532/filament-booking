@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 trait HandlesEventDragAndDrop
 {
-    protected bool $eventDragEnabled = false;
+    protected bool $eventDragEnabled = true;
 
     // TODO: Add a default implementation
     // TODO: for that we need to add two methods to Eventable interface:

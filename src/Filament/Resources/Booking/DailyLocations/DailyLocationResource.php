@@ -30,7 +30,7 @@ class DailyLocationResource extends Resource
 
     protected static string | UnitEnum | null $navigationGroup = 'Bookings';
 
-    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedMapPin;
 
     protected static ?int $navigationSort = 5;
 
@@ -76,7 +76,7 @@ class DailyLocationResource extends Resource
         return [
             'index' => ListDailyLocations::route('/'),
             'create' => CreateDailyLocation::route('/create'),
-            'view' => ViewDailyLocation::route('/{record}'),
+        //    'view' => ViewDailyLocation::route('/{record}'),
             'edit' => EditDailyLocation::route('/{record}/edit'),
         ];
     }

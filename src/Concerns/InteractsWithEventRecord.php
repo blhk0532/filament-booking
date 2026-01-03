@@ -47,19 +47,19 @@ trait InteractsWithEventRecord
 
     protected function resolveEventRecordRouteBinding(string $model, mixed $key): ?Model
     {
-        return app($model)
-            ->resolveRouteBindingQuery($this->getEloquentQuery($model), $key, $this->getEventRecordRouteKeyName($model))
+        return $this->getEloquentQuery($model)
+            ->where($this->getEventRecordRouteKeyName($model), $key)
             ->first()
         ;
     }
 
     protected function getEloquentQuery(string $model): Builder
     {
-        return app($model)::query();
+        return $model::query();
     }
 
     protected function getEventRecordRouteKeyName(?string $model = null): ?string
     {
-        return null;
+        return app($this->getModel())->getRouteKeyName();
     }
 }
