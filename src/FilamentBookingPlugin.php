@@ -26,6 +26,9 @@ use Adultdate\FilamentBooking\Filament\Resources\Booking\ServicePeriods\BookingS
 use Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Widgets\EventCalendar;
 use Adultdate\FilamentBooking\Filament\Resources\Booking\BookingOutcallQueues\BookingOutcallQueueResource; 
 use Adultdate\FilamentBooking\Filament\Resources\Booking\Users\UserResource;
+use Adultdate\FilamentBooking\Filament\Pages\Dashboard; 
+
+
 
 class FilamentBookingPlugin implements Plugin
 {
@@ -63,6 +66,7 @@ class FilamentBookingPlugin implements Plugin
             ->databaseNotifications()
             ->pages([
                 BookingCalendar::class,
+                Dashboard::class
             ])
             ->resources([
                 CustomerResource::class,

@@ -9,12 +9,16 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use BackedEnum;
 
 class ProductsRelationManager extends RelationManager
 {
     protected static string $relationship = 'products';
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-shopping-bag';
+
 
     public function form(Schema $schema): Schema
     {

@@ -8,10 +8,16 @@ use Filament\Pages\Dashboard as BaseDashboard;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
+use BackedEnum;
 
 class Dashboard extends BaseDashboard
 {
     use BaseDashboard\Concerns\HasFiltersForm;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChartPie;
+
+    protected static ?string $navigationLabel = 'Dash';
 
     public function filtersForm(Schema $schema): Schema
     {
@@ -20,6 +26,7 @@ class Dashboard extends BaseDashboard
                 Section::make()
                     ->schema([
                         Select::make('businessCustomersOnly')
+                            ->label('Business Customers Only')
                             ->boolean(),
                         DatePicker::make('startDate')
                             ->maxDate(fn (Get $get) => $get('endDate') ?: now()),

@@ -10,9 +10,9 @@ class ProductsCluster extends Cluster
 {
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-squares-2x2';
 
-    protected static string | UnitEnum | null $navigationGroup = 'Booking';
+    protected static string | UnitEnum | null $navigationGroup = 'Bookings';
 
-    protected static ?int $navigationSort = 0;
+    protected static ?int $navigationSort = 10;
 
     protected static ?string $slug = 'booking/products';
 }

@@ -23,7 +23,7 @@ class CategoryResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-tag';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-shopping-cart';
 
     protected static ?string $navigationParentItem = 'Products';
 

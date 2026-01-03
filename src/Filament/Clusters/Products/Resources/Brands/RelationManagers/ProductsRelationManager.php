@@ -14,6 +14,9 @@ class ProductsRelationManager extends RelationManager
 {
     protected static string $relationship = 'products';
 
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-shopping-bag';
+
+
     protected static ?string $recordTitleAttribute = 'name';
 
     public function form(Schema $schema): Schema

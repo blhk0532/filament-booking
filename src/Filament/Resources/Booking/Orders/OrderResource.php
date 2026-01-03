@@ -27,11 +27,11 @@ class OrderResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'number';
 
-    protected static string | UnitEnum | null $navigationGroup = 'Booking';
+    protected static string | UnitEnum | null $navigationGroup = 'Bookings';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-shopping-bag';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 11;
 
     public static function form(Schema $schema): Schema
     {

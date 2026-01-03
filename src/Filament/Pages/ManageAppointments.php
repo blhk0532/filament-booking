@@ -36,6 +36,9 @@ class ManageAppointments extends Page implements HasForms, HasTable
 
     protected static ?string $navigationLabel = 'Shedule';
 
+         protected static ?int $sort = 10;
+     protected static ?int $navigationSort = 10;
+
     protected static string|UnitEnum|null $navigationGroup = 'Bookings';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
@@ -139,6 +142,7 @@ class ManageAppointments extends Page implements HasForms, HasTable
 
             Section::make()
                 ->schema(function (Get $get) {
+                    /** @var \App\Models\User $serviceProvider */
                     $serviceProvider = \App\Models\User::find($get('service_user_id'));
                     if (! $serviceProvider) {
                         return [];

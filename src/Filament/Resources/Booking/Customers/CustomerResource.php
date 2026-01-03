@@ -26,9 +26,11 @@ class CustomerResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static string | UnitEnum | null $navigationGroup = 'Booking';
+    protected static ?string $navigationLabel = 'Customer';
 
-    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-user-group';
+    protected static string | UnitEnum | null $navigationGroup = 'Bookings';
+
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-user-circle';
 
     protected static ?int $navigationSort = 2;
 

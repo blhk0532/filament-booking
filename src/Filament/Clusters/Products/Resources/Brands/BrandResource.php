@@ -24,7 +24,7 @@ class BrandResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-bookmark-square';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-shopping-bag';
 
     protected static ?string $navigationParentItem = 'Products';
 
