@@ -2,23 +2,28 @@
 
 namespace Adultdate\FilamentBooking\Filament\Resources\Booking\ServicePeriods\Widgets;
 
+use Adultdate\FilamentBooking\Concerns\CanRefreshCalendar;
+use Adultdate\FilamentBooking\Concerns\HasOptions;
+use Adultdate\FilamentBooking\Concerns\HasSchema;
+use Adultdate\FilamentBooking\Concerns\InteractsWithCalendar;
 use Adultdate\FilamentBooking\Concerns\InteractsWithEventRecord;
-use Adultdate\FilamentBooking\Models\BookingServicePeriod;
-use App\Models\User;
-use Filament\Widgets\Widget;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\HtmlString;
-use Adultdate\FilamentBooking\Concerns\HasEvents;
-use Adultdate\FilamentBooking\Filament\Widgets\FullCalendarWidget;
-use Adultdate\FilamentBooking\Models\Booking\DailyLocation;
-use Adultdate\FilamentBooking\ValueObjects\FetchInfo;
-use Illuminate\Database\Eloquent\Builder;
-use Carbon\Carbon;
+use Adultdate\FilamentBooking\Contracts\HasCalendar;
 use Adultdate\FilamentBooking\Enums\BookingStatus;
-use Illuminate\Support\Str;
+use Adultdate\FilamentBooking\Filament\Widgets\Concerns\CanBeConfigured;
+use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithEvents;
+use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithRawJS;
+use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithRecords;
+use Adultdate\FilamentBooking\Filament\Widgets\FullCalendarWidget;
 use Adultdate\FilamentBooking\Models\Booking\Booking;
 use Adultdate\FilamentBooking\Models\Booking\BookingLocation;
+use Adultdate\FilamentBooking\Models\Booking\Client;
+use Adultdate\FilamentBooking\Models\Booking\DailyLocation;
+use Adultdate\FilamentBooking\Models\Booking\Service;
+use Adultdate\FilamentBooking\Models\BookingServicePeriod;
+use Adultdate\FilamentBooking\ValueObjects\FetchInfo;
+use App\Models\User;
+use Carbon\Carbon;
+use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
@@ -26,33 +31,13 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
-use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings\Schemas\BookingForm;
-use Adultdate\FilamentBooking\Filament\Widgets\Concerns\CanBeConfigured;
-use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithEvents;
-use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithRawJS;
-use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithRecords;
-use Adultdate\FilamentBooking\Models\Booking\Client;
-use Adultdate\FilamentBooking\Actions as BookingActions;
-use Adultdate\FilamentBooking\Concerns\CanRefreshCalendar;
-use Adultdate\FilamentBooking\Concerns\HasOptions;
-use Adultdate\FilamentBooking\Concerns\HasSchema;
-use Adultdate\FilamentBooking\Concerns\InteractsWithCalendar;
-use Illuminate\Support\Collection;
-use Adultdate\FilamentBooking\Contracts\HasCalendar;
-use Illuminate\Support\Facades\Schema;
-use Adultdate\FilamentBooking\Models\Booking\Service;
-use Adultdate\FilamentBooking\Filament\Resources\Booking\ServicePeriods\Actions\AdminAction;
-use Adultdate\FilamentBooking\ValueObjects\DateClickInfo;
-use Filament\Actions\Action;
-use Adultdate\FilamentBooking\Filament\Resources\Booking\ServicePeriods\Actions\CreateAction;
-use Adultdate\FilamentBooking\Filament\Resources\Booking\ServicePeriods\Actions\CreateDailyLocationAction;
 use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Blade;
-use Adultdate\FilamentBooking\Filament\Actions\CreateBlockPeriodAction;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Actions\EditAction;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
 {
@@ -87,7 +72,6 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
 
     protected string $view = 'adultdate/filament-booking::service-periods-fullcalendar';
 
-
     public function getHeading(): string | Htmlable
     {
         return 'Calenar';
@@ -100,7 +84,7 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
                 ->requiresConfirmation(true)
                 ->action(function (array $arguments) {
                     dd('Admin action called', $arguments);
-                })
+                }),
         ];
     }
 
@@ -124,7 +108,6 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
         return $this->getModel();
     }
 
-
     public function getEventRecord(): ?Model
     {
         return $this->record instanceof Model ? $this->record : null;
@@ -135,9 +118,7 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
         return $this->getModel()::query();
     }
 
-
-
-    protected int|string|array $columnSpan = 'full';
+    protected int | string | array $columnSpan = 'full';
 
     public function config(): array
     {
@@ -274,11 +255,11 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
                             $endTime = \Carbon\Carbon::parse($this->calendarData['end'])->format('H:i');
                         }
                         if ($endTime === $startTime) {
-                            $startDate  = \Carbon\Carbon::parse($dateVal)->format('Y-m-d');
+                            $startDate = \Carbon\Carbon::parse($dateVal)->format('Y-m-d');
                             $startTime = \Carbon\Carbon::parse($startVal)->format('H:i');
                             $endTime = \Carbon\Carbon::parse($endVal)->format('H:i');
                         }
-                        $data = ['date' => $startDate, 'start' => $startTime, 'end' => $endTime, 'service_date' => $startDate, 'start_time' => $startTime, 'end_time' => $endTime, 'start_val' => $startVal, 'end_val' => $endVal, 'date_val' => $dateVal,];
+                        $data = ['date' => $startDate, 'start' => $startTime, 'end' => $endTime, 'service_date' => $startDate, 'start_time' => $startTime, 'end_time' => $endTime, 'start_val' => $startVal, 'end_val' => $endVal, 'date_val' => $dateVal];
                         logger()->info('BookingCalendarWidget: LOCATION DATA', $data);
                         $this->replaceMountedAction('createDailyLocation', ['data' => $data]);
                         $newIndex = max(0, count($this->mountedActions) - 1);
@@ -301,11 +282,11 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
                             $endTime = \Carbon\Carbon::parse($this->calendarData['end'])->format('H:i');
                         }
                         if ($endTime === $startTime) {
-                            $startDate  = \Carbon\Carbon::parse($dateVal)->format('Y-m-d');
+                            $startDate = \Carbon\Carbon::parse($dateVal)->format('Y-m-d');
                             $startTime = \Carbon\Carbon::parse($startVal)->format('H:i');
                             $endTime = \Carbon\Carbon::parse($endVal)->format('H:i');
                         }
-                        $data = ['date' => $startDate, 'start' => $startTime, 'end' => $endTime, 'service_date' => $startDate, 'start_time' => $startTime, 'end_time' => $endTime, 'start_val' => $startVal, 'end_val' => $endVal, 'date_val' => $dateVal,];
+                        $data = ['date' => $startDate, 'start' => $startTime, 'end' => $endTime, 'service_date' => $startDate, 'start_time' => $startTime, 'end_time' => $endTime, 'start_val' => $startVal, 'end_val' => $endVal, 'date_val' => $dateVal];
                         logger()->info('BookingCalendarWidget: BOOKING DATA', $data);
                         $this->replaceMountedAction('create', ['data' => $data]);
                         $newIndex = max(0, count($this->mountedActions) - 1);
@@ -323,11 +304,11 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
                         $endVal = $this->calendarData['end_val'];
                         $dateVal = $this->calendarData['date_val'];
                         if ($endTime === $startTime) {
-                            $startDate  = \Carbon\Carbon::parse($dateVal)->format('Y-m-d');
+                            $startDate = \Carbon\Carbon::parse($dateVal)->format('Y-m-d');
                             $startTime = \Carbon\Carbon::parse($startVal)->format('H:i');
                             $endTime = \Carbon\Carbon::parse($endVal)->format('H:i');
                         }
-                        $data = ['date' => $startDate, 'start' => $startTime, 'end' => $endTime, 'service_date' => $startDate, 'start_time' => $startTime, 'end_time' => $endTime, 'start_val' => $startVal, 'end_val' => $endVal, 'date_val' => $dateVal,];
+                        $data = ['date' => $startDate, 'start' => $startTime, 'end' => $endTime, 'service_date' => $startDate, 'start_time' => $startTime, 'end_time' => $endTime, 'start_val' => $startVal, 'end_val' => $endVal, 'date_val' => $dateVal];
                         logger()->info('BookingCalendarWidget: BLOCK PERIOD DATA', $data);
                         $this->replaceMountedAction('createServicePeriod', ['data' => $data]);
                         $newIndex = max(0, count($this->mountedActions) - 1);
@@ -345,15 +326,15 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
                         $endVal = $this->calendarData['end_val'];
                         $dateVal = $this->calendarData['date_val'];
                         if ($endTime === $startTime) {
-                            $startDate  = \Carbon\Carbon::parse($dateVal)->format('Y-m-d');
+                            $startDate = \Carbon\Carbon::parse($dateVal)->format('Y-m-d');
                             $startTime = \Carbon\Carbon::parse($startVal)->format('H:i');
                             $endTime = \Carbon\Carbon::parse($endVal)->format('H:i');
                         }
-                        $data = ['date' => $startDate, 'start' => $startTime, 'end' => $endTime, 'service_date' => $startDate, 'start_time' => $startTime, 'end_time' => $endTime, 'start_val' => $startVal, 'end_val' => $endVal, 'date_val' => $dateVal,];
+                        $data = ['date' => $startDate, 'start' => $startTime, 'end' => $endTime, 'service_date' => $startDate, 'start_time' => $startTime, 'end_time' => $endTime, 'start_val' => $startVal, 'end_val' => $endVal, 'date_val' => $dateVal];
                         $this->replaceMountedAction('createServicePeriod', ['data' => $data]);
                         $newIndex = max(0, count($this->mountedActions) - 1);
                         $this->dispatch('sync-action-modals', ['id' => $this->getId(), 'newActionNestingIndex' => $newIndex]);
-                    })
+                    }),
 
             ]);
     }
@@ -370,6 +351,7 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
             ->schema($this->getFormLocation())
             ->fillForm(function (array $arguments) {
                 $data = $arguments['data'] ?? [];
+
                 return [
                     'date' => $data['date_val'] ?? $data['service_date'] ?? $data['date'] ?? now()->format('Y-m-d'),
                     'created_by' => Auth::id(),
@@ -398,6 +380,7 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
             ->schema($this->getFormPeriod())
             ->fillForm(function (array $arguments) {
                 $data = $arguments['data'] ?? [];
+
                 return [
                     'service_date' => $data['date_val'] ?? $data['service_date'] ?? $data['date'],
                     'service_user_id' => $data['service_user_id'] ?? null,
@@ -438,6 +421,7 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
             ->model(BookingServicePeriod::class)
             ->fillForm(function (array $arguments) {
                 $data = $arguments['data'] ?? [];
+
                 return [
                     'service_date' => $data['service_date'] ?? now()->format('Y-m-d'),
                     'service_user_id' => $data['service_user_id'] ?? null,
@@ -467,7 +451,6 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
                     ->send();
             });
     }
-
 
     public function manageBlockAction(): Action
     {
@@ -522,8 +505,6 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
             })
             ->modalFooterActions([
 
-
-
                 Action::make('view')
                     ->label('')
                     ->color('gray')
@@ -556,7 +537,6 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
                         $this->dispatch('sync-action-modals', id: $this->getId(), newActionNestingIndex: $newIndex);
                     }),
 
-
                 Action::make('delete')
                     ->label(' ')
                     ->color('danger')
@@ -568,7 +548,6 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
                         $newIndex = max(0, count($this->mountedActions) - 1);
                         $this->dispatch('sync-action-modals', id: $this->getId(), newActionNestingIndex: $newIndex);
                     }),
-
 
                 Action::make('cancel')
                     ->label('')
@@ -622,7 +601,7 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
                 'data' => $payload,
             ]);
         }
-        if ($event['title'] != 'ⓘ zzz' && (!isset($event['allDay']) || $event['allDay'] === false)) {
+        if ($event['title'] != 'ⓘ zzz' && (! isset($event['allDay']) || $event['allDay'] === false)) {
             //  dd($event)  ;
             $recId = $event['id'] ?? null;
             $this->model = Booking::class;
@@ -641,7 +620,6 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
             ]);
         }
     }
-
 
     protected function getDateClickContextMenuActions(): array
     {
@@ -750,6 +728,7 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
                 ->createOptionUsing(function (array $data) {
                     $data['country'] = 'Sweden';
                     $client = Client::create($data);
+
                     return $client->id;
                 })
                 ->required(),
@@ -839,7 +818,6 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
         ];
     }
 
-
     protected function getDefaultFormData(array $seed = []): array
     {
         return array_replace([
@@ -865,7 +843,7 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
         return 'BK-' . now()->format('Ymd') . '-' . Str::upper(Str::random(6));
     }
 
-    public function getEvents(FetchInfo $info): Collection|array|Builder
+    public function getEvents(FetchInfo $info): Collection | array | Builder
     {
         $start = $info->start->toMutable()->startOfDay();
         $end = $info->end->toMutable()->endOfDay();
@@ -874,7 +852,7 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
             ->where('period_type', '=', 'unavailable')
             ->get();
 
-        $blockingEvents = $blockingPeriods->map(fn(BookingServicePeriod $blockingPeriod) => $blockingPeriod->toCalendarEvent())->toArray();
+        $blockingEvents = $blockingPeriods->map(fn (BookingServicePeriod $blockingPeriod) => $blockingPeriod->toCalendarEvent())->toArray();
 
         $bookings = Booking::query()
             ->with(['client', 'service', 'serviceUser', 'bookingUser', 'location'])
@@ -882,14 +860,14 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
                 $query->whereBetween('service_date', [$start->toDateString(), $end->toDateString()])
                     ->when(
                         Schema::hasColumn('booking_bookings', 'starts_at'),
-                        fn($q) => $q->orWhereBetween('starts_at', [$start, $end]),
+                        fn ($q) => $q->orWhereBetween('starts_at', [$start, $end]),
                     );
             })
             ->where('is_active', true)
             ->get();
 
         // Transform bookings to calendar events
-        $bookingEvents = $bookings->map(fn(Booking $booking) => $booking->toCalendarEvent())->toArray();
+        $bookingEvents = $bookings->map(fn (Booking $booking) => $booking->toCalendarEvent())->toArray();
 
         // Also include DailyLocation entries as all-day events on calendar
         $dailyLocations = DailyLocation::query()

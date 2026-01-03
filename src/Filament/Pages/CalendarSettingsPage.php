@@ -20,16 +20,17 @@ final class CalendarSettingsPage extends Page implements HasForms
 
     public ?array $data = [];
 
-       protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     protected string $view = 'adultdate/filament-booking::pages.calendar-settings';
 
     protected static ?string $navigationLabel = 'Settings';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Bookings';
+    protected static string | UnitEnum | null $navigationGroup = 'Bookings';
 
-     protected static ?int $sort = 12;
-     protected static ?int $navigationSort = 12;
+    protected static ?int $sort = 12;
+
+    protected static ?int $navigationSort = 12;
 
     public function mount(): void
     {

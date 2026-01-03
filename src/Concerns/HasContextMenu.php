@@ -2,8 +2,8 @@
 
 namespace Adultdate\FilamentBooking\Concerns;
 
-use Filament\Actions\Action;
 use Adultdate\FilamentBooking\Enums\Context;
+use Filament\Actions\Action;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 
@@ -33,8 +33,7 @@ trait HasContextMenu
                 fn (Action $action) => $action
                     ->arguments($this->getRawCalendarContextData())
                     ->toHtml()
-            )
-        ;
+            );
     }
 
     public function hasContextMenu(?Context $context = null): bool
@@ -112,8 +111,7 @@ trait HasContextMenu
     private function cacheContextMenuAction(Action $action, Context $context): void
     {
         $action = $action
-            ->grouped()
-        ;
+            ->grouped();
 
         if (! $action instanceof Action) {
             throw new InvalidArgumentException('Context menu actions must be an instance of ' . Action::class . '.');

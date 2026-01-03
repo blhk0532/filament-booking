@@ -2,7 +2,6 @@
 
 namespace Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Services;
 
-use Adultdate\FilamentBooking\Filament\Clusters\Services\ServicesCluster;
 use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Services\Pages\CreateService;
 use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Services\Pages\EditService;
 use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Services\Pages\ListServices;
@@ -10,12 +9,12 @@ use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Services\Rela
 use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Services\Schemas\ServiceForm;
 use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Services\Tables\ServicesTable;
 use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Services\Widgets\ServiceStats;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\ServicesCluster;
 use Adultdate\FilamentBooking\Models\Booking\Service;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class ServiceResource extends Resource

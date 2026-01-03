@@ -3,7 +3,6 @@
 namespace Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings\Pages;
 
 use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings\BookingResource;
-
 use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings\Schemas\BookingForm;
 use Adultdate\FilamentBooking\Models\Booking\Booking;
 use App\Models\User;
@@ -70,5 +69,3 @@ class CreateBooking extends CreateRecord
             ->sendToDatabase([$user]);
     }
 }
-
- 

@@ -5,7 +5,6 @@ namespace Adultdate\FilamentBooking\Concerns;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Livewire\Attributes\Locked;
 
 trait InteractsWithEvent
@@ -49,8 +48,7 @@ trait InteractsWithEvent
     {
         return $this->getEloquentQuery($model)
             ->where($this->getEventRecordRouteKeyName($model), $key)
-            ->first()
-        ;
+            ->first();
     }
 
     protected function getEloquentQuery(string $model): Builder

@@ -21,7 +21,6 @@ trait HasLocale
     {
         return str(app()->getLocale())
             ->before('_')
-            ->toString()
-        ;
+            ->toString();
     }
 }

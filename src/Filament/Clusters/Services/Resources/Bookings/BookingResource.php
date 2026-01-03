@@ -32,7 +32,7 @@ class BookingResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-public static function form(Schema $schema): Schema
+    public static function form(Schema $schema): Schema
     {
         return BookingForm::configure($schema);
     }
@@ -135,5 +135,4 @@ public static function form(Schema $schema): Schema
     {
         return parent::getTableQuery()->withoutGlobalScope(SoftDeletingScope::class);
     }
-
 }

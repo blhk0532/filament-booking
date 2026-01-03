@@ -12,7 +12,6 @@ use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
-
 class Dashboard extends BaseDashboard
 {
     use BaseDashboard\Concerns\HasFiltersForm;
@@ -51,7 +50,7 @@ class Dashboard extends BaseDashboard
         return true;
     }
 
-    public static function getNavigationLabel(): string                       
+    public static function getNavigationLabel(): string
     {
         return '' . Str::ucfirst(Auth::user()->name) ?? 'User';
     }

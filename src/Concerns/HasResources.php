@@ -34,7 +34,6 @@ trait HasResources
 
                 return $resource->toCalendarObject();
             })
-            ->toArray()
-        ;
+            ->toArray();
     }
 }

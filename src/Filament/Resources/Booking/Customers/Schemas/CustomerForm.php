@@ -3,7 +3,6 @@
 namespace Adultdate\FilamentBooking\Filament\Resources\Booking\Customers\Schemas;
 
 use Adultdate\FilamentBooking\Models\Booking\Customer;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;

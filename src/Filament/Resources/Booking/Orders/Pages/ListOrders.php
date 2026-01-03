@@ -21,8 +21,6 @@ class ListOrders extends ListRecords
         ];
     }
 
-
-
     public function getTabs(): array
     {
         return [

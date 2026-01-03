@@ -195,7 +195,7 @@ trait InteractsWithCalendar
 
             if (isset($this->mountedActions[$idx]) && is_array($this->mountedActions[$idx])) {
                 // Ensure the 'data' key exists in the mounted action array
-                if (!isset($this->mountedActions[$idx]['data'])) {
+                if (! isset($this->mountedActions[$idx]['data'])) {
                     $this->mountedActions[$idx]['data'] = $merged['data'] ?? [];
                 }
 

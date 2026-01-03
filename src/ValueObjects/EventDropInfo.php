@@ -29,16 +29,14 @@ readonly class EventDropInfo implements ContextualInfo
                 data_get($data, 'event'),
                 data_get($data, 'tzOffset'),
                 $useFilamentTimezone
-            )
-        ;
+            );
 
         $this->oldEvent = CalendarEvent::make($record)
             ->fromCalendarObject(
                 data_get($data, 'oldEvent'),
                 data_get($data, 'tzOffset'),
                 $useFilamentTimezone
-            )
-        ;
+            );
 
         // todo: resource and old resource
         $this->view = new CalendarView(

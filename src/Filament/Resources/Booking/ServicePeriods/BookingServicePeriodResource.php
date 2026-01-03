@@ -19,19 +19,17 @@ use UnitEnum;
 
 class BookingServicePeriodResource extends Resource
 {
-
-
     protected static ?string $model = BookingServicePeriod::class;
 
-        protected static ?string $recordTitleAttribute = 'period';
+    protected static ?string $recordTitleAttribute = 'period';
 
- protected static ?string $modelLabel =  'Calendar Bookings';
+    protected static ?string $modelLabel = 'Calendar Bookings';
 
     protected static ?string $navigationLabel = 'Periods';
 
     protected static string | UnitEnum | null $navigationGroup = 'Bookings';
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClock;
+    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedClock;
 
     protected static ?int $sort = 1;
 
@@ -59,11 +57,10 @@ class BookingServicePeriodResource extends Resource
 
     public static function getWidgets(): array
     {
-     
-            return [\Adultdate\FilamentBooking\Filament\Resources\Booking\ServicePeriods\Widgets\BookingPeriodsCalendar::class];
-      
-    }
 
+        return [\Adultdate\FilamentBooking\Filament\Resources\Booking\ServicePeriods\Widgets\BookingPeriodsCalendar::class];
+
+    }
 
     public static function getPages(): array
     {

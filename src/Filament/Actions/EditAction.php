@@ -2,8 +2,8 @@
 
 namespace Adultdate\FilamentBooking\Filament\Actions;
 
-use Filament\Schemas\Schema;
 use Adultdate\FilamentBooking\Contracts\HasCalendar;
+use Filament\Schemas\Schema;
 
 class EditAction extends \Filament\Actions\EditAction
 {
@@ -17,8 +17,10 @@ class EditAction extends \Filament\Actions\EditAction
             ->before(function (HasCalendar $livewire) {
                 if (! $livewire->getEventRecord()) {
                     $livewire->refreshRecords();
+
                     return false; // Prevent the action
                 }
+
                 return true;
             })
             ->schema(
@@ -26,7 +28,6 @@ class EditAction extends \Filament\Actions\EditAction
                     ->getFormSchemaForModel($schema, $action->getModel())
                     ->record($livewire->getEventRecord())
             )
-            ->cancelParentActions()
-        ;
+            ->cancelParentActions();
     }
 }

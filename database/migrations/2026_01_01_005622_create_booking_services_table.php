@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('booking_services', function (Blueprint $table) {
-            $table->id();            $table->foreignId('booking_brand_id')->nullable()->constrained()->nullOnDelete();
+            $table->id();
+            $table->foreignId('booking_brand_id')->nullable()->constrained()->nullOnDelete();
             $table->string('name');
             $table->string('slug')->unique()->nullable();
             $table->string('service_code')->unique()->nullable();
@@ -26,7 +27,8 @@ return new class extends Migration
             $table->boolean('is_visible')->default(false);
             $table->date('published_at')->nullable();
             $table->string('seo_title', 60)->nullable();
-            $table->string('seo_description', 160)->nullable();            $table->timestamps();
+            $table->string('seo_description', 160)->nullable();
+            $table->timestamps();
         });
     }
 

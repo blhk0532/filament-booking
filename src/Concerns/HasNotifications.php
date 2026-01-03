@@ -23,8 +23,7 @@ trait HasNotifications
         return Notification::make()
             ->danger()
             ->title($this->getUnauthorizedNotificationTitle($response))
-            ->persistent()
-        ;
+            ->persistent();
     }
 
     protected function getUnauthorizedNotificationTitle(Response $response): ?string

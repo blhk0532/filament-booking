@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use Adultdate\FilamentBooking\Models\Booking\OrderAddress;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class BookingOrderAddressSeeder extends Seeder

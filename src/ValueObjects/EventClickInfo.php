@@ -27,8 +27,7 @@ readonly class EventClickInfo implements ContextualInfo
                 data_get($data, 'event'),
                 data_get($data, 'tzOffset'),
                 $useFilamentTimezone
-            )
-        ;
+            );
 
         $this->view = new CalendarView(
             data_get($data, 'view'),

@@ -4,13 +4,12 @@ namespace Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Booking
 
 use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings\BookingResource;
 use Filament\Actions\CreateAction;
-use Filament\Resources\Pages\ListRecords;
 use Filament\Pages\Concerns\ExposesTableToWidgets;
+use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Tabs\Tab;
 
 class ListBookings extends ListRecords
-{  
-    
+{
     use ExposesTableToWidgets;
 
     protected static string $resource = BookingResource::class;
@@ -40,4 +39,3 @@ class ListBookings extends ListRecords
         return BookingResource::getWidgets();
     }
 }
- 

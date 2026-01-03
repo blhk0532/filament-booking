@@ -371,8 +371,7 @@ class CalendarEvent
             ->classNames($data['classNames'])
             ->extendedProps($data['extendedProps'])
             ->display($data['display'])
-            ->resourceIds($data['resourceIds'])
-        ;
+            ->resourceIds($data['resourceIds']);
 
         if ($backgroundColor = data_get($data, 'backgroundColor')) {
             $this->backgroundColor($backgroundColor);

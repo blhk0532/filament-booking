@@ -29,16 +29,14 @@ readonly class EventResizeInfo implements ContextualInfo
                 data_get($data, 'event'),
                 data_get($data, 'tzOffset'),
                 $useFilamentTimezone
-            )
-        ;
+            );
 
         $this->oldEvent = CalendarEvent::make($record)
             ->fromCalendarObject(
                 data_get($data, 'oldEvent'),
                 data_get($data, 'tzOffset'),
                 $useFilamentTimezone
-            )
-        ;
+            );
 
         $this->view = new CalendarView(
             data_get($data, 'view'),

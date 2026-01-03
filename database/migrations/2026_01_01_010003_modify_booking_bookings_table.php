@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('booking_bookings', function (Blueprint $table): void {
             // Remove old columns
             $table->dropColumn(['shipping_price', 'shipping_method']);
-            
+
             // Add new columns
             $table->foreignId('booking_location_id')->nullable()->after('booking_client_id')->constrained('booking_locations')->nullOnDelete();
             $table->date('service_date')->nullable()->after('booking_location_id');
@@ -25,7 +25,7 @@ return new class extends Migration
             $table->timestamp('notified_at')->nullable()->after('is_active');
             $table->timestamp('confirmed_at')->nullable()->after('notified_at');
             $table->timestamp('completed_at')->nullable()->after('confirmed_at');
-            
+
             // Set default currency to SEK
             $table->string('currency')->default('SEK')->change();
         });
@@ -50,11 +50,11 @@ return new class extends Migration
                 'confirmed_at',
                 'completed_at',
             ]);
-            
+
             // Add old columns back
             $table->decimal('shipping_price')->nullable();
             $table->string('shipping_method')->nullable();
-            
+
             // Remove default from currency
             $table->string('currency')->default(null)->change();
         });

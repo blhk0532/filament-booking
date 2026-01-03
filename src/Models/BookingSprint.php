@@ -2,8 +2,8 @@
 
 namespace Adultdate\FilamentBooking\Models;
 
-use Adultdate\FilamentBooking\Enums\Priority;
 use Adultdate\FilamentBooking\Contracts\Eventable;
+use Adultdate\FilamentBooking\Enums\Priority;
 use Adultdate\FilamentBooking\ValueObjects\CalendarEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

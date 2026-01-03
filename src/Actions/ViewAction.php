@@ -2,8 +2,8 @@
 
 namespace Adultdate\FilamentBooking\Actions;
 
-use Filament\Actions\ViewAction as BaseViewAction;
 use Adultdate\FilamentBooking\Filament\Widgets\FullCalendarWidget;
+use Filament\Actions\ViewAction as BaseViewAction;
 
 class ViewAction extends BaseViewAction
 {

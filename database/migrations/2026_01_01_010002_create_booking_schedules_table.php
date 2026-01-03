@@ -21,7 +21,7 @@ return new class extends Migration
             $table->integer('max_bookings')->default(10);
             $table->text('notes')->nullable();
             $table->timestamps();
-            
+
             // Ensure one schedule per location per date
             $table->unique(['booking_location_id', 'date']);
         });
