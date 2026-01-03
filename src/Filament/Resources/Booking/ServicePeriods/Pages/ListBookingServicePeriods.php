@@ -5,6 +5,8 @@ namespace Adultdate\FilamentBooking\Filament\Resources\Booking\ServicePeriods\Pa
 use Adultdate\FilamentBooking\Filament\Resources\Booking\ServicePeriods\BookingServicePeriodResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Actions\Action;
+use Filament\Forms\Components\Select;
 
 class ListBookingServicePeriods extends ListRecords
 {
@@ -13,7 +15,11 @@ class ListBookingServicePeriods extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+               Select::make('booking_client_id')
+                ->label('Service User')
+                ->options([1,2,3,4,5])
+                ->searchable()
+                ->preload()
         ];
     }
 

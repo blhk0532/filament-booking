@@ -49,13 +49,13 @@ class Booking extends Model
 
     protected $casts = [
         'status' => BookingStatus::class,
-        'service_date' => 'date',
-        'starts_at' => 'datetime',
-        'ends_at' => 'datetime',
         'is_active' => 'boolean',
         'notified_at' => 'datetime',
         'confirmed_at' => 'datetime',
         'completed_at' => 'datetime',
+        'service_date' => 'date',
+        'start_time',
+        'end_time',
     ];
 
     protected $attributes = [
@@ -157,19 +157,24 @@ class Booking extends Model
 
         return [
             'id' => $this->id,
-            'title' => $this->client?->name ?? 'Booking #' . $this->number,
+            'title' => $this->client?->name ?? 'Booking #' . ($this->number ?? 'New'),
             'start' => $start,
             'end' => $end,
             'backgroundColor' => $this->status?->getColor() ?? '#3788d8',
             'borderColor' => $this->status?->getColor() ?? '#3788d8',
             'extendedProps' => [
+                'key' => $this->id,  // Required: Record ID for event resolution
                 'booking_id' => $this->id,
                 'number' => $this->number,
                 'client_name' => $this->client?->name,
+                'service_date' => $this->service_date?->format('Y-m-d'),
                 'service_name' => $this->service?->name,
                 'service_user' => $this->serviceUser?->name,
                 'booking_user' => $this->bookingUser?->name,
                 'location' => $this->location?->name,
+                'displayLocation' => $this->location?->name,
+                // Model FQCN used by calendar to select custom event content
+                'model' => static::class,
                 'status' => $this->status?->value,
                 'total_price' => $this->total_price,
                 'currency' => $this->currency,

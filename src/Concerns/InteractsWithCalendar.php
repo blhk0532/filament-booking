@@ -191,29 +191,18 @@ trait InteractsWithCalendar
         // Ensure the newly mounted action has a `data` entry so Livewire entanglement to
         // mountedActions.0.data.* does not fail due to missing nested keys.
         try {
-            $idx = max(0, count($this->mountedActions) - 1);
+            $idx = max(0, count($this->mountedActions ?? []) - 1);
 
-            if (isset($this->mountedActions[$idx])) {
-                // If it's an array-like mounted action
-                if (is_array($this->mountedActions[$idx])) {
-                    $this->mountedActions[$idx]['data'] = $merged['data'] ?? ($this->mountedActions[$idx]['data'] ?? []);
-                } elseif (is_object($this->mountedActions[$idx])) {
-                    // Some implementations may use objects for mounted action representations - try to set property if possible
-                    try {
-                        if (property_exists($this->mountedActions[$idx], 'data')) {
-                            $this->mountedActions[$idx]->data = $merged['data'] ?? ($this->mountedActions[$idx]->data ?? []);
-                        } elseif (method_exists($this->mountedActions[$idx], 'set')) {
-                            $this->mountedActions[$idx]->set('data', $merged['data'] ?? []);
-                        }
-                    } catch (\Throwable $e) {
-                        // ignore - this is only a safety net for Livewire entanglement
-                    }
+            if (isset($this->mountedActions[$idx]) && is_array($this->mountedActions[$idx])) {
+                // Ensure the 'data' key exists in the mounted action array
+                if (!isset($this->mountedActions[$idx]['data'])) {
+                    $this->mountedActions[$idx]['data'] = $merged['data'] ?? [];
                 }
 
                 // Log final mounted state for diagnostic purposes
                 Log::debug('InteractsWithCalendar::mountAction::ensuredData', [
                     'idx' => $idx,
-                    'mounted' => $this->mountedActions[$idx],
+                    'hasData' => isset($this->mountedActions[$idx]['data']),
                 ]);
             }
         } catch (\Throwable $e) {

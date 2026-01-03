@@ -56,7 +56,6 @@ class DailyLocation extends Model implements Eventable
         return CalendarEvent::make($this)
             ->title($title)
             ->start($this->date)
-            ->end(Carbon::parse($this->date)->addDay()->startOfDay())
             ->allDay(true)
             ->backgroundColor('#f3f4f6')
             ->textColor('#111827')
@@ -65,6 +64,17 @@ class DailyLocation extends Model implements Eventable
                 'daily_location_id' => $this->id,
                 'service_user_id' => $this->service_user_id,
                 'location' => $this->location,
+                'serviceUser' => $this->serviceUser?->name,
+                'displayLocation' => $this->location ?: ($this->serviceUser?->name ?? 'Location'),
             ]);
     }
+
+        /**
+         * Return the stored location value.
+         */
+        public function getLocation(): ?string
+        {
+            $title = $this->location ?: ($this->serviceUser?->name ?? 'Location');
+            return $title;
+        }
 }

@@ -19,6 +19,7 @@ use Adultdate\FilamentBooking\Filament\Widgets\SimpleCalendarWidget;
 use Adultdate\FilamentBooking\Models\BookingMeeting;
 use Adultdate\FilamentBooking\Models\BookingSprint;
 use Adultdate\FilamentBooking\Models\BookingServicePeriod;
+use Adultdate\FilamentBooking\Models\Booking\Booking;
 use Adultdate\FilamentBooking\Models\Booking\DailyLocation;
 // use Adultdate\FilamentBooking\Filament\Actions\CreateAction;
 use Adultdate\FilamentBooking\Models\CalendarSettings;
@@ -362,10 +363,16 @@ final class LocationCalendarWidget extends SimpleCalendarWidget implements HasCa
         return view('adultdate/filament-booking::components.calendar.events.sprint')->render();
     }
 
-    #[CalendarEventContent(model: BookingSprint::class)]
+    #[CalendarEventContent(model: DailyLocation::class)]
     protected function locationEventContent(): string
     {
         return view('adultdate/filament-booking::components.calendar.events.location')->render();
+    }
+
+    #[CalendarEventContent(model: Booking::class)]
+    protected function bookingEventContent(): string
+    {
+        return view('adultdate/filament-booking::components.calendar.events.booking')->render();
     }
 
     public function mount(): void

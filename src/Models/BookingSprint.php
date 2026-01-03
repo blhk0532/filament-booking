@@ -39,6 +39,9 @@ class BookingSprint extends Model implements Eventable
             ->title($this->title)
             ->start($this->starts_at)
             ->end($this->ends_at)
-            ->extendedProp('priority', $this->priority->getLabel());
+            ->extendedProps([
+                'title' => $this->title,
+                'priority' => $this->priority->getLabel(),
+            ]);
     }
 }

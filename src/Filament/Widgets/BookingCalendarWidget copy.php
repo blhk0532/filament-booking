@@ -21,9 +21,6 @@ use Adultdate\FilamentBooking\Models\Booking\Client;
 use Adultdate\FilamentBooking\Models\Booking\DailyLocation;
 use Adultdate\FilamentBooking\Models\Booking\Service;
 use Adultdate\FilamentBooking\ValueObjects\FetchInfo;
-use Adultdate\FilamentBooking\ValueObjects\DateClickInfo;
-use Adultdate\FilamentBooking\ValueObjects\DateSelectInfo;
-use Adultdate\FilamentBooking\Models\BookingServicePeriod;
 use App\Models\User;
 use Carbon\Carbon;
 use Filament\Actions\Action;
@@ -113,7 +110,6 @@ class BookingCalendarWidget extends FullCalendarWidget implements HasCalendar
             ],
             'nowIndicator' => true,
             'selectable' => true,
-            'dateClick' => true,
             'slotMinTime' => '00:00:00',
             'slotMaxTime' => '24:00:00',
             'slotDuration' => '00:30:00',
@@ -130,7 +126,6 @@ class BookingCalendarWidget extends FullCalendarWidget implements HasCalendar
                     'slotHeight' => 120,
                 ],
             ],
-            'dayRender' => 'function(info) { info.el.addEventListener("contextmenu", function(e) { e.preventDefault(); $wire.dispatch("calendar--open-menu", { context: "DateClick", data: { date: info.dateStr } }); }); }',
         ];
     }
 
@@ -612,269 +607,9 @@ class BookingCalendarWidget extends FullCalendarWidget implements HasCalendar
 
     protected function isAdmin(User $user): bool
     {
-        // Only treat a user as admin when their `role` attribute equals 'admin' or 'super_admin'
-        return isset($user->role) && in_array($user->role, ['admin', 'super_admin']);
+        return true;
     }
 
-    protected function getDateClickContextMenuActions(): array
-    {
-        $user = Auth::user();
-
-        if (! $user || ! $this->isAdmin($user)) {
-            return [];
-        }
-
-        \Illuminate\Support\Facades\Log::info('getDateClickContextMenuActions called for admin user', ['user_id' => $user->id]);
-
-        return [
-            $this->createAction(Booking::class, 'ctxCreateBooking')
-                ->label('New Booking')
-                ->form($this->getFormSchema())
-                ->mountUsing(function ($formOrSchema, array $arguments) {
-                    if ($formOrSchema instanceof FilamentSchema) {
-                        $formOrSchema->fill([]);
-                    } elseif (is_object($formOrSchema) && method_exists($formOrSchema, 'fill')) {
-                        $formOrSchema->fill([]);
-                    }
-
-                    if (! isset($arguments['start']) && ! isset($arguments['service_date'])) {
-                        return;
-                    }
-
-                    $timezone = config('app.timezone');
-
-                    if (isset($arguments['service_date']) || isset($arguments['start_time'])) {
-                        $values = [
-                            'service_date' => $arguments['service_date'] ?? null,
-                            'start_time' => $arguments['start_time'] ?? null,
-                            'end_time' => $arguments['end_time'] ?? null,
-                        ];
-                    } else {
-                        $start = Carbon::parse($arguments['start'], $timezone);
-                        $values = ['service_date' => $start->format('Y-m-d')];
-
-                        if ($start->format('H:i:s') !== '00:00:00') {
-                            $values['start_time'] = $start->format('H:i');
-                        }
-
-                        if (isset($arguments['end'])) {
-                            $end = Carbon::parse($arguments['end'], $timezone);
-                            if ($end->format('H:i:s') !== '00:00:00') {
-                                $values['end_time'] = $end->format('H:i');
-                            }
-                        }
-                    }
-
-                    if ($formOrSchema instanceof FilamentSchema) {
-                        $formOrSchema->fillPartially($values, array_keys($values));
-                        return;
-                    }
-
-                    if (is_object($formOrSchema) && method_exists($formOrSchema, 'fill')) {
-                        $formOrSchema->fill($values);
-                        return;
-                    }
-                })
-                ->mutateDataUsing(function (array $data): array {
-                    $data['number'] = 'BK-' . now()->format('Ymd') . '-' . strtoupper(substr(uniqid(), -6));
-                    $data['booking_user_id'] = Auth::id();
-                    $data['currency'] = 'SEK';
-                    $data['is_active'] = true;
-
-                    if (isset($data['service_date']) && isset($data['start_time'])) {
-                        $data['starts_at'] = $data['service_date'] . ' ' . $data['start_time'];
-                    }
-                    if (isset($data['service_date']) && isset($data['end_time'])) {
-                        $data['ends_at'] = $data['service_date'] . ' ' . $data['end_time'];
-                    }
-
-                    return $data;
-                })
-                ->after(function (Booking $record, array $data) {
-                    if (isset($data['items']) && is_array($data['items'])) {
-                        foreach ($data['items'] as $item) {
-                            $record->items()->create([
-                                'booking_service_id' => $item['booking_service_id'],
-                                'qty' => $item['qty'] ?? 1,
-                                'unit_price' => $item['unit_price'] ?? 0,
-                            ]);
-                        }
-                    }
-                }),
-
-            $this->createAction(DailyLocation::class, 'ctxCreateDailyLocation')
-                ->label('Service Location')
-                ->icon('heroicon-o-map-pin')
-                ->modalHeading('Service Location')
-                ->modalWidth('2xl')
-                ->mountUsing(function ($action, ?FilamentSchema $schema, ?DateClickInfo $info): void {
-                    if (! $schema || ! $info) {
-                        return;
-                    }
-
-                    $schema->fill([
-                        'date' => $info->date->toDateString(),
-                        'service_user_id' => \Illuminate\Support\Facades\Auth::id(),
-                        'created_by' => \Illuminate\Support\Facades\Auth::id(),
-                    ]);
-                }),
-
-            $this->createAction(BookingServicePeriod::class, 'ctxCreateServicePeriod')
-                ->label('Add Block Period')
-                ->icon('heroicon-o-clock')
-                ->modalHeading('Add Block Period')
-                ->modalWidth('sm')
-                ->mountUsing(function ($action, ?FilamentSchema $schema, ?DateClickInfo $info): void {
-                    if (! $schema || ! $info) {
-                        return;
-                    }
-
-                    $schema->fill([
-                        'service_date' => $info->date->toDateString(),
-                        'created_by' => \Illuminate\Support\Facades\Auth::id(),
-                    ]);
-                }),
-        ];
-    }
-
-    protected function getDateSelectContextMenuActions(): array
-    {
-        $user = Auth::user();
-
-        if (! $user || ! $this->isAdmin($user)) {
-            return [];
-        }
-
-        return [
-            $this->createAction(Booking::class, 'ctxCreateBooking')
-                ->label('Create Bookings')
-                ->icon('heroicon-o-calendar-days')
-                ->modalHeading('Create Bookings')
-                ->modalWidth('4xl')
-                ->form($this->getFormSchema())
-                ->mountUsing(function (...$args) {
-                    $formOrSchema = $args[0] ?? null;
-
-                    try {
-                        $debugArgs = array_map(function ($a) {
-                            if (is_object($a)) {
-                                return json_decode(json_encode($a), true);
-                            }
-
-                            return $a;
-                        }, $args);
-
-                        \Illuminate\Support\Facades\Log::info('BookingCalendar date-select mount args', ['args' => $debugArgs]);
-                    } catch (\Throwable $e) {
-                        // ignore logging failures
-                    }
-
-                    if ($formOrSchema instanceof FilamentSchema) {
-                        $formOrSchema->fill([]);
-                    } elseif (is_object($formOrSchema) && method_exists($formOrSchema, 'fill')) {
-                        $formOrSchema->fill([]);
-                    }
-
-                    $values = [];
-
-                    if (isset($args[2]) && $args[2] instanceof DateSelectInfo) {
-                        $info = $args[2];
-                        $start = $info->start->toMutable();
-                        $end = $info->end->toMutable();
-
-                        if ($info->allDay) {
-                            $start->startOfDay();
-                            $end->subDay()->endOfDay();
-                        }
-
-                        $values = [
-                            'service_date' => $start->format('Y-m-d'),
-                        ];
-
-                        if ($start->format('H:i:s') !== '00:00:00') {
-                            $values['start_time'] = $start->format('H:i');
-                        }
-
-                        if ($end && $end->format('H:i:s') !== '00:00:00') {
-                            $values['end_time'] = $end->format('H:i');
-                        }
-                    } elseif (isset($args[1]) && (is_array($args[1]) || is_object($args[1]))) {
-                        $arguments = is_object($args[1]) ? json_decode(json_encode($args[1]), true) : $args[1];
-                        if (!isset($arguments['start']) && !isset($arguments['startStr']) && !isset($arguments['service_date'])) {
-                            return;
-                        }
-
-                        if (isset($arguments['service_date']) || isset($arguments['start_time'])) {
-                            $values = [
-                                'service_date' => $arguments['service_date'] ?? null,
-                                'start_time' => $arguments['start_time'] ?? null,
-                                'end_time' => $arguments['end_time'] ?? null,
-                            ];
-                        } else {
-                            $timezone = config('app.timezone');
-
-                            $startRaw = $arguments['startStr'] ?? $arguments['start'] ?? null;
-                            $endRaw = $arguments['endStr'] ?? $arguments['end'] ?? null;
-
-                            if (is_object($startRaw)) {
-                                if (isset($startRaw->date)) {
-                                    $startRaw = $startRaw->date;
-                                } else {
-                                    $startRaw = json_encode($startRaw);
-                                }
-                            }
-
-                            if (is_object($endRaw)) {
-                                if (isset($endRaw->date)) {
-                                    $endRaw = $endRaw->date;
-                                } else {
-                                    $endRaw = json_encode($endRaw);
-                                }
-                            }
-
-                            try {
-                                $start = Carbon::parse($startRaw, $timezone);
-                            } catch (\Throwable $e) {
-                                return; // couldn't parse start
-                            }
-
-                            $end = null;
-                            if ($endRaw) {
-                                try {
-                                    $end = Carbon::parse($endRaw, $timezone);
-                                } catch (\Throwable $e) {
-                                    $end = null;
-                                }
-                            }
-
-                            $values = ['service_date' => $start->format('Y-m-d')];
-
-                            if ($start->format('H:i:s') !== '00:00:00') {
-                                $values['start_time'] = $start->format('H:i');
-                            }
-
-                            if ($end && $end->format('H:i:s') !== '00:00:00') {
-                                $values['end_time'] = $end->format('H:i');
-                            }
-                        }
-                    } else {
-                        return; // no recognizable args
-                    }
-
-                    if ($formOrSchema instanceof FilamentSchema) {
-                        $formOrSchema->fillPartially($values, array_keys($values));
-
-                        return;
-                    }
-
-                    if (is_object($formOrSchema) && method_exists($formOrSchema, 'fill')) {
-                        $formOrSchema->fill($values);
-
-                        return;
-                    }
-                }),
-        ];
-    }
     protected function getActions(): array
     {
         return [
@@ -980,14 +715,5 @@ class BookingCalendarWidget extends FullCalendarWidget implements HasCalendar
         if (method_exists($this, 'cacheFooterActions')) {
             $this->cacheFooterActions();
         }
-    }
-
-    public function bootedHasContextMenu(): void
-    {
-        \Illuminate\Support\Facades\Log::info('bootedHasContextMenu called in BookingCalendarWidget');
-
-        $this->cacheContextMenuActions();
-
-        $this->setDateClickEnabled($this->hasContextMenu(\Adultdate\FilamentBooking\Enums\Context::DateClick));
     }
 }

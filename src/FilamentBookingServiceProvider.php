@@ -97,9 +97,30 @@ class FilamentBookingServiceProvider extends PackageServiceProvider
                 'adultdate.filament-booking.filament.resources.booking.daily-locations.widgets.location-calendar-widget',
                 \Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Widgets\LocationCalendarWidget::class
             );
-            \Livewire\Livewire::component('adultdate.schedule.filament.widgets.event-calendar', \Adultdate\Schedule\Filament\Widgets\EventCalendar::class);
+            \Livewire\Livewire::component('adultdate.filament-booking.filament.widgets.event-calendar', \Adultdate\FilamentBooking\Filament\Widgets\EventCalendar::class);
 
         }
+
+        FilamentAsset::register(
+            assets: [
+                AlpineComponent::make(
+                    'calendar',
+                    __DIR__ . '/../dist/js/calendar.js',
+                ),
+                AlpineComponent::make(
+                    'calendar-context-menu',
+                    __DIR__ . '/../dist/js/calendar-context-menu.js',
+                ),
+                AlpineComponent::make(
+                    'calendar-event',
+                    __DIR__ . '/../dist/js/calendar-event.js',
+                ),
+                AlpineComponent::make('filament-booking-alpine', __DIR__ . '/../resources/dist/filament-booking.js'),
+                Css::make('calendar-styles', 'https://cdn.jsdelivr.net/npm/@event-calendar/build@4.5.0/dist/event-calendar.min.css'),
+                Js::make('calendar-script', 'https://cdn.jsdelivr.net/npm/@event-calendar/build@4.5.0/dist/event-calendar.min.js'),
+            ],
+            package: 'adultdate/filament-booking'
+        );
 
         // Ensure views are available under the legacy namespace used across the package
         $viewsPath = __DIR__ . '/../resources/views';

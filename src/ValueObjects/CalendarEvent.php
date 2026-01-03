@@ -17,7 +17,7 @@ class CalendarEvent
 
     protected Carbon $start;
 
-    protected Carbon $end;
+    protected ?Carbon $end = null;
 
     protected bool $allDay = false;
 
@@ -68,7 +68,7 @@ class CalendarEvent
         return $this->start;
     }
 
-    public function end(string | Carbon $end): static
+    public function end(string | Carbon | null $end): static
     {
         $end = is_string($end)
             ? Carbon::make($end)
@@ -80,7 +80,7 @@ class CalendarEvent
         return $this;
     }
 
-    public function getEnd(): Carbon
+    public function getEnd(): ?Carbon
     {
         return $this->end;
     }
@@ -326,9 +326,6 @@ class CalendarEvent
             'start' => $useFilamentTimezone
                 ? $this->getStart()->setTimezone($this->timezone ?? FilamentTimezone::get())->toIso8601String()
                 : $this->getStart()->utcOffset($timezoneOffset)->toIso8601String(),
-            'end' => $useFilamentTimezone
-                ? $this->getEnd()->setTimezone($this->timezone ?? FilamentTimezone::get())->toIso8601String()
-                : $this->getEnd()->utcOffset($timezoneOffset)->toIso8601String(),
             'allDay' => $this->getAllDay(),
             'backgroundColor' => $this->getBackgroundColor(),
             'textColor' => $this->getTextColor(),
@@ -337,6 +334,12 @@ class CalendarEvent
             'resourceIds' => $this->getResourceIds(),
             'extendedProps' => $this->getExtendedProps(),
         ];
+
+        if ($this->getEnd() !== null) {
+            $array['end'] = $useFilamentTimezone
+                ? $this->getEnd()->setTimezone($this->timezone ?? FilamentTimezone::get())->toIso8601String()
+                : $this->getEnd()->utcOffset($timezoneOffset)->toIso8601String();
+        }
 
         if (($editable = $this->getEditable()) !== null) {
             $array['editable'] = $editable;

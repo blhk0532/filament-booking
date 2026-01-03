@@ -15,11 +15,11 @@ class CreateAction extends \Filament\Actions\CreateAction
         parent::setUp();
 
         $this
-            ->schema(
+            ->form(
                 fn (Schema $schema, CreateAction $action, HasCalendar $livewire) => $livewire
                     ->getFormSchemaForModel($schema, $action->getModel())
             )
-            ->mutateFormDataUsing(function (array $data): array {
+            ->mutateDataUsing(function (array $data): array {
                 $model = $this->getModel();
                 if ($model && is_a($model, \Adultdate\FilamentBooking\Models\Booking\Booking::class, true)) {
                     if (! isset($data['schedulable_type']) || ! isset($data['schedulable_id'])) {
@@ -48,6 +48,16 @@ class CreateAction extends \Filament\Actions\CreateAction
                             $arguments[$k] = $v;
                         }
                     }
+                }
+
+                // Normalize service_date/date into start_date so calendar callers that pass 'service_date'
+                // (or 'date') will still prefill the form.
+                if (isset($arguments['service_date']) && ! isset($arguments['start_date'])) {
+                    $arguments['start_date'] = $arguments['service_date'];
+                }
+
+                if (isset($arguments['date']) && ! isset($arguments['start_date'])) {
+                    $arguments['start_date'] = $arguments['date'];
                 }
 
                 // If no date arguments provided, do nothing

@@ -46,6 +46,9 @@ class BookingMeeting extends Model implements Eventable
             ->start($this->starts_at)
             ->end($this->ends_at)
             ->durationEditable(false)
-            ->extendedProp('participants', $participants);
+            ->extendedProps([
+                'title' => $this->title,
+                'participants' => $participants,
+            ]);
     }
 }

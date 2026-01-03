@@ -28,7 +28,7 @@ use Adultdate\FilamentBooking\ValueObjects\DateSelectInfo;
 use Adultdate\FilamentBooking\ValueObjects\EventDropInfo;
 use Adultdate\FilamentBooking\ValueObjects\EventResizeInfo;
 use Adultdate\FilamentBooking\ValueObjects\FetchInfo;
-// use Filament\Actions\CreateAction;
+use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
@@ -126,6 +126,22 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
         ]);
     }
 
+    #[CalendarSchema(model: Booking::class)]
+    protected function bookingSchema(Schema $schema): Schema
+    {
+        return $schema->schema([
+            TextInput::make('title')->required(),
+            TimePicker::make('start_time')
+                ->label('Start Time')
+                ->seconds(false)
+                ->required(),
+            TimePicker::make('end_time')
+                ->label('End Time')
+                ->seconds(false)
+                ->required(),
+        ]);
+    }
+
     #[CalendarSchema(model: BookingServicePeriod::class)]
     protected function bookingServicePeriodSchema(Schema $schema): Schema
     {
@@ -163,7 +179,8 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
         $openingEnd = $settings?->opening_hour_end?->format('H:i:s') ?? '17:00:00';
 
         $config = [
-            'view' => 'dayGridMonth',
+            'timeZone' => config('app.timezone'), // Set the calendar timezone
+            'view' => 'timeGridWeek',
             'headerToolbar' => [
                 'start' => 'prev,next today',
                 'center' => 'title',
@@ -177,12 +194,12 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
                     'slotHeight' => 60,
                 ],
                 'timeGridWeek' => [
-                    'slotMinTime' => $openingStart,
+                    'slotMinTime' => '00:00:00',
                     'slotMaxTime' => '24:00:00',
                     'slotHeight' => 60,
                 ],
                 'timeGridMonth' => [
-                    'slotMinTime' => $openingStart,
+                    'slotMinTime' => '00:00:00',
                     'slotMaxTime' => '24:00:00',
                     'slotHeight' => 60,
                 ],
@@ -203,6 +220,14 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
             ->whereBetween('date', [$start, $end])
             ->with(['serviceUser'])
             ->get();
+            
+        // Query bookings by service_date (bookings use service_date + start_time/end_time, not starts_at/ends_at)
+        $bookings = Booking::query()
+            ->with(['client', 'service', 'serviceUser', 'bookingUser', 'location', 'items'])
+            ->whereBetween('service_date', [$start, $end])
+            ->get();
+        
+        \Illuminate\Support\Facades\Log::info('Bookings fetched', ['count' => $bookings->count()]);
 
         $meetings = BookingMeeting::query()
             ->withCount('users')
@@ -217,6 +242,7 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
 
         $events = collect()
             ->push(...$dailyLocations)
+            ->push(...$bookings)
             ->push(...$meetings)
             ->push(...$sprints);
 
@@ -362,7 +388,7 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
         return [
             $this->createAction(Booking::class, 'ctxCreateBooking')
                 ->label('New Booking')
-                ->schema($this->getFormSchema())
+                ->form($this->getFormSchema())
                 ->mountUsing(function ($formOrSchema, array $arguments) {
                     if ($formOrSchema instanceof Schema) {
                         $formOrSchema->fill([]);
@@ -472,30 +498,142 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
     protected function getDateSelectContextMenuActions(): array
     {
         return [
-            CreateAction::make()
+            $this->createAction(Booking::class, 'ctxCreateBooking')
                 ->label('Create Bookings')
                 ->icon('heroicon-o-calendar-days')
                 ->modalHeading('Create Bookings')
                 ->modalWidth('4xl')
-                ->schema($this->getFormSchema())
-                ->mountUsing(function (CreateAction $action, ?Schema $schema, ?DateSelectInfo $info): void {
-                    if (! $schema || ! $info) {
+                ->form($this->getFormSchema())
+                ->mountUsing(function (...$args) {
+                    // Support both invocation signatures:
+                    // 1) ($formOrSchema, array $arguments)
+                    // 2) (CreateAction $action, ?Schema $schema, ?DateSelectInfo $info)
+                    $formOrSchema = $args[0] ?? null;
+
+                    // Log incoming args for debugging date-select payloads
+                    try {
+                        $debugArgs = array_map(function ($a) {
+                            if (is_object($a)) {
+                                return json_decode(json_encode($a), true);
+                            }
+
+                            return $a;
+                        }, $args);
+
+                        \Illuminate\Support\Facades\Log::info('EventCalendar date-select mount args', ['args' => $debugArgs]);
+                    } catch (\Throwable $e) {
+                        // ignore logging failures
+                    }
+
+                    // Reset form state to avoid leftover values
+                    if ($formOrSchema instanceof Schema) {
+                        $formOrSchema->fill([]);
+                    } elseif (is_object($formOrSchema) && method_exists($formOrSchema, 'fill')) {
+                        $formOrSchema->fill([]);
+                    }
+
+                    $values = [];
+
+                    // Case: DateSelectInfo provided as 3rd arg
+                    if (isset($args[2]) && $args[2] instanceof DateSelectInfo) {
+                        $info = $args[2];
+                        $start = $info->start->toMutable();
+                        $end = $info->end->toMutable();
+
+                        if ($info->allDay) {
+                            $start->startOfDay();
+                            $end->subDay()->endOfDay();
+                        }
+
+                        $values = [
+                            'service_date' => $start->format('Y-m-d'),
+                        ];
+
+                        if ($start->format('H:i:s') !== '00:00:00') {
+                            $values['start_time'] = $start->format('H:i');
+                        }
+
+                        if ($end && $end->format('H:i:s') !== '00:00:00') {
+                            $values['end_time'] = $end->format('H:i');
+                        }
+                    } elseif (isset($args[1]) && (is_array($args[1]) || is_object($args[1]))) {
+                        // Case: array or object arguments provided (from JS payload)
+                        $arguments = is_object($args[1]) ? json_decode(json_encode($args[1]), true) : $args[1];
+                        if (!isset($arguments['start']) && !isset($arguments['startStr']) && !isset($arguments['service_date'])) {
+                            return;
+                        }
+
+                        if (isset($arguments['service_date']) || isset($arguments['start_time'])) {
+                            $values = [
+                                'service_date' => $arguments['service_date'] ?? null,
+                                'start_time' => $arguments['start_time'] ?? null,
+                                'end_time' => $arguments['end_time'] ?? null,
+                            ];
+                        } else {
+                            $timezone = config('app.timezone');
+
+                            // Prefer 'startStr'/'endStr' if provided by JS, otherwise fall back to 'start'/'end'.
+                            $startRaw = $arguments['startStr'] ?? $arguments['start'] ?? null;
+                            $endRaw = $arguments['endStr'] ?? $arguments['end'] ?? null;
+
+                            // If startRaw is an object (stdClass), try to extract string fields
+                            if (is_object($startRaw)) {
+                                if (isset($startRaw->date)) {
+                                    $startRaw = $startRaw->date;
+                                } else {
+                                    $startRaw = json_encode($startRaw);
+                                }
+                            }
+
+                            if (is_object($endRaw)) {
+                                if (isset($endRaw->date)) {
+                                    $endRaw = $endRaw->date;
+                                } else {
+                                    $endRaw = json_encode($endRaw);
+                                }
+                            }
+
+                            try {
+                                $start = Carbon::parse($startRaw, $timezone);
+                            } catch (\Throwable $e) {
+                                return; // couldn't parse start
+                            }
+
+                            $end = null;
+                            if ($endRaw) {
+                                try {
+                                    $end = Carbon::parse($endRaw, $timezone);
+                                } catch (\Throwable $e) {
+                                    $end = null;
+                                }
+                            }
+
+                            $values = ['service_date' => $start->format('Y-m-d')];
+
+                            if ($start->format('H:i:s') !== '00:00:00') {
+                                $values['start_time'] = $start->format('H:i');
+                            }
+
+                            if ($end && $end->format('H:i:s') !== '00:00:00') {
+                                $values['end_time'] = $end->format('H:i');
+                            }
+                        }
+                    } else {
+                        // No recognizable args
                         return;
                     }
 
-                    $start = $info->start->toMutable();
-                    $end = $info->end->toMutable();
+                    if ($formOrSchema instanceof Schema) {
+                        $formOrSchema->fillPartially($values, array_keys($values));
 
-                    if ($info->allDay) {
-                        $start->startOfDay();
-                        $end->subDay()->endOfDay();
+                        return;
                     }
 
-                    $schema->fill([
-                        'priority' => Priority::Medium->value,
-                        'starts_at' => $start->format('Y-m-d'),
-                        'ends_at' => ($end->greaterThan($start) ? $end : $start->copy()->addDay())->format('Y-m-d'),
-                    ]);
+                    if (is_object($formOrSchema) && method_exists($formOrSchema, 'fill')) {
+                        $formOrSchema->fill($values);
+
+                        return;
+                    }
                 }),
             $this->createAction(DailyLocation::class, 'ctxCreateDailyLocation')
                 ->label('Service Location')
@@ -594,6 +732,12 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
     protected function locationEventContent(): string
     {
         return view('adultdate/filament-booking::components.calendar.events.location')->render();
+    }
+
+    #[CalendarEventContent(model: Booking::class)]
+    protected function bookingEventContent(): string
+    {
+        return view('adultdate/filament-booking::components.calendar.events.booking')->render();
     }
 
     public function mount(): void

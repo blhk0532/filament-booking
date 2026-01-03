@@ -7,7 +7,7 @@ use Filament\Tables\Columns\Enums\BadgeColor;
 
 enum BookingStatus: string
 {
-    
+    case New = 'new';
     case Booked = 'booked';
     case Confirmed = 'confirmed';
     case Processing = 'processing';
@@ -20,7 +20,7 @@ enum BookingStatus: string
     public function getLabel(): string
     {
         return match ($this) {
-
+            self::New => 'New',
             self::Booked => 'Booked',
             self::Confirmed => 'Confirmed',
             self::Processing => 'Processing',
@@ -35,6 +35,7 @@ enum BookingStatus: string
     public function getColor(): string
     {
         return match ($this) {
+            self::New => 'success',
             self::Booked => 'primary',
             self::Confirmed => 'warning',
             self::Processing => 'secondary',

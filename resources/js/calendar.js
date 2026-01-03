@@ -1,30 +1,30 @@
 const Calendar = window.EventCalendar;
 
 export default function calendar({
-                                     view = 'dayGridMonth',
-                                     locale = 'en',
-                                     firstDay = 1, 
-                                     dayMaxEvents = false,
-                                     eventContent = null,
-                                     eventClickEnabled = false,
-                                     eventDragEnabled = false,
-                                     eventResizeEnabled = false,
-                                     noEventsClickEnabled = false,
-                                     dateClickEnabled = false,
-                                     dateSelectEnabled = false,
-                                     datesSetEnabled = false,
-                                     viewDidMountEnabled = false,
-                                     eventAllUpdatedEnabled = false,
-                                     hasDateClickContextMenu = null,
-                                     hasDateSelectContextMenu = null,
-                                     hasEventClickContextMenu = null,
-                                     hasNoEventsClickContextMenu = null,
-                                     resources = null,
-                                     resourceLabelContent = null,
-                                     theme = null,
-                                     options = {},
-                                     eventAssetUrl,
-                                 }
+                                      view = 'dayGridMonth',
+                                      locale = 'en',
+                                      firstDay = 1, 
+                                      dayMaxEvents = false,
+                                      eventContent = null,
+                                      eventClickEnabled = false,
+                                      eventDragEnabled = false,
+                                      eventResizeEnabled = false,
+                                      noEventsClickEnabled = false,
+                                      dateClickEnabled = false,
+                                      dateSelectEnabled = false,
+                                      datesSetEnabled = false,
+                                      viewDidMountEnabled = false,
+                                      eventAllUpdatedEnabled = false,
+                                      hasDateClickContextMenu = null,
+                                      hasDateSelectContextMenu = null,
+                                      hasEventClickContextMenu = null,
+                                      hasNoEventsClickContextMenu = null,
+                                      resources = null,
+                                      resourceLabelContent = null,
+                                      theme = null,
+                                      options = {},
+                                      eventAssetUrl,
+                                  }
 ) {
     return {
 
@@ -41,7 +41,6 @@ export default function calendar({
         },
 
         mountCalendar: function () {
-     
             return Calendar.create(
                 this.$el.querySelector('[data-calendar]'),
                 this.getSettings(),
@@ -78,8 +77,28 @@ export default function calendar({
                         return undefined
                     }
 
+                     // Check if content already has actual values (not placeholders)
+                    // by looking for a specific placeholder pattern { key } with space
+                    const hasPlaceholders = /{ \w+ }/.test(content)
+                    if (content && !hasPlaceholders) {
+                        return {
+                            html: content,
+                        }
+                    }
+
+                    // Replace placeholders like { key } with extendedProps.key
+                    let html = content
+                    if (typeof info.event.extendedProps === 'object') {
+                        for (const key in info.event.extendedProps) {
+                            if (key !== 'model') {
+                                const pattern = new RegExp('{' + key + ' }', 'g')
+                                html = html.replace(pattern, info.event.extendedProps[key] ?? '')
+                            }
+                        }
+                    }
+
                     return {
-                        html: content,
+                        html: html,
                     }
                 }
             }
@@ -295,6 +314,9 @@ export default function calendar({
                 }
             }
 
+            // Eval string functions in options
+            if(typeof options.dayRender==="string"){options.dayRender=eval("("+options.dayRender+")")}
+
             const finalSettings = {
                 ...settings,
                 ...options,
@@ -311,7 +333,7 @@ export default function calendar({
             container.setAttribute('x-data', JSON.stringify(info))
             container.classList.add('w-full')
 
-            // Get the modified HTML
+            // Get modified HTML
             return container.outerHTML
         },
 

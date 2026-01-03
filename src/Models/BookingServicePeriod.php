@@ -47,4 +47,53 @@ class BookingServicePeriod extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+        public function toCalendarEvent(): array
+    {
+        $start = null;
+        $end = null;
+
+        if ($this->service_date && $this->start_time) {
+            $start = $this->service_date->toDateString().'T'.
+                str($this->start_time)->padRight(8, ':00');
+        } elseif ($this->starts_at) {
+            $start = $this->starts_at->toIso8601String();
+        }
+
+        if ($this->service_date && $this->end_time) {
+            $end = $this->service_date->toDateString().'T'.
+                str($this->end_time)->padRight(8, ':00');
+        } elseif ($this->ends_at) {
+            $end = $this->ends_at->toIso8601String();
+        }
+
+        return [
+            'id' => $this->id,
+            'title' => $this->client?->name ?? 'ⓘ zzz',
+            'start' => $start,
+            'end' => $end,
+            'backgroundColor' => $this->status?->getColor() ?? '#f3f4f6',
+            'borderColor' => $this->status?->getColor() ?? '#f3f4f6',
+            'extendedProps' => [
+                'key' => $this->id,  // Required: Record ID for event resolution
+                'booking_id' => $this->id,
+                'number' => $this->number,
+                'client_name' => $this->client?->name,
+                'service_date' => $this->service_date?->format('Y-m-d'),
+                'service_name' => $this->service?->name,
+                'service_user' => $this->serviceUser?->name,
+                'booking_user' => $this->bookingUser?->name,
+                'location' => $this->location?->name,
+                'displayLocation' => $this->location?->name,
+                // Model FQCN used by calendar to select custom event content
+                'model' => static::class,
+                'status' => $this->status?->value,
+                'total_price' => $this->total_price,
+                'currency' => $this->currency,
+                'notes' => $this->notes,
+            ],
+        ];
+    }
+
+
 }

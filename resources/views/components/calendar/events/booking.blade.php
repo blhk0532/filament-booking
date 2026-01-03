@@ -1,4 +1,6 @@
 <div class="flex flex-col">
-    <div class="font-semibold text-sm">{{ $event->title }}</div>
-    <div class="text-xs text-gray-600 dark:text-gray-400">{{ $event->client_name ?? 'No client' }}</div>
+	<span class="font-medium">{ client_name }</span>
+	<span class="text-xs text-gray-500">{ service_date }</span>
+	<div class="text-xs text-gray-500">{ location }</div>
+	<div class="text-xs text-gray-500">{ service_user }</div>
 </div>
