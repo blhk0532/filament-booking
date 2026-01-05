@@ -40,7 +40,7 @@ class FilamentBookingPlugin implements Plugin
 
     protected array $config = [];
 
-    protected string | Closure | null $timezone = null;
+    protected string | Closure | null $timezone = "Europe/Stockholm";
 
     protected string | Closure | null $locale = null;
 
@@ -61,12 +61,10 @@ class FilamentBookingPlugin implements Plugin
                 Css::make('event-calendar', 'https://cdn.jsdelivr.net/npm/@event-calendar/build@4.5.0/dist/event-calendar.min.css'),
             ])
             ->discoverClusters(in: app_path('../plugins/adultdate/filament-booking/src/Filament/Clusters'), for: 'Adultdate\\FilamentBooking\\Filament\\Clusters')
-            ->discoverPages(in: app_path('../plugins/adultdate/filament-booking/src/Filament/Pages'), for: 'Adultdate\\FilamentBooking\\Filament\\Pages')
 
             ->databaseNotifications()
             ->pages([
                 BookingCalendar::class,
-                Dashboard::class
             ])
             ->resources([
                 CustomerResource::class,
@@ -83,7 +81,7 @@ class FilamentBookingPlugin implements Plugin
                 OrdersChart::class,
                 StatsOverviewWidget::class,
                 EventCalendar::class,
-            ]);
+            ]); 
 
         FilamentAsset::register([
             AlpineComponent::make('calendar', __DIR__ . '/../dist/js/calendar.js'),

@@ -31,9 +31,9 @@ class BrandResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    public static function getFormSchema(): array
+    public static function form(Schema $schema): Schema
     {
-        return BrandForm::configure(Schema::make())->getComponents();
+        return BrandForm::configure($schema);
     }
 
     public static function table(Table $table): Table

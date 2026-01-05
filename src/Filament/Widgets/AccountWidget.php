@@ -3,6 +3,7 @@
 namespace Adultdate\FilamentBooking\Filament\Widgets;
 
 use Filament\Facades\Filament;
+use Filament\Widgets\Widget;
 
 class AccountWidget extends Widget
 {

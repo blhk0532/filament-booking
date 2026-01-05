@@ -2,40 +2,38 @@
 
 namespace Adultdate\FilamentBooking\Filament\Pages;
 
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
+use Shreejan\DashArrange\Traits\HasDashArrange;
 use Filament\Pages\Dashboard as BaseDashboard;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Utilities\Get;
-use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
-use BackedEnum;
+use Illuminate\Contracts\Support\Htmlable;
 
 class Dashboard extends BaseDashboard
 {
-    use BaseDashboard\Concerns\HasFiltersForm;
+    use HasDashArrange;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChartPie;
+    protected string $view = 'dash-arrange::dashboard';
 
-    protected static ?string $navigationLabel = 'Dash';
-
-    public function filtersForm(Schema $schema): Schema
+    public function mount(): void
     {
-        return $schema
-            ->components([
-                Section::make()
-                    ->schema([
-                        Select::make('businessCustomersOnly')
-                            ->label('Business Customers Only')
-                            ->boolean(),
-                        DatePicker::make('startDate')
-                            ->maxDate(fn (Get $get) => $get('endDate') ?: now()),
-                        DatePicker::make('endDate')
-                            ->minDate(fn (Get $get) => $get('startDate') ?: now())
-                            ->maxDate(now()),
-                    ])
-                    ->columns(3)
-                    ->columnSpanFull(),
-            ]);
+        // Initialize DashArrange functionality
+        $this->mountHasDashArrange();
+    }
+
+    public function getTitle(): string|Htmlable
+    {
+        return '';
+    }
+
+    public function getWidgets(): array
+    {
+        return [
+            \Adultdate\FilamentBooking\Filament\Widgets\StatsOverviewWidget::class,
+            \Adultdate\FilamentBooking\Filament\Widgets\AccountWidget::class,
+            \Adultdate\FilamentBooking\Filament\Widgets\FilamentInfosWidget::class,
+        ];
+    }
+
+    public function getPermissionCheckClosure(): \Closure
+    {
+        return fn (string $widgetClass) => true;
     }
 }

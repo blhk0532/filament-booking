@@ -116,6 +116,7 @@ class FilamentBookingServiceProvider extends PackageServiceProvider
                     __DIR__ . '/../dist/js/calendar-event.js',
                 ),
                 AlpineComponent::make('filament-booking-alpine', __DIR__ . '/../resources/dist/filament-booking.js'),
+                AlpineComponent::make('filament-fullcalendar-alpine', __DIR__ . '/../dist/js/filament-fullcalendar.js'),
                 Css::make('calendar-styles', 'https://cdn.jsdelivr.net/npm/@event-calendar/build@4.5.0/dist/event-calendar.min.css'),
                 Js::make('calendar-script', 'https://cdn.jsdelivr.net/npm/@event-calendar/build@4.5.0/dist/event-calendar.min.js'),
             ],

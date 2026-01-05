@@ -1,0 +1,75 @@
+<?php
+
+namespace Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings\Pages;
+
+// use Adultdate\FilamentBooking\Filament\Widgets\BookingCalendarWidget;
+use BackedEnum;
+use Filament\Forms\Components\Select;
+use Filament\Pages\Page as BasePage;
+use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
+use Filament\Schemas\Schema;
+use Filament\Widgets\Widget;
+use UnitEnum;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings\Widgets\BookingCalendar;
+use App\Models\BookingCalendar as BookingCalendarModel;
+use App\UserRole;
+
+class PageBooking extends BasePage
+{
+    use HasFiltersForm;
+
+    protected string $view = 'filament-booking::pages.page';
+
+    protected static ?string $navigationLabel = 'Booking Page';
+
+     // protected static string $routePath = 'services';
+    protected static ?string $slug = '';
+
+    protected static string $routePath = 'page/booking';
+
+    protected static BackedEnum | string | null $navigationIcon = 'heroicon-o-calendar';
+
+    protected static ?int $sort = 1;
+
+    protected static string | UnitEnum | null $navigationGroup = '';
+
+    public function filtersForm(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                Select::make('booking_calendars')
+                    ->label('Booking Calendars')
+                    ->options(fn () => BookingCalendarModel::whereHas('owner', fn($q) => $q->where('role', UserRole::SERVICE))->pluck('name', 'id'))
+                    ->placeholder('Select a calendar')
+                    ->reactive()
+                    ->afterStateUpdated(function () {
+                        $this->dispatch('refreshCalendar');
+                    }),
+            ]);
+    }
+
+    /**
+     * Return header widgets for the page.
+     *
+     * @return array<class-string<Widget>>
+     */
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            BookingCalendar::class,
+        ];
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return true;
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [            
+            \Filament\Actions\CreateAction::make('create-new-booking')::make()
+                ->label('New schedule')
+                ->icon('heroicon-o-calendar'),];
+    }
+}

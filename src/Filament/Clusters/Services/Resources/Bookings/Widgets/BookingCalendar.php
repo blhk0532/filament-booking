@@ -1,6 +1,6 @@
 <?php
 
-namespace Adultdate\FilamentBooking\Filament\Resources\Booking\ServicePeriods\Widgets;
+namespace Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings\Widgets;
 
 use Adultdate\FilamentBooking\Concerns\CanRefreshCalendar;
 use Adultdate\FilamentBooking\Concerns\HasOptions;
@@ -13,6 +13,7 @@ use Adultdate\FilamentBooking\Filament\Widgets\Concerns\CanBeConfigured;
 use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithEvents;
 use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithRawJS;
 use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithRecords;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Adultdate\FilamentBooking\Filament\Widgets\FullCalendarWidget;
 use Adultdate\FilamentBooking\Models\Booking\Booking;
 use Adultdate\FilamentBooking\Models\Booking\BookingLocation;
@@ -41,11 +42,13 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
-class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
+class BookingCalendar extends FullCalendarWidget implements HasCalendar
 {
     public ?int $recordId = null;
 
     protected $settings;
+
+    protected $listeners = ['refreshCalendar' => 'refreshCalendar'];
 
     //    protected bool $eventDragEnabled = true;
     //    protected bool $eventResizeEnabled = true;
@@ -54,12 +57,15 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
 
     protected static ?int $sort = -1;
 
-    use CanBeConfigured, CanRefreshCalendar, HasOptions, HasSchema, InteractsWithCalendar, InteractsWithEventRecord, InteractsWithEvents, InteractsWithRawJS, InteractsWithRecords {
+    use CanBeConfigured, CanRefreshCalendar, HasOptions, HasSchema, InteractsWithCalendar, InteractsWithEventRecord, InteractsWithEvents, InteractsWithPageFilters, InteractsWithRawJS, InteractsWithRecords {
         // Prefer the contract-compatible refreshRecords (chainable) from CanRefreshCalendar
         CanRefreshCalendar::refreshRecords insteadof InteractsWithEvents;
 
         // Keep the frontend-only refresh available under an alias if needed
         InteractsWithEvents::refreshRecords as refreshRecordsFrontend;
+
+        // Resolve __get collision: prefer InteractsWithPageFilters for pageFilters access
+        InteractsWithPageFilters::__get insteadof InteractsWithCalendar;
 
         // Resolve getOptions collision: prefer HasOptions' getOptions which merges config and options
         HasOptions::getOptions insteadof CanBeConfigured;
@@ -133,7 +139,6 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
 
         return [
             'initialView' => 'timeGridWeek',
-            'timeZone' => 'UTC',
             // Start week on Monday (0 = Sunday, 1 = Monday)
             'firstDay' => 1,
             'dayHeaderFormat' => [
@@ -868,7 +873,17 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
         $start = $info->start->toMutable()->startOfDay();
         $end = $info->end->toMutable()->endOfDay();
 
+        $filters = $this->pageFilters;
+        $selectedCalendarId = $filters['booking_calendars'] ?? null;
+
+        $serviceUserId = null;
+        if ($selectedCalendarId) {
+            $calendar = \App\Models\BookingCalendar::find($selectedCalendarId);
+            $serviceUserId = $calendar?->owner_id;
+        }
+
         $blockingPeriods = BookingServicePeriod::query()
+            ->when($serviceUserId, fn ($query) => $query->where('service_user_id', $serviceUserId))
             ->where('period_type', '=', 'unavailable')
             ->get();
 
@@ -876,6 +891,7 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
 
         $bookings = Booking::query()
             ->with(['client', 'service', 'serviceUser', 'bookingUser', 'location'])
+            ->when($serviceUserId, fn ($query) => $query->where('service_user_id', $serviceUserId))
             ->where(function ($query) use ($start, $end) {
                 $query->whereBetween('service_date', [$start->toDateString(), $end->toDateString()])
                     ->when(
@@ -891,6 +907,7 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
 
         // Also include DailyLocation entries as all-day events on calendar
         $dailyLocations = DailyLocation::query()
+            ->when($serviceUserId, fn ($query) => $query->where('service_user_id', $serviceUserId))
             ->whereBetween('date', [$start, $end])
             ->with(['serviceUser'])
             ->get();
@@ -937,6 +954,11 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
         return [
             $this->adminAction(),
         ];
+    }
+
+    public function refreshCalendar()
+    {
+        $this->refreshRecords();
     }
 
     public function mount(): void

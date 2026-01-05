@@ -4,6 +4,7 @@ namespace App;
 
 enum UserRole: string
 {
+ 
     case ADMIN = 'admin';
     case SERVICE = 'service';
     case BOOKING = 'booking';
@@ -12,8 +13,9 @@ enum UserRole: string
     public function label(): string
     {
         return match ($this) {
-            UserRole::ADMIN => 'Administrator',
-            UserRole::SERVICE => 'Doctor',
+
+            UserRole::ADMIN => 'Admin',
+            UserRole::SERVICE => 'Service',
             UserRole::BOOKING => 'Booking',
             UserRole::USER => 'User',
         };

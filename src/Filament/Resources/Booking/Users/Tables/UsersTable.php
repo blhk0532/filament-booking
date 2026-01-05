@@ -24,10 +24,10 @@ class UsersTable
                     ->label('Email address')
                     ->searchable(),
                 TextColumn::make('role')
-                    ->formatStateUsing(fn ($state) => UserRole::tryFrom($state)?->label() ?? $state)
+                    ->formatStateUsing(fn ($state) => $state->label() ?? $state)
                     ->badge()
                     ->color(function ($state): ?string {
-                        $role = UserRole::tryFrom($state);
+                        $role = $state;
 
                         if ($role === null) {
                             return null;
@@ -58,7 +58,7 @@ class UsersTable
                 Action::make('schedule')
                     ->label('Manage Schedule')
                     ->url(fn (User $record) => ManageServiceProviderSchedules::getUrl(['record' => $record->id]))
-                    ->visible(fn (User $record) => UserRole::tryFrom($record->role) === UserRole::SERVICE),
+                    ->visible(fn (User $record) => $record->role === UserRole::SERVICE),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

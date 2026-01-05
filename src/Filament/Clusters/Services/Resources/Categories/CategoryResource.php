@@ -30,9 +30,9 @@ class CategoryResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-    public static function getFormSchema(): array
+    public static function form(Schema $schema): Schema
     {
-        return CategoryForm::configure(Schema::make())->getComponents();
+        return CategoryForm::configure($schema);
     }
 
     public static function table(Table $table): Table

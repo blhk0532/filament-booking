@@ -12,7 +12,7 @@ export default function fullcalendar({
                                      noEventsClickEnabled = false,
                                      dateClickEnabled = true,
                                      dateSelectEnabled = true,
-                                     datesSetEnabled = false,
+                                     datesSetEnabled = true,
                                      viewDidMountEnabled = false,
                                      eventAllUpdatedEnabled = false,
                                      hasDateClickContextMenu = null,

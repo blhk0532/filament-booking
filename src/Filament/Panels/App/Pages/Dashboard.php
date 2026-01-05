@@ -6,6 +6,7 @@ use BackedEnum;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Pages\Dashboard as BaseDashboard;
+use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
@@ -15,7 +16,7 @@ use Illuminate\Support\Str;
 
 class Dashboard extends BaseDashboard
 {
-    use BaseDashboard\Concerns\HasFiltersForm;
+    use HasFiltersForm;
 
     protected static ?string $title = '';
 

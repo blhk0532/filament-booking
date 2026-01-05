@@ -1,6 +1,6 @@
 <?php
 
-namespace Adultdate\FilamentBooking\Filament\Resources\Booking\ServicePeriods\Widgets;
+namespace Adultdate\FilamentBooking\Filament\Clusters\Services\Widgets;
 
 use Adultdate\FilamentBooking\Concerns\CanRefreshCalendar;
 use Adultdate\FilamentBooking\Concerns\HasOptions;
@@ -41,7 +41,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
-class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
+class ServiceCalendar extends FullCalendarWidget implements HasCalendar
 {
     public ?int $recordId = null;
 

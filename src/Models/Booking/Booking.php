@@ -54,7 +54,8 @@ class Booking extends Model
         'confirmed_at' => 'datetime',
         'completed_at' => 'datetime',
         'service_date' => 'date',
-        'booking_user_id',
+        'starts_at' => 'datetime',
+        'ends_at' => 'datetime',
         'start_time',
         'end_time',
     ];
@@ -155,7 +156,9 @@ class Booking extends Model
         } elseif ($this->ends_at) {
             $end = $this->ends_at->toIso8601String();
         }
-
+                        $timeStamp = time();
+                        $dateStamp = date('m-d-Y', $timeStamp);
+                        $bookingNumber = 'BK-' . strrev($timeStamp) . '-NDS-' . $dateStamp;
         return [
             'id' => $this->id,
             'title' => $this->bookingUser?->name ?? 'Booking #' . ($this->number ?? 'New'),
@@ -166,7 +169,7 @@ class Booking extends Model
             'extendedProps' => [
                 'key' => $this->id,  // Required: Record ID for event resolution
                 'booking_id' => $this->id,
-                'number' => $this->number,
+                'number' => $bookingNumber,
                 'client_name' => $this->client?->name,
                 'service_date' => $this->service_date?->format('Y-m-d'),
                 'service_name' => $this->service?->name,

@@ -76,7 +76,7 @@ final class LocationCalendarWidget extends FullCalendarWidget implements HasActi
 
         $openingStart = $settings?->opening_hour_start?->format('H:i:s') ?? '09:00:00';
         $openingEnd = $settings?->opening_hour_end?->format('H:i:s') ?? '17:00:00';
-
+ 
         $config = [
             'initialView' => 'dayGridMonth',
             'headerToolbar' => [

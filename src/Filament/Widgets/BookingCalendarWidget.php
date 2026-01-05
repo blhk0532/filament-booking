@@ -25,6 +25,7 @@ use Adultdate\FilamentBooking\ValueObjects\DateClickInfo;
 use Adultdate\FilamentBooking\ValueObjects\DateSelectInfo;
 use Adultdate\FilamentBooking\Models\BookingServicePeriod;
 use App\Models\User;
+use App\UserRole;
 use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
@@ -613,7 +614,7 @@ class BookingCalendarWidget extends FullCalendarWidget implements HasCalendar
     protected function isAdmin(User $user): bool
     {
         // Only treat a user as admin when their `role` attribute equals 'admin' or 'super_admin'
-        return isset($user->role) && in_array($user->role, ['admin', 'super_admin']);
+        return isset($user->role) && ($user->role === UserRole::ADMIN || $user->role === UserRole::SUPER_ADMIN);
     }
 
     protected function getDateClickContextMenuActions(): array
