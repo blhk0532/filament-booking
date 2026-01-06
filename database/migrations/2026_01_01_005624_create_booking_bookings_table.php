@@ -13,20 +13,23 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('booking_bookings', function (Blueprint $table): void {
-            $table->id();
-            $table->unsignedInteger('sort')->default(0);
-            $table->foreignId('booking_customer_id')->nullable()->constrained()->nullOnDelete();
-            $table->string('number', 32)->unique();
-            $table->decimal('total_price', 12, 2)->nullable();
-            $table->enum('status', ['new', 'processing', 'shipped', 'delivered', 'cancelled'])->default('new');
-            $table->string('currency');
-            $table->decimal('shipping_price')->nullable();
-            $table->string('shipping_method')->nullable();
-            $table->text('notes')->nullable();
-            $table->timestamps();
-            $table->softDeletes();
-        });
+        if (! Schema::hasTable('booking_bookings')) {
+            Schema::create('booking_bookings', function (Blueprint $table): void {
+                $table->id();
+                $table->unsignedInteger('sort')->default(0);
+                $table->foreignId('booking_customer_id')->nullable()->constrained()->nullOnDelete();
+                $table->string('number', 32)->unique();
+                $table->decimal('total_price', 12, 2)->nullable();
+                $table->enum('status', ['new', 'processing', 'shipped', 'delivered', 'cancelled'])->default('new');
+                $table->string('currency');
+                $table->decimal('shipping_price')->nullable();
+                $table->string('shipping_method')->nullable();
+                $table->text('notes')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+
+        }
     }
 
     /**

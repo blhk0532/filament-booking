@@ -13,14 +13,17 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('booking_order_items', function (Blueprint $table): void {
-            $table->id();
-            $table->foreignId('booking_order_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->foreignId('booking_product_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->integer('qty');
-            $table->decimal('unit_price', 10, 2);
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('booking_order_items')) {
+            Schema::create('booking_order_items', function (Blueprint $table): void {
+                $table->id();
+                $table->foreignId('booking_order_id')->nullable();
+                $table->foreignId('booking_product_id')->nullable();
+                $table->integer('qty');
+                $table->decimal('unit_price', 10, 2);
+                $table->timestamps();
+            });
+
+        }
     }
 
     /**

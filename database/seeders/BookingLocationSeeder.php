@@ -69,7 +69,7 @@ class BookingLocationSeeder extends Seeder
                     'booking_location_id' => $location->id,
                     'date' => $date->format('Y-m-d'),
                     'start_time' => '08:00:00',
-                    'end_time' => '17:00:00',
+                    'end_time' => '21:00:00',
                     'is_available' => true,
                     'max_bookings' => 10,
                     'notes' => 'Regular business hours',

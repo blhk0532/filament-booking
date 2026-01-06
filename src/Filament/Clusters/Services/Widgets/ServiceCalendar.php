@@ -128,8 +128,8 @@ class ServiceCalendar extends FullCalendarWidget implements HasCalendar
     {
         $this->settings = CalendarSettings::where('user_id', Auth::id())->first();
 
-        $openingStart = $this->settings?->opening_hour_start?->format('H:i:s') ?? '09:00:00';
-        $openingEnd = $this->settings?->opening_hour_end?->format('H:i:s') ?? '17:00:00';
+        $openingStart = $this->settings?->opening_hour_start?->format('H:i:s') ?? '07:00:00';
+        $openingEnd = $this->settings?->opening_hour_end?->format('H:i:s') ?? '21:00:00';
 
         return [
             'initialView' => 'timeGridWeek',

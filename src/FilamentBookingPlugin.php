@@ -27,8 +27,7 @@ use Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Widgets\
 use Adultdate\FilamentBooking\Filament\Resources\Booking\BookingOutcallQueues\BookingOutcallQueueResource; 
 use Adultdate\FilamentBooking\Filament\Resources\Booking\Users\UserResource;
 use Adultdate\FilamentBooking\Filament\Pages\Dashboard; 
-
-
+use Illuminate\Support\Facades\Auth;
 
 class FilamentBookingPlugin implements Plugin
 {
@@ -178,7 +177,12 @@ class FilamentBookingPlugin implements Plugin
 
     public function isEditable(): bool
     {
-        return $this->editable ?? data_get($this->config, 'editable', false);
+        if (!Auth::check()) {
+            return false;
+        }
+
+        $user = Auth::user();
+        return in_array($user->role, [\App\UserRole::ADMIN, \App\UserRole::SUPER_ADMIN]);
     }
 
     public function selectable(bool $selectable = true): static

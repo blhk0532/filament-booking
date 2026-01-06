@@ -20,7 +20,7 @@ class PageBooking extends BasePage
 
     protected string $view = 'filament-booking::pages.page';
 
-    protected static ?string $navigationLabel = 'Booking Page';
+    protected static ?string $navigationLabel = 'Booking';
 
      // protected static string $routePath = 'services';
     protected static ?string $slug = '';
@@ -33,12 +33,16 @@ class PageBooking extends BasePage
 
     protected static string | UnitEnum | null $navigationGroup = '';
 
+        protected static bool $shouldRegisterNavigation = false;
+
+ protected static bool $isDiscovered = false;
+
     public function filtersForm(Schema $schema): Schema
     {
         return $schema
             ->components([
                 Select::make('booking_calendars')
-                    ->label('Booking Calendars')
+                    ->label('Calendars')
                     ->options(fn () => BookingCalendarModel::whereHas('owner', fn($q) => $q->where('role', UserRole::SERVICE))->pluck('name', 'id'))
                     ->placeholder('Select a calendar')
                     ->reactive()
@@ -62,7 +66,7 @@ class PageBooking extends BasePage
 
     public static function shouldRegisterNavigation(): bool
     {
-        return true;
+        return false;
     }
 
     protected function getHeaderActions(): array

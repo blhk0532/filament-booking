@@ -47,13 +47,13 @@ class DashboardBooking extends BaseDashboard
 
     public static function getNavigationLabel(): string                       
     {
-        return '' . Str::ucfirst(Auth::user()->name) ?? 'User';
+        return '' . Str::ucfirst('Bokning') ?? 'User';
     }
 
     public static function getNavigationBadge(): ?string
     {
         //  return now()->format('H:m');
-        return 'APP';
+        return '#';
     }
 
     public static function getNavigationBadgeColor(): ?string
@@ -71,14 +71,14 @@ class DashboardBooking extends BaseDashboard
                     ->schema([
                         Select::make('booking_calendars')
                             ->options(fn () => BookingCalendarModel::whereHas('owner', fn($q) => $q->where('role', UserRole::SERVICE))->pluck('name', 'id')->toArray())
-                            ->label('Booking Calendars')
+                            ->label('Tekninker')
                             ->placeholder('Select a calendar owner')
                             ->searchable()
                             ->reactive()
                             ->afterStateUpdated(function () {
                                 $this->dispatch('refreshCalendar');
-                            })
-                            ->columnSpanFull(),
+                            }),
+                      
                        
                         DatePicker::make('startDate')
                             ->maxDate(fn (Get $get) => $get('endDate') ?: now()),

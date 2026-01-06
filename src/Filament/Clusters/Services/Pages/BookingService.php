@@ -12,13 +12,18 @@ class BookingService extends Page
 {
     protected string $view = 'filament-booking::pages.page';
 
-    protected static ?string $navigationLabel = 'Booking Page';
-
+    protected static ?string $navigationLabel = 'Booking';
+ 
      protected static string $routePath = '/booking/service';
 
     protected static BackedEnum | string | null $navigationIcon = 'heroicon-o-calendar';
+    
 
     protected static ?int $sort = 1;
+
+    protected static bool $shouldRegisterNavigation = false;
+
+ protected static bool $isDiscovered = false;
 
     protected static string | UnitEnum | null $navigationGroup = '';
 
@@ -36,7 +41,7 @@ class BookingService extends Page
 
     public static function shouldRegisterNavigation(): bool
     {
-        return true;
+        return false;
     }
 
     protected function getHeaderActions(): array

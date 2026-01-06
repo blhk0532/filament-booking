@@ -46,6 +46,12 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
 {
     public ?int $recordId = null;
 
+    public ?array $lastMountedData = null;
+
+    public Model|int|string|null $record;
+
+    public ?Model $eventRecord = null;
+
     protected $settings;
 
     protected $listeners = ['refreshCalendar' => 'refreshCalendar'];
@@ -98,6 +104,86 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
         ];
     }
 
+    public function editServicePeriodAction(): Action
+    {
+        return Action::make('editServicePeriod')
+            ->label('Edit Service Period')
+            ->icon('heroicon-o-clock')
+            ->color('primary')
+            ->modalHeading('Edit Service Period')
+            ->modalWidth('md')
+            ->model(BookingServicePeriod::class)
+            ->schema($this->getFormPeriod())
+            ->fillForm(function (array $arguments) {
+                $data = $arguments['data'] ?? [];
+                $serviceUserId = $this->getSelectedServiceUserId();
+
+                return [
+                    'service_date' => $data['service_date'] ?? null,
+                    'service_user_id' => $data['service_user_id'] ?? $serviceUserId,
+                    'start_time' => $data['start_time'] ?? null,
+                    'end_time' => $data['end_time'] ?? null,
+                    'service_location' => $data['service_location'] ?? '',
+                    'period_type' => $data['period_type'] ?? 'unavailable',
+                ];
+            })
+            ->action(function (array $data, array $arguments) {
+                $id = $arguments['data']['id'] ?? null;
+                if ($id) {
+                    BookingServicePeriod::whereKey($id)->update($data);
+                }
+                $this->refreshRecords();
+                \Filament\Notifications\Notification::make()
+                    ->title('Period updated successfully')
+                    ->success()
+                    ->send();
+            })
+            ->modalSubmitActionLabel('Update')
+            ->modalCancelActionLabel('Cancel')
+            ->extraModalFooterActions([
+                \Filament\Actions\Action::make('deleteFromModal')
+                    ->label('Delete')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->modalHeading('Delete Service Period')
+                    ->modalDescription('Are you sure? This action cannot be undone.')
+                    ->modalSubmitActionLabel('Delete')
+                    ->action(function (array $arguments) {
+                        $id = $arguments['data']['id'] ?? null;
+                        if ($id) {
+                            BookingServicePeriod::whereKey($id)->delete();
+                        }
+                        $this->refreshRecords();
+                        \Filament\Notifications\Notification::make()
+                            ->title('Period deleted successfully')
+                            ->success()
+                            ->send();
+                    }),
+            ]);
+    }
+
+    public function deleteServicePeriodAction(): Action
+    {
+        return Action::make('deleteServicePeriod')
+            ->label('Delete Period')
+            ->icon('heroicon-o-trash')
+            ->color('danger')
+            ->requiresConfirmation()
+            ->modalHeading('Delete Service Period')
+            ->modalDescription('Are you sure you want to delete this service period? This action cannot be undone.')
+            ->action(function (array $arguments) {
+                $id = $arguments['data']['id'] ?? null;
+                if ($id) {
+                    BookingServicePeriod::whereKey($id)->delete();
+                }
+                $this->refreshRecords();
+                \Filament\Notifications\Notification::make()
+                    ->title('Period deleted successfully')
+                    ->success()
+                    ->send();
+            });
+    }
+
     public function getModelAlt(): string
     {
         return DailyLocation::class;
@@ -134,8 +220,8 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
     {
         $this->settings = CalendarSettings::where('user_id', Auth::id())->first();
 
-        $openingStart = $this->settings?->opening_hour_start?->format('H:i:s') ?? '09:00:00';
-        $openingEnd = $this->settings?->opening_hour_end?->format('H:i:s') ?? '17:00:00';
+        $openingStart = $this->settings?->opening_hour_start?->format('H:i:s') ?? '07:00:00';
+        $openingEnd = $this->settings?->opening_hour_end?->format('H:i:s') ?? '21:00:00';
 
         return [
             'initialView' => 'timeGridWeek',
@@ -154,6 +240,9 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
             'selectable' => true,
             'dateClick' => true,
             'eventClick' => true,
+            'onEventDrop' => 'onEventDrop',
+            'timeZone' => 'Europe/Stockholm',
+            'now' => now()->setTimezone('Europe/Stockholm')->addHour()->toISOString(),
             'slotMinTime' => $openingStart ? $openingStart : '08:00:00',
             'slotMaxTime' => $openingEnd ? $openingEnd : '18:00:00',
             'views' => [
@@ -176,6 +265,14 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
     public function onDateClick(string $date, bool $allDay, ?array $view, ?array $resource): void
     {
         $startDate = \Carbon\Carbon::parse($date);
+
+        // In dayGridMonth view, clicking on an empty day should create a location
+        if ($view && isset($view['type']) && $view['type'] === 'dayGridMonth') {
+            $this->mountAction('createDailyLocation', [
+                'date' => $startDate->format('Y-m-d'),
+            ]);
+            return;
+        }
 
         $this->mountAction('create', [
             'service_date' => $startDate->format('Y-m-d'),
@@ -205,10 +302,11 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
         $endTime = $endVal;
 
         if ($allDay) {
-            logger()->info('BookingCalendarWidget: ALL-DAY CLICK DETECTED!');
+            logger()->info('BookingCalendarWidget: ALL-DAY CLICK DETECTED!', ['dataVal' => $dateVal]);
 
             $this->mountAction('createDailyLocation', [
-                'date' => $startDate->format('Y-m-d'),
+                'date' => $dateVal->format('Y-m-d'),
+
             ]);
 
             return;
@@ -279,8 +377,9 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                         $endVal = $this->calendarData['end_val'];
                         $dateVal = $this->calendarData['date_val'];
                         $timeStamp = time();
-                        $dateStamp = date('dmY', $timeStamp);
-                        $bookingNumber = 'NDS-' . $timeStamp . '-' . Str::upper(Str::substr(Auth::user()->name, 0, 3)) . '-' . $dateStamp;
+                        $dateStamp = date('Ymd', $timeStamp);
+                        $startStamp = date('Ymd', strtotime($startDate));
+                        $bookingNumber = 'NDS-' . $startStamp . '-' . Str::upper(Str::substr(Auth::user()->name, 0, 3)) . '-' . $dateStamp . '-Bk-' . $timeStamp . '-S1';
                         if ($this->calendarData['allDay']) {
                             $startTime = '00:00';
                             $endTime = '23:59';
@@ -329,7 +428,7 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                     }),
 
                 Action::make('createBlockPeriod')
-                    ->label('Blocka')
+                    ->label('')
                     ->color('danger')
                     ->icon('heroicon-o-clock')
                     ->action(function () {
@@ -351,12 +450,12 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                         $this->dispatch('sync-action-modals', ['id' => $this->getId(), 'newActionNestingIndex' => $newIndex]);
                     }),
 
-                //   Action::make('close')
-                //   ->label('')
-                //   ->color('gray')
-                //   ->icon('heroicon-o-x-circle')
-                //   ->close(true)
-                //   ->action(function () { }),
+                 Action::make('close')
+                 ->label('')
+                 ->color('gray')
+                 ->icon('heroicon-o-x-circle')
+                 ->close(true)
+                 ->action(function () { }),
 
             ]);
     }
@@ -373,9 +472,11 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
             ->schema($this->getFormLocation())
             ->fillForm(function (array $arguments) {
                 $data = $arguments['data'] ?? [];
+                $serviceUserId = $this->getSelectedServiceUserId();
 
                 return [
                     'date' => $data['date_val'] ?? $data['service_date'] ?? $data['date'] ?? now()->format('Y-m-d'),
+                    'service_user_id' => $data['service_user_id'] ?? $serviceUserId,
                     'created_by' => Auth::id(),
                 ];
             })
@@ -387,6 +488,62 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                     ->title('Location saved successfully')
                     ->success()
                     ->send();
+            });
+    }
+
+    public function editDailyLocationAction(): Action
+    {
+        return Action::make('editDailyLocation')
+            ->label('Edit Location')
+            ->icon('heroicon-o-map-pin')
+            ->color('primary')
+            ->modalHeading('Edit Daily Location')
+            ->modalWidth('md')
+            ->model(DailyLocation::class)
+            ->schema($this->getFormLocation())
+            ->fillForm(function (array $arguments) {
+                $data = $arguments['data'] ?? [];
+                $serviceUserId = $this->getSelectedServiceUserId();
+
+                return [
+                    'date' => $data['date'] ?? now()->format('Y-m-d'),
+                    'service_user_id' => $data['service_user_id'] ?? $serviceUserId,
+                    'location' => $data['location'] ?? null,
+                    'created_by' => Auth::id(),
+                ];
+            })
+            ->action(function (array $data, array $arguments) {
+                $id = $arguments['data']['id'] ?? null;
+                if ($id) {
+                    DailyLocation::whereKey($id)->update($data);
+                }
+                $this->refreshRecords();
+                \Filament\Notifications\Notification::make()
+                    ->title('Location updated successfully')
+                    ->success()
+                    ->send();
+            })
+            ->modalSubmitActionLabel('Update')
+            ->extraModalFooterActions(function (array $arguments) {
+                $id = $arguments['data']['id'] ?? null;
+                if (!$id) {
+                    return [];
+                }
+
+                return [
+                    Action::make('deleteLocation')
+                        ->label('Delete')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->action(function () use ($id) {
+                            DailyLocation::whereKey($id)->delete();
+                            $this->refreshRecords();
+                            \Filament\Notifications\Notification::make()
+                                ->title('Location deleted successfully')
+                                ->success()
+                                ->send();
+                        }),
+                ];
             });
     }
 
@@ -402,10 +559,11 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
             ->schema($this->getFormPeriod())
             ->fillForm(function (array $arguments) {
                 $data = $arguments['data'] ?? [];
+                $serviceUserId = $this->getSelectedServiceUserId();
 
                 return [
                     'service_date' => $data['date_val'] ?? $data['service_date'] ?? $data['date'],
-                    'service_user_id' => $data['service_user_id'] ?? null,
+                    'service_user_id' => $data['service_user_id'] ?? $serviceUserId,
                     'start_time' => $data['start_val'] ?? $data['start_time'] ?? $data['start'],
                     'end_time' => $data['end_val'] ?? $data['end_time'] ?? $data['end'],
                     'created_by' => Auth::id(),
@@ -442,11 +600,12 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
             ->modalWidth('lg')
             ->fillForm(function (array $arguments) {
                 $data = $arguments['data'] ?? [];
+                $serviceUserId = $this->getSelectedServiceUserId();
 
                 return [
                     'number' => $this->generateNumber(),
                     'service_date' => $data['service_date'] ?? now()->format('Y-m-d'),
-                    'service_user_id' => $data['service_user_id'] ?? null,
+                    'service_user_id' => $data['service_user_id'] ?? $serviceUserId,
                     'start_time' => $data['start_time'] ?? null,
                     'end_time' => $data['end_time'] ?? null,
                     'status' => BookingStatus::Booked->value,
@@ -521,7 +680,7 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
             ->label('Admin Actions')
             ->icon('heroicon-o-cog-6-tooth')
             ->color('gray')
-            ->modalHeading('Edit booking')
+            ->modalHeading('Manage Update Booking')
             ->modalDescription('')
             ->modalWidth('sm')
             ->model(Booking::class)
@@ -530,18 +689,8 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
             })
             ->modalFooterActions([
 
-                Action::make('view')
-                    ->label('')
-                    ->color('gray')
-                    ->icon('heroicon-o-eye')
-                    ->action(function () {
-                        $data = $arguments['data'] ?? [];
-                        $this->replaceMountedAction('view', []);
-                        $newIndex = max(0, count($this->mountedActions) - 1);
-                        $this->dispatch('sync-action-modals', ['id' => $this->getId(), 'newActionNestingIndex' => $newIndex]);
-                    }),
                 Action::make('confirm')
-                    ->label('')
+                    ->label('Confirm')
                     ->color('success')
                     ->icon('heroicon-o-check-circle')
                     ->action(function () {
@@ -551,7 +700,7 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                         $this->dispatch('sync-action-modals', ['id' => $this->getId(), 'newActionNestingIndex' => $newIndex]);
                     }),
                 Action::make('edit')
-                    ->label('Changes')
+                    ->label('Update')
                     ->color('warning')
                     ->icon('heroicon-o-calendar')
                     ->requiresConfirmation(false)
@@ -563,7 +712,7 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                     }),
 
                 Action::make('delete')
-                    ->label(' ')
+                    ->label('Radera')
                     ->color('danger')
                     ->requiresConfirmation(true)
                     ->icon('heroicon-o-trash')
@@ -574,76 +723,406 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                         $this->dispatch('sync-action-modals', id: $this->getId(), newActionNestingIndex: $newIndex);
                     }),
 
-                Action::make('cancel')
-                    ->label('')
-                    ->color('gray')
-                    ->close(true)
-                    ->icon('heroicon-o-arrow-down-circle')
-                    ->action(function () {
-                        $data = $arguments['data'] ?? [];
-                        $this->replaceMountedAction('', ['data' => $data]);
-                        $newIndex = max(0, count($this->mountedActions) - 1);
-                        $this->dispatch('sync-action-modals', ['id' => $this->getId(), 'newActionNestingIndex' => $newIndex]);
-                    }),
+    
 
             ]);
     }
 
-    public function onEventClick(array $event): void
+    public function locationOptionsAction(): Action
     {
-        logger()->info('xxx: EVENT zzz PAYLOAD', ['event' => $event]);
-        //    logger()->info('BookingCalendarWidget: EVENT CLICK PAYLOAD', ['title' => $event['title']]);
-
-        if ($event['title'] == 'ⓘ zzz') {
-
-            $recId = $event['extendedProps']['booking_id'] ?? null;
-            $this->model = BookingServicePeriod::class;
-            $this->record = $recId ? $this->resolveRecord($recId) : null;
-            $payload = $this->record->toArray();
-            $user = Auth::user();
-            $canEdit = Auth::user()->role === 'admin' || Auth::user()->role === 'super_admin';
-            $action = $canEdit ? 'edit' : '';
-            $this->mountAction($action, [
-                'type' => 'click',
-                'event' => $event,
-                'data' => $payload,
+        return Action::make('locationOptions')
+            ->label('Location options')
+            ->icon('heroicon-o-map-pin')
+            ->color('gray')
+            ->modalHeading('Edit location')
+            ->modalWidth('sm')
+            ->model(DailyLocation::class)
+            ->mountUsing(function (array $arguments) {
+                $this->calendarData = $arguments['data'];
+            })
+            ->modalFooterActions([
+                Action::make('edit')
+                    ->label('Edit')
+                    ->color('primary')
+                    ->icon('heroicon-o-pencil-square')
+                    ->action(function () {
+                        $data = $arguments['data'] ?? [];
+                        $this->replaceMountedAction('editDailyLocation', ['data' => $data]);
+                        $newIndex = max(0, count($this->mountedActions) - 1);
+                        $this->dispatch('sync-action-modals', ['id' => $this->getId(), 'newActionNestingIndex' => $newIndex]);
+                    }),
+                Action::make('delete')
+                    ->label('Delete')
+                    ->color('danger')
+                    ->icon('heroicon-o-trash')
+                    ->requiresConfirmation()
+                    ->action(function () {
+                        $data = $arguments['data'] ?? [];
+                        $id = $data['id'] ?? null;
+                        if ($id) {
+                            DailyLocation::whereKey($id)->delete();
+                            $this->refreshRecords();
+                        }
+                        $this->dispatch('sync-action-modals', ['id' => $this->getId(), 'newActionNestingIndex' => 0]);
+                    }),
+                Action::make('close')
+                    ->label('Close')
+                    ->color('gray')
+                    ->close(true)
+                    ->icon('heroicon-o-x-circle'),
             ]);
-        }
-        if (isset($event['allDay']) && $event['allDay'] === true) {
+    }
 
-            $recId = $event['extendedProps']['daily_location_id'] ?? null;
-            $this->model = DailyLocation::class;
-            $this->record = $this->resolveRecord($recId);
-            $this->eventRecord = $this->record;
-            $this->recordId = $this->record->id;
-            $payload = $this->record->toArray();
-            $user = Auth::user();
-            $canEdit = Auth::user()->role === 'admin' || Auth::user()->role === 'super_admin';
-            $action = $canEdit ? 'edit' : '';
-            $this->mountAction($action, [
-                'type' => 'click',
-                'event' => $event,
-                'data' => $payload,
+    public function periodOptionsAction(): Action
+    {
+        return Action::make('periodOptions')
+            ->label('Period options')
+            ->icon('heroicon-o-clock')
+            ->color('gray')
+            ->modalHeading('Edit period')
+            ->modalWidth('sm')
+            ->model(BookingServicePeriod::class)
+            ->mountUsing(function (array $arguments) {
+                $this->calendarData = $arguments['data'];
+            })
+            ->modalFooterActions([
+                Action::make('edit')
+                    ->label('Edit')
+                    ->color('primary')
+                    ->icon('heroicon-o-pencil-square')
+                    ->action(function () {
+                        $data = $arguments['data'] ?? [];
+                        $this->replaceMountedAction('editServicePeriod', ['data' => $data]);
+                        $newIndex = max(0, count($this->mountedActions) - 1);
+                        $this->dispatch('sync-action-modals', ['id' => $this->getId(), 'newActionNestingIndex' => $newIndex]);
+                    }),
+                Action::make('delete')
+                    ->label('Delete')
+                    ->color('danger')
+                    ->icon('heroicon-o-trash')
+                    ->requiresConfirmation()
+                    ->action(function () {
+                        $data = $arguments['data'] ?? [];
+                        $id = $data['id'] ?? null;
+                        if ($id) {
+                            BookingServicePeriod::whereKey($id)->delete();
+                            $this->refreshRecords();
+                        }
+                        $this->dispatch('sync-action-modals', ['id' => $this->getId(), 'newActionNestingIndex' => 0]);
+                    }),
+                Action::make('close')
+                    ->label('Close')
+                    ->color('gray')
+                    ->close(true)
+                    ->icon('heroicon-o-x-circle'),
             ]);
+    }
+
+    public function onEventClick($event): void
+    {
+        logger()->info('zzz: onEventClick', ['events' => $event]);
+
+         $title = $event['title'] ?? null;
+         $start = $event['start'] ?? null;
+         $end = $event['end'] ?? null;
+         $view = $event['view'] ?? null;
+         $resource = $event['resource'] ?? null;
+        // logger()->info('zzz: onEventClick', ['events' => $start . ' ' . $end . ' ' . ($allDay ? 'allDay' : 'notAllDay')]);
+    
+        $allDay = (bool) ($event['allDay']);
+
+        logger()->info('BookingCalendarWidget CALENDAR WAS CLICKED', [
+            'title' => $title,
+            'start' => $start,
+            'end' => $end,
+            'allDay' => $allDay,
+            'view' => $view,
+            'resource' => $resource,
+        ]);
+
+        $type = data_get($event, 'extendedProps.type', 'booking');
+
+        logger()->info('BookingCalendarWidget: Event type detected', ['type' => $type]);
+
+        switch ($type) {
+            case 'blocking':
+                $recId = $event['extendedProps']['booking_id'] ?? null;
+                logger()->info('BookingCalendarWidget: Blocking period click', ['recId' => $recId]);
+                
+                if (!$recId) {
+                    logger()->error('BookingCalendarWidget: No record ID found for blocking period');
+                    return;
+                }
+                
+                try {
+                    $this->model = BookingServicePeriod::class;
+                    
+                    // Directly query the record instead of using resolveRecord
+                    $this->record = BookingServicePeriod::find($recId);
+                    
+                    if (!$this->record) {
+                        logger()->error('BookingCalendarWidget: Record not found', ['id' => $recId]);
+                        \Filament\Notifications\Notification::make()
+                            ->title('Period not found')
+                            ->danger()
+                            ->send();
+                        return;
+                    }
+                    
+                    if ($this->record instanceof Model) {
+                        $this->eventRecord = $this->record;
+                        $this->recordId = $this->record->id;
+                        $payload = $this->record->toArray();
+                    } else {
+                        logger()->error('BookingCalendarWidget: Record is not a valid Model instance', ['record' => $this->record]);
+                        \Filament\Notifications\Notification::make()
+                            ->title('Invalid record type')
+                            ->danger()
+                            ->send();
+                        return;
+                    }
+                    
+                    $user = Auth::user();
+                    $canEdit = in_array($user->role, [\App\UserRole::ADMIN, \App\UserRole::SUPER_ADMIN], true);
+                    
+                    logger()->info('BookingCalendarWidget: Mounting editServicePeriod', [
+                        'canEdit' => $canEdit,
+                        'userRole' => $user->role->value,
+                        'recordId' => $this->record->id,
+                    ]);
+                    
+                    if ($canEdit) {
+                        $this->mountAction('editServicePeriod', [
+                            'data' => $payload,
+                        ]);
+                        // Store the payload for delete action
+                        $this->lastMountedData = $payload;
+                    } else {
+                        logger()->info('BookingCalendarWidget: User does not have permission to edit blocking period', [
+                            'userRole' => $user->role->value,
+                        ]);
+                        \Filament\Notifications\Notification::make()
+                            ->title('Permission denied')
+                            ->body('You do not have permission to edit blocking periods')
+                            ->warning()
+                            ->send();
+                    }
+                } catch (\Exception $e) {
+                    logger()->error('BookingCalendarWidget: Exception in blocking case', [
+                        'message' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                    ]);
+                    \Filament\Notifications\Notification::make()
+                        ->title('Error loading period')
+                        ->body($e->getMessage())
+                        ->danger()
+                        ->send();
+                }
+                break;
+
+            case 'location':
+                if ($allDay) {
+                    $recId = $event['extendedProps']['daily_location_id'] ?? null;
+                    try {
+                        $this->model = DailyLocation::class;
+                        $this->record = DailyLocation::find($recId);
+                        if (!$this->record) {
+                            throw new \Exception("Location record not found: {$recId}");
+                        }
+                        if ($this->record instanceof Model) {
+                            $this->eventRecord = $this->record;
+                            $this->recordId = $this->record->id;
+                            $payload = $this->record->toArray();
+                        }
+                        $user = Auth::user();
+                        $canEdit = in_array($user->role, [\App\UserRole::ADMIN, \App\UserRole::SUPER_ADMIN], true);
+                        \Illuminate\Support\Facades\Log::info('BookingCalendarWidget: Location click', [
+                            'canEdit' => $canEdit,
+                            'userRole' => $user->role->value ?? $user->role,
+                            'recordId' => $recId,
+                        ]);
+                        $action = $canEdit ? 'editDailyLocation' : '';
+                        if ($action) {
+                            $this->mountAction($action, [
+                                'data' => $payload,
+                            ]);
+                        }
+                    } catch (\Exception $e) {
+                        \Illuminate\Support\Facades\Log::error('BookingCalendarWidget: Location error', [
+                            'error' => $e->getMessage(),
+                            'recId' => $recId,
+                        ]);
+                        \Filament\Notifications\Notification::make()
+                            ->title('Error loading location')
+                            ->body($e->getMessage())
+                            ->danger()
+                            ->send();
+                    }
+                }
+                break;
+
+            case 'booking':
+            default:
+                if (!$allDay) {
+                    $recId = $event['id'] ?? null;
+                    try {
+                        $this->model = Booking::class;
+                        $this->record = Booking::find($recId);
+                        if (!$this->record) {
+                            throw new \Exception("Booking record not found: {$recId}");
+                        }
+                        if ($this->record instanceof Model) {
+                            $this->eventRecord = $this->record;
+                            $this->record->load('items');
+                            $this->recordId = $this->record->id;
+                            $payload = $this->record->toArray();
+                        }
+                        $payload['service_date'] = $this->record->service_date?->format('Y-m-d') ?? ($payload['service_date'] ?? null);
+                        $booking = $this->record;
+                        $user = Auth::user();
+                        $canEdit = $user->id == $booking->booking_user_id || in_array($user->role, [\App\UserRole::ADMIN, \App\UserRole::SUPER_ADMIN], true);
+                        \Illuminate\Support\Facades\Log::info('BookingCalendarWidget: Booking click', [
+                            'canEdit' => $canEdit,
+                            'isBookingOwner' => $user->id == $booking->booking_user_id,
+                            'userRole' => $user->role->value ?? $user->role,
+                            'recordId' => $recId,
+                        ]);
+                        $action = $canEdit ? 'options' : '';
+                        if ($action) {
+                            logger()->info('CLICK $payload:', $payload);
+                            $this->mountAction($action, [
+                                'data' => $payload,
+                            ]);
+                        }
+                    } catch (\Exception $e) {
+                        \Illuminate\Support\Facades\Log::error('BookingCalendarWidget: Booking error', [
+                            'error' => $e->getMessage(),
+                            'recId' => $recId,
+                        ]);
+                        \Filament\Notifications\Notification::make()
+                            ->title('Error loading booking')
+                            ->body($e->getMessage())
+                            ->danger()
+                            ->send();
+                    }
+                } else {
+                    // All-day click for creating location
+                    $timezone = config('app.timezone');
+                    $startDate = Carbon::parse($start, $timezone);
+                    $this->mountAction('createDailyLocation', [
+                        'date' => $startDate->format('Y-m-d'),
+                        'service_date' => $startDate->format('Y-m-d'),
+                        'service_user_id' => $event['extendedProps']['service_user_id'] ?? null,
+                        'created_by' => Auth::id(),
+                    ]);
+                }
+                break;
         }
-        if ($event['title'] != 'ⓘ zzz' && (! isset($event['allDay']) || $event['allDay'] === false)) {
-            //  dd($event)  ;
-            $recId = $event['id'] ?? null;
-            $this->model = Booking::class;
-            $this->record = $this->resolveRecord($recId);
-            $this->eventRecord = $this->record;
-            $this->record->load('items');
-            $this->recordId = $this->record->id;
-            $payload = $this->record->toArray();
-            $payload['service_date'] = $this->record->service_date?->format('Y-m-d') ?? ($payload['service_date'] ?? null);
-            $booking = $this->record;
-            $user = Auth::user();
-            $canEdit = $user->id == $booking->booking_user_id || Auth::user()->role === 'admin' || Auth::user()->role === 'super_admin';
-            $action = $canEdit ? 'options' : '';
-            $this->mountAction($action, [
-                'data' => $payload,
-            ]);
+    }
+
+    public function eventDropped(string $eventId, string $startStr, ?string $endStr = null, string $type = 'booking', bool $allDay = false): void
+    {
+        // Only allow admins to drag and drop
+        if (!Auth::check() || !in_array(Auth::user()->role, [\App\UserRole::ADMIN, \App\UserRole::SUPER_ADMIN])) {
+            $this->dispatch('notify', 'error', 'You do not have permission to modify events.');
+            return;
         }
+
+        $start = Carbon::parse($startStr, 'Europe/Stockholm');
+        $end = $endStr ? Carbon::parse($endStr, 'Europe/Stockholm') : null;
+
+        $serviceDate = $start->toDateString();
+
+        // Validate drag operations based on event type and target
+        switch ($type) {
+            case 'booking':
+            case 'blocking':
+                // Timed events cannot be dropped to all-day row
+                if ($allDay) {
+                    $this->dispatch('notify', 'error', 'Timed events cannot be moved to the all-day row.');
+                    return;
+                }
+                $startTime = $start->format('H:i:s');
+                $endTime = $end?->format('H:i:s');
+                break;
+
+            case 'location':
+                // Location events are always all-day and should stay that way
+                if (!$allDay) {
+                    $this->dispatch('notify', 'error', 'Location events can only be moved within the all-day row.');
+                    return;
+                }
+                $startTime = null;
+                $endTime = null;
+                break;
+
+            default:
+                $this->dispatch('notify', 'error', 'Unknown event type.');
+                return;
+        }
+
+        switch ($type) {
+            case 'booking':
+                /** @var Booking|null $booking */
+                $booking = Booking::find($eventId);
+                if ($booking) {
+                    $booking->update([
+                        'service_date' => $serviceDate,
+                        'start_time' => $startTime,
+                        'end_time' => $endTime,
+                        'starts_at' => $start->toIso8601String(),
+                        'ends_at' => $end?->toIso8601String(),
+                    ]);
+                    $this->dispatch('notify', 'success', 'Booking moved successfully.');
+                }
+                break;
+
+            case 'location':
+                /** @var DailyLocation|null $location */
+                $location = DailyLocation::find($eventId);
+                if ($location) {
+                    $location->update([
+                        'date' => $serviceDate,
+                    ]);
+                    $this->dispatch('notify', 'success', 'Location moved successfully.');
+                }
+                break;
+
+            case 'blocking':
+                /** @var BookingServicePeriod|null $blocking */
+                $blocking = BookingServicePeriod::find($eventId);
+                if ($blocking) {
+                    $blocking->update([
+                        'service_date' => $serviceDate,
+                        'start_time' => $startTime,
+                        'end_time' => $endTime,
+                        'starts_at' => $start->toIso8601String(),
+                        'ends_at' => $end?->toIso8601String(),
+                    ]);
+                    $this->dispatch('notify', 'success', 'Blocking period moved successfully.');
+                }
+                break;
+        }
+
+        // Refresh the calendar
+        $this->refreshCalendar();
+    }
+
+    public function onEventDrop($event): void
+    {
+        $id = data_get($event, 'id');
+        $start = data_get($event, 'startStr') ?? data_get($event, 'start');
+        $end = data_get($event, 'endStr') ?? data_get($event, 'end');
+        $type = data_get($event, 'extendedProps.type') ?? data_get($event, 'type') ?? 'booking';
+        $allDay = data_get($event, 'allDay', false);
+
+        if (! $id || ! $start) {
+            $this->dispatch('notify', 'error', 'Unable to move event: missing event data.');
+
+            return;
+        }
+
+        $this->eventDropped((string) $id, (string) $start, $end ? (string) $end : null, (string) $type, (bool) $allDay);
     }
 
     protected function getDateClickContextMenuActions(): array
@@ -914,10 +1393,11 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
 
         $locationEvents = $dailyLocations->map(function (DailyLocation $loc) {
             $title = $loc->location ?: ($loc->serviceUser?->name ?? 'Location');
-
             return [
-                'id' => 'location-'.$loc->id,
+                'id' => $loc->id,
                 'title' => $title,
+                'eventsType' => 'location',
+                'type' => 'location',
                 'start' => $loc->date?->toDateString(),
                 'number' => 0,
                 'allDay' => true,
@@ -926,6 +1406,7 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                 'textColor' => '#111827',
                 'extendedProps' => [
                     'is_location' => true,
+                    'type' => 'location',
                     'daily_location_id' => $loc->id,
                     'service_user_id' => $loc->service_user_id,
                     'location' => $loc->location,
@@ -959,6 +1440,20 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
     public function refreshCalendar()
     {
         $this->refreshRecords();
+    }
+
+    protected function getSelectedServiceUserId(): ?int
+    {
+        $filters = $this->pageFilters ?? [];
+        $selectedCalendarId = $filters['booking_calendars'] ?? null;
+
+        if ($selectedCalendarId) {
+            $calendar = \App\Models\BookingCalendar::find($selectedCalendarId);
+
+            return $calendar?->owner_id;
+        }
+
+        return null;
     }
 
     public function mount(): void

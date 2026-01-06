@@ -159,16 +159,18 @@ class Booking extends Model
                         $timeStamp = time();
                         $dateStamp = date('m-d-Y', $timeStamp);
                         $bookingNumber = 'BK-' . strrev($timeStamp) . '-NDS-' . $dateStamp;
-        return [
+        return [ 
             'id' => $this->id,
             'title' => $this->bookingUser?->name ?? 'Booking #' . ($this->number ?? 'New'),
             'start' => $start,
             'end' => $end,
+            'type' => 'booking',
             'backgroundColor' => $this->status?->getColor() ?? '#3788d8',
             'borderColor' => $this->status?->getColor() ?? '#3788d8',
             'extendedProps' => [
                 'key' => $this->id,  // Required: Record ID for event resolution
                 'booking_id' => $this->id,
+                'type' => 'booking',
                 'number' => $bookingNumber,
                 'client_name' => $this->client?->name,
                 'service_date' => $this->service_date?->format('Y-m-d'),

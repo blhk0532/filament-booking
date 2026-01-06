@@ -11,15 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('booking_booking_items', function (Blueprint $table): void {
-            $table->id();
-            $table->foreignId('booking_booking_id')->constrained('booking_bookings')->cascadeOnDelete();
-            $table->foreignId('booking_service_id')->constrained('booking_services')->cascadeOnDelete();
-            $table->integer('qty')->default(1);
-            $table->decimal('unit_price', 10, 2)->default(0);
-            $table->integer('sort')->nullable();
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('booking_booking_items')) {
+            Schema::create('booking_booking_items', function (Blueprint $table): void {
+                $table->id();
+                $table->foreignId('booking_booking_id')->constrained('booking_bookings')->cascadeOnDelete();
+                $table->foreignId('booking_service_id')->constrained('booking_services')->cascadeOnDelete();
+                $table->integer('qty')->default(1);
+                $table->decimal('unit_price', 10, 2)->default(0);
+                $table->integer('sort')->nullable();
+                $table->timestamps();
+            });
+
+        }
     }
 
     /**

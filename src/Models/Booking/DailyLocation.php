@@ -64,6 +64,7 @@ class DailyLocation extends Model implements Eventable
             ->extendedProps([
                 'id' => $this->id,
                 'is_location' => true,
+                'type' => 'location',
                 'daily_location_id' => $this->id,
                 'service_user_id' => $this->service_user_id,
                 'location' => $this->location,

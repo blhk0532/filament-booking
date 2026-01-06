@@ -2,7 +2,7 @@
 
 namespace Adultdate\FilamentBooking\Models;
 
-use App\Models\User;
+use Adultdate\FilamentBooking\Models\User;
 use Adultdate\FilamentBooking\Contracts\Eventable;
 use Adultdate\FilamentBooking\ValueObjects\CalendarEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

@@ -12,7 +12,7 @@ class ListUsers extends ListRecords
 {
     protected static string $resource = UserResource::class;
 
-    protected static ?string $title = 'ServiceProvider s &Booking Agents';
+    protected static ?string $title = 'Tekniker & Bokare';
 
     protected function getHeaderActions(): array
     {
@@ -25,11 +25,11 @@ class ListUsers extends ListRecords
     {
         return [
             // ServiceProvider s
-            'service' => Tab::make('Service Providers')
+            'service' => Tab::make('Servicetekniker')
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('role', 'service')),
 
-            // Booking Agents
-            'booking' => Tab::make('Booking Agents')
+            // Mötesbokare
+            'booking' => Tab::make('Mötesbokare')
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('role', 'booking')),
             // 'all' => Tab::make('All Users'),
 

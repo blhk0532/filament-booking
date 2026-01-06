@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use Adultdate\FilamentBooking\Models\Comment;
+use Adultdate\FilamentBooking\Models\BookingComment;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -13,7 +13,7 @@ class CommentFactory extends Factory
     /**
      * @var string
      */
-    protected $model = Comment::class;
+    protected $model = BookingComment::class;
 
     public function definition(): array
     {

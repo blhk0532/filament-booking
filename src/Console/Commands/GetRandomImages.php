@@ -2,7 +2,7 @@
 
 namespace Adultdate\FilamentBooking\Console\Commands;
 
-use Database\Seeders\LocalImages;
+use Database\Seeders\BookingLocalImages;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -33,8 +33,8 @@ class GetRandomImages extends Command
         // This needs some deeper research to get the best results
 
         $schemas = [
-            ['amount' => 40, 'size' => LocalImages::SIZE_200x200, 'terms' => ['']],
-            ['amount' => 40, 'size' => LocalImages::SIZE_1280x720, 'terms' => ['']],
+            ['amount' => 40, 'size' => BookingLocalImages::SIZE_200x200, 'terms' => ['']],
+            ['amount' => 40, 'size' => BookingLocalImages::SIZE_1280x720, 'terms' => ['']],
         ];
 
         foreach ($schemas as $schema) {

@@ -3,7 +3,7 @@
 namespace Database\Factories\Booking;
 
 use Adultdate\FilamentBooking\Models\Booking\Product;
-use Database\Seeders\LocalImages;
+use Database\Seeders\BookingLocalImages;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -43,7 +43,7 @@ class ProductFactory extends Factory
     {
         return $this->afterCreating(function (Product $product): void {
             $product
-                ->addMedia(LocalImages::getRandomFile(LocalImages::SIZE_200x200))
+                ->addMedia(BookingLocalImages::getRandomFile(BookingLocalImages::SIZE_200x200))
                 ->preservingOriginal()
                 ->toMediaCollection('product-images');
         });

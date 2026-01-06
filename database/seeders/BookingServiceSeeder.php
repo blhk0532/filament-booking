@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Adultdate\FilamentBooking\Enums\ServiceStatus;
 use Adultdate\FilamentBooking\Models\Booking\Service;
+use Adultdate\FilamentBooking\Models\Booking\Brand;
 use Illuminate\Database\Seeder;
 
 class BookingServiceSeeder extends Seeder
@@ -11,6 +12,9 @@ class BookingServiceSeeder extends Seeder
     public function run(): void
     {
         Service::query()->delete();
+
+        // Get all brands to assign to services
+        $brands = Brand::all();
 
         $services = [
             [
@@ -26,7 +30,7 @@ class BookingServiceSeeder extends Seeder
                 'featured' => true,
                 'is_visible' => true,
                 'published_at' => now()->subMonth(),
-                'booking_brand_id' => 1,
+                'booking_brand_id' => $brands->get(0)?->id ?? 1,
             ],
             [
                 'name' => 'Ventilation System Installation',
@@ -41,7 +45,7 @@ class BookingServiceSeeder extends Seeder
                 'featured' => true,
                 'is_visible' => true,
                 'published_at' => now()->subWeeks(2),
-                'booking_brand_id' => 2,
+                'booking_brand_id' => $brands->get(1)?->id ?? 2,
             ],
             [
                 'name' => 'Heat Pump Maintenance',
@@ -56,7 +60,7 @@ class BookingServiceSeeder extends Seeder
                 'featured' => false,
                 'is_visible' => true,
                 'published_at' => now()->subDays(5),
-                'booking_brand_id' => 3,
+                'booking_brand_id' => $brands->get(2)?->id ?? 3,
             ],
             [
                 'name' => 'Air Quality Assessment',
@@ -71,7 +75,7 @@ class BookingServiceSeeder extends Seeder
                 'featured' => true,
                 'is_visible' => true,
                 'published_at' => now()->subWeek(),
-                'booking_brand_id' => 4,
+                'booking_brand_id' => $brands->get(3)?->id ?? 4,
             ],
             [
                 'name' => 'Radiant Heating Installation',
@@ -86,7 +90,7 @@ class BookingServiceSeeder extends Seeder
                 'featured' => false,
                 'is_visible' => true,
                 'published_at' => now()->subWeeks(3),
-                'booking_brand_id' => 5,
+                'booking_brand_id' => $brands->get(4)?->id ?? 5,
             ],
             [
                 'name' => 'HVAC System Design',
@@ -101,7 +105,7 @@ class BookingServiceSeeder extends Seeder
                 'featured' => false,
                 'is_visible' => true,
                 'published_at' => now()->subDays(10),
-                'booking_brand_id' => 6,
+                'booking_brand_id' => $brands->get(5)?->id ?? 6,
             ],
             [
                 'name' => 'Duct Cleaning Service',
@@ -116,7 +120,7 @@ class BookingServiceSeeder extends Seeder
                 'featured' => true,
                 'is_visible' => true,
                 'published_at' => now()->subDays(3),
-                'booking_brand_id' => 7,
+                'booking_brand_id' => $brands->get(6)?->id ?? 7,
             ],
             [
                 'name' => 'Energy Audit Service',
@@ -131,7 +135,7 @@ class BookingServiceSeeder extends Seeder
                 'featured' => false,
                 'is_visible' => true,
                 'published_at' => now()->subWeeks(4),
-                'booking_brand_id' => 8,
+                'booking_brand_id' => $brands->get(7)?->id ?? 8,
             ],
             [
                 'name' => 'Boiler Service & Repair',
@@ -146,7 +150,7 @@ class BookingServiceSeeder extends Seeder
                 'featured' => true,
                 'is_visible' => true,
                 'published_at' => now()->subDays(7),
-                'booking_brand_id' => 9,
+                'booking_brand_id' => $brands->get(8)?->id ?? 9,
             ],
             [
                 'name' => 'Smart Thermostat Installation',
@@ -161,7 +165,7 @@ class BookingServiceSeeder extends Seeder
                 'featured' => false,
                 'is_visible' => true,
                 'published_at' => now()->subDays(2),
-                'booking_brand_id' => 10,
+                'booking_brand_id' => $brands->get(9)?->id ?? 10,
             ],
         ];
 

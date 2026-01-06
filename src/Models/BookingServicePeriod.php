@@ -82,6 +82,7 @@ class BookingServicePeriod extends Model
             'title' => $this->client?->name ?? 'ⓘ zzz',
             'start' => $start,
             'end' => $end,
+            'type' => 'blocking',
             'backgroundColor' => $this->status?->getColor() ?? '#f3f4f6',
             'borderColor' => $this->status?->getColor() ?? 'transparent',
             'extendedProps' => [
@@ -101,6 +102,7 @@ class BookingServicePeriod extends Model
                 'total_price' => $this->total_price,
                 'currency' => $this->currency,
                 'notes' => $this->notes,
+                'type' => 'blocking',
             ],
         ];
     }

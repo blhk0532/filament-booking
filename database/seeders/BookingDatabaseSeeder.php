@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use Adultdate\FilamentBooking\User;
+use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-final class DatabaseSeeder extends Seeder
+final class BookingDatabaseSeeder extends Seeder
 {
     public function run(): void
     {
