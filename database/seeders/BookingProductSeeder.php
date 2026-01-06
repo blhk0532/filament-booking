@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use Adultdate\FilamentBooking\Models\Booking\Product;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class BookingProductSeeder extends Seeder

@@ -15,7 +15,7 @@ class AppDashboard extends BaseAdminDashboard
 
     protected static ?string $slug = 'dashboard';
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChartPie;
+    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedChartPie;
 
     protected static ?string $navigationLabel = 'Dash';
 
@@ -28,7 +28,7 @@ class AppDashboard extends BaseAdminDashboard
 
     public static function getNavigationLabel(): string
     {
-        return ''.Str::ucfirst(Auth::user()->name) ?? 'User';
+        return '' . Str::ucfirst(Auth::user()->name) ?? 'User';
     }
 
     public static function getNavigationBadge(): ?string

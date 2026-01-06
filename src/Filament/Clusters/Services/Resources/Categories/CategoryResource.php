@@ -2,13 +2,13 @@
 
 namespace Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Categories;
 
-use Adultdate\FilamentBooking\Filament\Clusters\Services\ServicesCluster;
 use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Categories\Pages\CreateCategory;
 use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Categories\Pages\EditCategory;
 use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Categories\Pages\ListCategories;
 use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Categories\RelationManagers\ServicesRelationManager;
 use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Categories\Schemas\CategoryForm;
 use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Categories\Tables\CategoriesTable;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\ServicesCluster;
 use Adultdate\FilamentBooking\Models\Booking\Category;
 use BackedEnum;
 use Filament\Resources\Resource;

@@ -2,32 +2,23 @@
 
 namespace Adultdate\FilamentBooking\Filament\Panels\App\Pages;
 
-use Caresome\FilamentAuthDesigner\Concerns\HasAuthDesignerLayout;
 use Caresome\FilamentAuthDesigner\Pages\Auth\Login;
-use Filament\Auth\Pages\Login as BaseLogin;
-
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
 use DanHarrin\LivewireRateLimiting\WithRateLimiting;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Auth\Http\Responses\Contracts\LoginResponse;
 use Filament\Auth\MultiFactor\Contracts\HasBeforeChallengeHook;
-use Filament\Auth\MultiFactor\Contracts\MultiFactorAuthenticationProvider;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Checkbox;
-use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\TextInput;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Notifications\Notification;
-use Filament\Pages\SimplePage;
 use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\EmbeddedSchema;
 use Filament\Schemas\Components\Form;
-use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\RenderHook;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Alignment;
 use Filament\View\PanelsRenderHook;
@@ -36,12 +27,10 @@ use Illuminate\Auth\SessionGuard;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Locked;
-use Illuminate\Support\Str;
 use SensitiveParameter;
 
 /**
@@ -177,13 +166,12 @@ class AppLogin extends Login
 
     public function form(Schema $schema): Schema
     {
-          return $schema->components([
+        return $schema->components([
             TextInput::make('name')->label('Username')->required()->autofocus(),
             $this->getPasswordFormComponent(),
             $this->getRememberFormComponent(),
         ]);
     }
-
 
     public function multiFactorChallengeForm(Schema $schema): Schema
     {
@@ -291,9 +279,9 @@ class AppLogin extends Login
      */
     protected function getCredentialsFromFormData(#[SensitiveParameter] array $data): array
     {
-    return filter_var($data, FILTER_VALIDATE_EMAIL)
-    ? ['email' => $data, 'password' => $data['password']]
-    : ['name' => $data, 'password' => $data['password']];
+        return filter_var($data, FILTER_VALIDATE_EMAIL)
+        ? ['email' => $data, 'password' => $data['password']]
+        : ['name' => $data, 'password' => $data['password']];
     }
 
     public function getSubheading(): string | Htmlable | null

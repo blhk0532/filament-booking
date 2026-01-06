@@ -3,8 +3,8 @@
 namespace Adultdate\FilamentBooking\Filament\Actions;
 
 use Adultdate\FilamentBooking\Contracts\HasCalendar;
-use Filament\Actions\Action;
 use Adultdate\FilamentBooking\Models\Booking\DailyLocation;
+use Filament\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 
 class CreateDailyLocationAction extends Action
@@ -19,15 +19,16 @@ class CreateDailyLocationAction extends Action
             ->before(function (HasCalendar $livewire) {
                 if (! $livewire->getEventRecord()) {
                     $livewire->refreshRecords();
+
                     return false; // Prevent the action
                 }
+
                 return true;
             })
-            ->cancelParentActions()
-        ;
+            ->cancelParentActions();
     }
 
-        public function createDailyLocation(): Action
+    public function createDailyLocation(): Action
     {
         return Action::make('createDailyLocation')
             ->label('Create Location')
@@ -39,6 +40,7 @@ class CreateDailyLocationAction extends Action
             ->schema($this->getFormLocation())
             ->fillForm(function (array $arguments) {
                 $data = $arguments['data'] ?? [];
+
                 return [
                     'date' => $data['date_val'] ?? $data['service_date'] ?? $data['date'] ?? now()->format('Y-m-d'),
                     'created_by' => Auth::id(),
@@ -46,7 +48,7 @@ class CreateDailyLocationAction extends Action
             })
             ->action(function (array $data) {
                 $data['created_by'] = Auth::id();
-                DailyLocation::updateOrCreate(['date' => $data['date'], 'service_user_id' => $data['service_user_id']],$data);
+                DailyLocation::updateOrCreate(['date' => $data['date'], 'service_user_id' => $data['service_user_id']], $data);
                 $this->refreshRecords();
                 \Filament\Notifications\Notification::make()
                     ->title('Location saved successfully')

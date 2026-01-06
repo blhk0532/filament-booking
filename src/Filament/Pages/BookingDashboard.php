@@ -2,37 +2,34 @@
 
 namespace Adultdate\FilamentBooking\Filament\Pages;
 
+use Adultdate\FilamentBooking\Filament\Pages\Dashboard as BaseAppDashboard;
+use BackedEnum;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
-use Adultdate\FilamentBooking\Filament\Pages\Dashboard as BaseAppDashboard;
 use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
 use Filament\Schemas\Components\Section;
-use BackedEnum; 
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-
-
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class BookingDashboard extends BaseAppDashboard
 {
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChartPie;
+    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedChartPie;
 
     protected static ?string $navigationLabel = 'Dash';
 
-     protected static ?string $title = '';
+    protected static ?string $title = '';
 
-     protected static ?string $slug = 'booking-dashboard';
+    protected static ?string $slug = 'booking-dashboard';
 
     public static function shouldRegisterNavigation(): bool
     {
         return true;
     }
 
-    public static function getNavigationLabel(): string                       
+    public static function getNavigationLabel(): string
     {
         return '' . Str::ucfirst(Auth::user()->name) ?? 'User';
     }
@@ -73,5 +70,4 @@ class BookingDashboard extends BaseAppDashboard
     {
         return fn (string $widgetClass) => true;
     }
-
 }

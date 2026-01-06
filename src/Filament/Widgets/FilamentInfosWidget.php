@@ -1,7 +1,7 @@
 <?php
 
-
 namespace Adultdate\FilamentBooking\Filament\Widgets;
+
 use Filament\Widgets\Widget;
 
 class FilamentInfosWidget extends Widget

@@ -10,7 +10,7 @@ return new class extends Migration
     public function up()
     {
         Schema::dropIfExists('booking_reviews');
- 
+
         Schema::create('booking_comments', function (Blueprint $table): void {
             $table->id();
 

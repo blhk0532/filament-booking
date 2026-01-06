@@ -2,28 +2,31 @@
 
 namespace Adultdate\FilamentBooking\Filament\Widgets;
 
+use Adultdate\FilamentBooking\Concerns\HasHeaderActions;
+use Adultdate\FilamentBooking\Filament\Widgets\Concerns\CanBeConfigured;
+use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithRawJS;
+use Adultdate\FilamentBooking\FilamentBookingPlugin;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Pages\Concerns\InteractsWithFormActions;
-use Filament\Pages\Concerns\InteractsWithHeaderActions;
 use Filament\Widgets\Widget;
-use Adultdate\FilamentBooking\FilamentBookingPlugin;
-use Adultdate\FilamentBooking\Concerns\HasHeaderActions;
-use Adultdate\FilamentBooking\Filament\Widgets\Concerns\CanBeConfigured;
-use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithRawJS;
 
-class FullCalendarWidget extends Widget implements HasForms, HasActions
+class FullCalendarWidget extends Widget implements HasActions, HasForms
 {
-    use InteractsWithForms;
+    use CanBeConfigured;
+    use HasHeaderActions;
     use InteractsWithActions;
-    use HasHeaderActions, CanBeConfigured, InteractsWithRawJS;
+    use InteractsWithForms;
+    use InteractsWithRawJS;
+
     /**
      * Blade view used by this widget (NON-static in Filament v3)
      */
     protected string $view = 'filament-booking::fullcalendar';
+
     protected static ?int $sort = 4;
+
     /**
      * Widget width
      */
@@ -50,10 +53,10 @@ class FullCalendarWidget extends Widget implements HasForms, HasActions
 
             // Localization
             'timezone' => $plugin?->getTimezone(),
-            'locale'   => $plugin?->getLocale(),
+            'locale' => $plugin?->getLocale(),
 
             // Interaction flags
-            'editable'   => $plugin?->isEditable() ?? false,
+            'editable' => $plugin?->isEditable() ?? false,
             'selectable' => $plugin?->isSelectable() ?? false,
 
             // Scheduler license key (optional)

@@ -2,8 +2,8 @@
 
 namespace Adultdate\FilamentBooking\Enums;
 
-use Carbon\CarbonInterface;
 use Adultdate\FilamentBooking\Data\FrequencyConfig;
+use Carbon\CarbonInterface;
 
 enum Frequency: string
 {

@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use Adultdate\FilamentBooking\Enums\ServiceStatus;
-use Adultdate\FilamentBooking\Models\Booking\Service;
 use Adultdate\FilamentBooking\Models\Booking\Brand;
+use Adultdate\FilamentBooking\Models\Booking\Service;
 use Illuminate\Database\Seeder;
 
 class BookingServiceSeeder extends Seeder

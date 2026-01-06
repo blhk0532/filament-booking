@@ -4,7 +4,6 @@ namespace Adultdate\FilamentBooking\Models\Booking;
 
 use Adultdate\FilamentBooking\Contracts\Eventable;
 use Adultdate\FilamentBooking\ValueObjects\CalendarEvent;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -28,7 +27,7 @@ class DailyLocation extends Model implements Eventable
         'service_date',
         'location',
         'created_by',
-        'id', 
+        'id',
     ];
 
     public function serviceUser()
@@ -73,12 +72,13 @@ class DailyLocation extends Model implements Eventable
             ]);
     }
 
-        /**
-         * Return the stored location value.
-         */
-        public function getLocation(): ?string
-        {
-            $title = $this->location ?: ($this->serviceUser?->name ?? 'Location');
-            return $title;
-        }
+    /**
+     * Return the stored location value.
+     */
+    public function getLocation(): ?string
+    {
+        $title = $this->location ?: ($this->serviceUser?->name ?? 'Location');
+
+        return $title;
+    }
 }

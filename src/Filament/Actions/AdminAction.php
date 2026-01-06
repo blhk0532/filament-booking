@@ -5,7 +5,6 @@ namespace Adultdate\FilamentBooking\Filament\Actions;
 use Adultdate\FilamentBooking\Contracts\HasCalendar;
 use Filament\Actions\Action;
 
-
 class AdminAction extends Action
 {
     protected function setUp(): void
@@ -18,12 +17,13 @@ class AdminAction extends Action
             ->before(function (HasCalendar $livewire) {
                 if (! $livewire->getEventRecord()) {
                     $livewire->refreshRecords();
+
                     return false; // Prevent the action
                 }
+
                 return true;
             })
-            ->cancelParentActions()
-        ;
+            ->cancelParentActions();
     }
 
     public function adminAction(): Action
@@ -34,5 +34,4 @@ class AdminAction extends Action
                 dd('Admin action called', $arguments);
             });
     }
-
 }

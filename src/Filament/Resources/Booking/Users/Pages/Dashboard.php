@@ -2,6 +2,7 @@
 
 namespace Adultdate\FilamentBooking\Filament\Resources\Booking\Users\Pages;
 
+use BackedEnum;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Pages\Dashboard as BaseDashboard;
@@ -10,13 +11,12 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use BackedEnum;
 
 class Dashboard extends BaseDashboard
 {
     use HasFiltersForm;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChartPie;
+    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedChartPie;
 
     protected static ?string $navigationLabel = 'Dash';
 

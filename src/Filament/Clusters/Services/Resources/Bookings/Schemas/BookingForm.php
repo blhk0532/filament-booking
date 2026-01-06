@@ -3,7 +3,6 @@
 namespace Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings\Schemas;
 
 use Adultdate\FilamentBooking\Enums\BookingStatus;
-use Adultdate\FilamentBooking\Forms\Components\AddressForm;
 use Adultdate\FilamentBooking\Models\Booking\Booking;
 use Adultdate\FilamentBooking\Models\Booking\Client;
 use Adultdate\FilamentBooking\Models\Booking\Service;
@@ -15,14 +14,13 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
-use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+
 class BookingForm
 {
     public static function configure(Schema $schema): Schema
@@ -50,12 +48,12 @@ class BookingForm
                     ])
                     ->columnSpan(['lg' => 3]),
 
-                        // Removed created_at / updated_at display section — not needed in modal
+                // Removed created_at / updated_at display section — not needed in modal
             ])
-                ->columns(3);
-            }
+            ->columns(3);
+    }
 
-            /**
+    /**
      * Determine if the current user may see and edit the booking `status` field.
      */
     public static function canShowStatus(?Booking $record): bool
@@ -79,7 +77,7 @@ class BookingForm
     /** @return array<Component> */
     public static function getDetailsComponents(): array
     {
-        return [            
+        return [
             TextInput::make('number')
                 ->default('OR-' . random_int(100000, 999999))
                 ->disabled()
@@ -97,10 +95,10 @@ class BookingForm
                 ->dehydrated(),
 
             TextInput::make('end_time')
-              
+
                 ->default(Auth::id())
                 ->dehydrated(),
- 
+
             Select::make('booking_client_id')
                 ->relationship('client', 'name')
                 ->searchable()
@@ -177,7 +175,7 @@ class BookingForm
                 ->options(BookingStatus::class)
                 ->columnSpan('full')
                 ->required()
-                ->hidden(fn (?Booking $record) => !static::canShowStatus($record)),
+                ->hidden(fn (?Booking $record) => ! static::canShowStatus($record)),
 
             // Address moved to client create modal; no address field on booking form
 
@@ -185,6 +183,7 @@ class BookingForm
                 ->columnSpan('full'),
         ];
     }
+
     public static function getItemsRepeater(): Repeater
     {
         return Repeater::make('items')

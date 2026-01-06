@@ -2,7 +2,7 @@
 
 namespace Adultdate\FilamentBooking;
 
-use  Adultdate\FilamentBooking\Commands\NumpadFieldCommand;
+use Adultdate\FilamentBooking\Commands\NumpadFieldCommand;
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Assets\Asset;
 use Filament\Support\Assets\Css;

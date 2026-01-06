@@ -2,6 +2,8 @@
 
 namespace Adultdate\FilamentBooking;
 
+use Adultdate\FilamentBooking\Commands\FilamentBookingCommand;
+use Adultdate\FilamentBooking\Testing\TestsFilamentBooking;
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Assets\Asset;
 use Filament\Support\Assets\Css;
@@ -15,8 +17,6 @@ use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use Adultdate\FilamentBooking\Commands\FilamentBookingCommand;
-use Adultdate\FilamentBooking\Testing\TestsFilamentBooking;
 
 class FilamentBookingServiceProvider extends PackageServiceProvider
 {
@@ -226,23 +226,23 @@ class FilamentBookingServiceProvider extends PackageServiceProvider
     protected function getMigrations(): array
     {
         return [
-            'create_booking_addressable_table', 
-            'create_booking_addresses_table', 
+            'create_booking_addressable_table',
+            'create_booking_addresses_table',
             'create_booking_clients_table',
-            'create_booking_comments_table', 
-            'create_booking_exports_table', 
-            'create_booking_imports_table', 
-            'create_booking_media_table', 
-            'create_booking_notifications_table', 
-            'create_booking_payments_table', 
-            'create_booking_settings_table', 
-            'create_booking_brands_table', 
-            'create_booking_categories_table', 
-            'create_booking_category_product_table', 
-            'create_booking_customers_table', 
-            'create_booking_order_items_table', 
-            'create_booking_orders_table', 
-            'create_booking_products_table', 
+            'create_booking_comments_table',
+            'create_booking_exports_table',
+            'create_booking_imports_table',
+            'create_booking_media_table',
+            'create_booking_notifications_table',
+            'create_booking_payments_table',
+            'create_booking_settings_table',
+            'create_booking_brands_table',
+            'create_booking_categories_table',
+            'create_booking_category_product_table',
+            'create_booking_customers_table',
+            'create_booking_order_items_table',
+            'create_booking_orders_table',
+            'create_booking_products_table',
             'create_booking_tag_tables',
         ];
     }
@@ -258,7 +258,7 @@ class FilamentBookingServiceProvider extends PackageServiceProvider
         $filesystem = app(Filesystem::class);
 
         foreach ($directories as $directory) {
-            if (!$filesystem->exists($directory)) {
+            if (! $filesystem->exists($directory)) {
                 $filesystem->makeDirectory($directory, 0755, true);
             }
         }
@@ -295,7 +295,7 @@ class FilamentBookingServiceProvider extends PackageServiceProvider
         $productImagesLink = public_path('storage/product-images');
         $productImagesTarget = storage_path('app/product-images');
 
-        if (!$filesystem->exists($productImagesLink)) {
+        if (! $filesystem->exists($productImagesLink)) {
             $filesystem->link($productImagesTarget, $productImagesLink);
         }
     }

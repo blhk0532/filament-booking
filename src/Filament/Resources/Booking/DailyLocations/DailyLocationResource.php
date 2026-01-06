@@ -2,8 +2,6 @@
 
 namespace Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations;
 
-use Adultdate\FilamentBooking\Filament\Clusters\Services\ServicesCluster;
-
 use Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Pages\CreateDailyLocation;
 use Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Pages\EditDailyLocation;
 use Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Pages\ListDailyLocations;
@@ -11,14 +9,14 @@ use Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Pages\Vi
 use Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Schemas\DailyLocationForm;
 use Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Schemas\DailyLocationInfolist;
 use Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Tables\DailyLocationsTable;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Widgets\LocationCalendarWidget;
 use Adultdate\FilamentBooking\Models\Booking\DailyLocation;
 use BackedEnum;
-use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Widgets\LocationCalendarWidget;
+use UnitEnum;
 
 class DailyLocationResource extends Resource
 {
@@ -76,7 +74,7 @@ class DailyLocationResource extends Resource
         return [
             'index' => ListDailyLocations::route('/'),
             'create' => CreateDailyLocation::route('/create'),
-        //    'view' => ViewDailyLocation::route('/{record}'),
+            //    'view' => ViewDailyLocation::route('/{record}'),
             'edit' => EditDailyLocation::route('/{record}/edit'),
         ];
     }

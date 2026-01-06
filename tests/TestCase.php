@@ -2,6 +2,7 @@
 
 namespace Adultdate\FilamentBooking\Tests;
 
+use Adultdate\FilamentBooking\FilamentBookingServiceProvider;
 use BladeUI\Heroicons\BladeHeroiconsServiceProvider;
 use BladeUI\Icons\BladeIconsServiceProvider;
 use Filament\Actions\ActionsServiceProvider;
@@ -16,7 +17,6 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Livewire\LivewireServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 use RyanChandler\BladeCaptureDirective\BladeCaptureDirectiveServiceProvider;
-use Adultdate\FilamentBooking\FilamentBookingServiceProvider;
 
 class TestCase extends Orchestra
 {

@@ -42,7 +42,7 @@ trait CanBeConfigured
 
         // Apply uniqueness to non-array values if needed, but keep arrays as is
         foreach ($merged as $key => $value) {
-            if (!is_array($value)) {
+            if (! is_array($value)) {
                 // For simplicity, assume no duplicates in scalars; extend if needed
             }
         }

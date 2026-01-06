@@ -2,11 +2,11 @@
 
 namespace Adultdate\FilamentBooking\Concerns;
 
+use Adultdate\FilamentBooking\Attributes\CalendarSchema;
+use Adultdate\FilamentBooking\Exceptions\SchemaNotFoundException;
 use Filament\Facades\Filament;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Adultdate\FilamentBooking\Attributes\CalendarSchema;
-use Adultdate\FilamentBooking\Exceptions\SchemaNotFoundException;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionMethod;
@@ -39,8 +39,7 @@ trait HasSchema
         $methodName = Str::of(class_basename($model))
             ->camel()
             ->append('Schema')
-            ->toString()
-        ;
+            ->toString();
 
         if (method_exists($this, $methodName)) {
             return $this->{$methodName}($schema);
@@ -67,7 +66,7 @@ trait HasSchema
             return $this->getSchemaForModel($schema, $model);
         } catch (SchemaNotFoundException $e) {
             // Try to find form schema in resource
-            /** @var class-string<Resource> $resource */
+            /** @var class-string<resource> $resource */
             if ($resource = Filament::getModelResource($model)) {
                 return $resource::form($schema);
             }
@@ -85,7 +84,7 @@ trait HasSchema
             return $this->getSchemaForModel($schema, $model);
         } catch (SchemaNotFoundException $e) {
             // Try to find infolist schema in resource
-            /** @var class-string<Resource> $resource */
+            /** @var class-string<resource> $resource */
             if ($resource = Filament::getModelResource($model)) {
                 return $resource::infolist($schema);
             }

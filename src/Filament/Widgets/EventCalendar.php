@@ -2,42 +2,39 @@
 
 namespace Adultdate\FilamentBooking\Filament\Widgets;
 
+use Adultdate\FilamentBooking\Attributes\CalendarEventContent;
+use Adultdate\FilamentBooking\Enums\BookingStatus;
 use Adultdate\FilamentBooking\Enums\CalendarViewType;
 use Adultdate\FilamentBooking\Enums\Priority;
+use Adultdate\FilamentBooking\Filament\Actions\CreateAction;
 use Adultdate\FilamentBooking\Models\Booking\Booking;
 use Adultdate\FilamentBooking\Models\BookingMeeting;
 use Adultdate\FilamentBooking\Models\BookingSprint;
 use Adultdate\FilamentBooking\Models\CalendarSettings;
-use Filament\Notifications\Notification;
-use Illuminate\Support\Facades\Auth;
-use Adultdate\FilamentBooking\Attributes\CalendarEventContent;
-use Adultdate\FilamentBooking\Filament\Actions\CreateAction;
-use Adultdate\FilamentBooking\Filament\Widgets\SimpleCalendarWidget;
 use Adultdate\FilamentBooking\ValueObjects\DateClickInfo;
 use Adultdate\FilamentBooking\ValueObjects\DateSelectInfo;
 use Adultdate\FilamentBooking\ValueObjects\EventDropInfo;
 use Adultdate\FilamentBooking\ValueObjects\EventResizeInfo;
 use Adultdate\FilamentBooking\ValueObjects\FetchInfo;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\ToggleButtons;
+use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HtmlString;
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Repeater;
-use Filament\Schemas\Components\Section;
-use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\ToggleButtons;
-use Adultdate\FilamentBooking\Enums\BookingStatus;
 
 final class EventCalendar extends CalendarWidget
 {
     protected static string $viewIdentifier = 'adultdate/filament-booking::calendar-widget';
 
-    protected string|HtmlString|bool|null $heading = 'Calendar';
+    protected string | HtmlString | bool | null $heading = 'Calendar';
 
     protected bool $eventClickEnabled = true;
 
@@ -108,8 +105,7 @@ final class EventCalendar extends CalendarWidget
         return $config;
     }
 
-
-    protected function getEvents(FetchInfo $info): Collection|array|Builder
+    protected function getEvents(FetchInfo $info): Collection | array | Builder
     {
         $start = $info->start->toMutable()->startOfDay();
         $end = $info->end->toMutable()->endOfDay();
@@ -226,7 +222,7 @@ final class EventCalendar extends CalendarWidget
                                 ->label('Status')
                                 ->inline()
                                 ->options(BookingStatus::class)
-                                ->default(BookingStatus::Booked )
+                                ->default(BookingStatus::Booked)
                                 ->required()
                                 ->columnSpanFull(),
 
@@ -238,6 +234,7 @@ final class EventCalendar extends CalendarWidget
                 ])
                 ->mutateFormDataUsing(function (array $data): array {
                     $data['booking_user_id'] = Auth::id();
+
                     return $data;
                 })
                 ->mountUsing(function (CreateAction $action, ?Schema $schema, ?DateSelectInfo $info): void {

@@ -10,34 +10,29 @@ use Adultdate\FilamentBooking\Concerns\HasSchema;
 use Adultdate\FilamentBooking\Concerns\InteractsWithCalendar;
 use Adultdate\FilamentBooking\Concerns\InteractsWithEventRecord;
 use Adultdate\FilamentBooking\Contracts\HasCalendar;
-use Adultdate\FilamentBooking\Enums\Priority;
+use Adultdate\FilamentBooking\Enums\BookingStatus;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Actions\CreateAction;
 use Adultdate\FilamentBooking\Filament\Widgets\Concerns\CanBeConfigured;
 use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithEvents;
 use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithRawJS;
 use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithRecords;
 use Adultdate\FilamentBooking\Filament\Widgets\SimpleCalendarWidget;
-use Adultdate\FilamentBooking\Models\BookingMeeting;
-use Adultdate\FilamentBooking\Models\BookingSprint;
-use Adultdate\FilamentBooking\Models\BookingServicePeriod;
-use Adultdate\FilamentBooking\Models\Booking\DailyLocation;
 use Adultdate\FilamentBooking\Models\Booking\Booking;
-use Adultdate\FilamentBooking\Filament\Actions\CreateAction as FilamentCreateAction;
+use Adultdate\FilamentBooking\Models\Booking\BookingLocation;
+use Adultdate\FilamentBooking\Models\Booking\Client;
+use Adultdate\FilamentBooking\Models\Booking\DailyLocation;
+use Adultdate\FilamentBooking\Models\Booking\Service;
+use Adultdate\FilamentBooking\Models\BookingMeeting;
+use Adultdate\FilamentBooking\Models\BookingServicePeriod;
+use Adultdate\FilamentBooking\Models\BookingSprint;
 use Adultdate\FilamentBooking\Models\CalendarSettings;
 use Adultdate\FilamentBooking\ValueObjects\DateClickInfo;
 use Adultdate\FilamentBooking\ValueObjects\DateSelectInfo;
 use Adultdate\FilamentBooking\ValueObjects\EventDropInfo;
 use Adultdate\FilamentBooking\ValueObjects\EventResizeInfo;
 use Adultdate\FilamentBooking\ValueObjects\FetchInfo;
-use Filament\Actions\Action;
-use Filament\Notifications\Notification;
-use Filament\Schemas\Schema;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\HtmlString;
-use Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Actions\CreateAction as DailyLocationCreateAction;
-use Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Actions\CreateAction;
+use App\Models\User;
+use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
@@ -45,20 +40,15 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
-use Adultdate\FilamentBooking\Enums\BookingStatus;
-use Adultdate\FilamentBooking\Models\Booking\BookingLocation;
-use Adultdate\FilamentBooking\Models\Booking\BookingSchedule;
-use Adultdate\FilamentBooking\Models\Booking\Client;
-use Adultdate\FilamentBooking\Models\Booking\Service;
-use App\Models\User;
-use Carbon\Carbon;
-use Livewire\Attributes\Locked;
+use Filament\Notifications\Notification;
+use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 
 final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
 {
-
-   
-
     use CanBeConfigured, CanRefreshCalendar, HasOptions, HasSchema, InteractsWithCalendar, InteractsWithEventRecord, InteractsWithEvents, InteractsWithRawJS, InteractsWithRecords {
         // Prefer the contract-compatible refreshRecords (chainable) from CanRefreshCalendar
         CanRefreshCalendar::refreshRecords insteadof InteractsWithEvents;
@@ -209,24 +199,24 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
         return $config;
     }
 
-    protected function getEvents(FetchInfo $info): Collection|array|Builder
+    protected function getEvents(FetchInfo $info): Collection | array | Builder
     {
         $start = $info->start->toMutable()->startOfDay();
         $end = $info->end->toMutable()->endOfDay();
 
         \Illuminate\Support\Facades\Log::info('getEvents called', ['start' => $start, 'end' => $end]);
 
-        $dailyLocations = DailyLocation::query()    
+        $dailyLocations = DailyLocation::query()
             ->whereBetween('date', [$start, $end])
             ->with(['serviceUser'])
             ->get();
-            
+
         // Query bookings by service_date (bookings use service_date + start_time/end_time, not starts_at/ends_at)
         $bookings = Booking::query()
             ->with(['client', 'service', 'serviceUser', 'bookingUser', 'location', 'items'])
             ->whereBetween('service_date', [$start, $end])
             ->get();
-        
+
         \Illuminate\Support\Facades\Log::info('Bookings fetched', ['count' => $bookings->count()]);
 
         $meetings = BookingMeeting::query()
@@ -261,8 +251,7 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
         ];
     }
 
-
-      public function getFormSchema(): array
+    public function getFormSchema(): array
     {
         return [
             Select::make('booking_client_id')
@@ -294,6 +283,7 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
                 ->createOptionUsing(function (array $data) {
                     $data['country'] = 'Sweden';
                     $client = Client::create($data);
+
                     return $client->id;
                 })
                 ->required(),
@@ -396,12 +386,12 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
                         $formOrSchema->fill([]);
                     }
 
-                    if (!isset($arguments['start']) && !isset($arguments['service_date'])) {
+                    if (! isset($arguments['start']) && ! isset($arguments['service_date'])) {
                         return;
                     }
 
                     $timezone = config('app.timezone');
-                     
+
                     if (isset($arguments['service_date']) || isset($arguments['start_time'])) {
                         $values = [
                             'service_date' => $arguments['service_date'] ?? null,
@@ -426,11 +416,13 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
 
                     if ($formOrSchema instanceof Schema) {
                         $formOrSchema->fillPartially($values, array_keys($values));
+
                         return;
                     }
 
                     if (is_object($formOrSchema) && method_exists($formOrSchema, 'fill')) {
                         $formOrSchema->fill($values);
+
                         return;
                     }
                 })
@@ -559,7 +551,7 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
                     } elseif (isset($args[1]) && (is_array($args[1]) || is_object($args[1]))) {
                         // Case: array or object arguments provided (from JS payload)
                         $arguments = is_object($args[1]) ? json_decode(json_encode($args[1]), true) : $args[1];
-                        if (!isset($arguments['start']) && !isset($arguments['startStr']) && !isset($arguments['service_date'])) {
+                        if (! isset($arguments['start']) && ! isset($arguments['startStr']) && ! isset($arguments['service_date'])) {
                             return;
                         }
 
@@ -671,7 +663,7 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
 
     protected function onEventDrop(EventDropInfo $info, Model $event): bool
     {
-        if (! $event instanceof BookingMeeting && ! $event instanceof BookingSprint && ! $event instanceof DailyLocation &&  ! $event instanceof BookingServicePeriod) {
+        if (! $event instanceof BookingMeeting && ! $event instanceof BookingSprint && ! $event instanceof DailyLocation && ! $event instanceof BookingServicePeriod) {
             return false;
         }
 
@@ -756,6 +748,4 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
     {
         return null;
     }
-
-  
 }

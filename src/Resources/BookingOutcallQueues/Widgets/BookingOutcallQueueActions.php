@@ -49,13 +49,13 @@ class BookingOutcallQueueActions extends Widget
         $query = BookingOutcallQueue::query();
 
         if ($this->filter_name) {
-            $query->where('name', 'like', '%'.$this->filter_name.'%');
+            $query->where('name', 'like', '%' . $this->filter_name . '%');
         }
         if ($this->filter_phone) {
-            $query->where('phone', 'like', '%'.$this->filter_phone.'%');
+            $query->where('phone', 'like', '%' . $this->filter_phone . '%');
         }
         if ($this->filter_city) {
-            $query->where('city', 'like', '%'.$this->filter_city.'%');
+            $query->where('city', 'like', '%' . $this->filter_city . '%');
         }
 
         $rows = $query->limit(1000)->get()->map(function ($r) {
@@ -68,15 +68,15 @@ class BookingOutcallQueueActions extends Widget
             ];
         })->toArray();
 
-        $csv = implode(',', array_keys($rows[0] ?? ['id', 'name']))."\n";
+        $csv = implode(',', array_keys($rows[0] ?? ['id', 'name'])) . "\n";
         foreach ($rows as $row) {
             $csv .= implode(',', array_map(function ($v) {
-                return '"'.str_replace('"', '""', (string) $v).'"';
-            }, $row))."\n";
+                return '"' . str_replace('"', '""', (string) $v) . '"';
+            }, $row)) . "\n";
         }
 
         // Store temporary csv and provide download link via notification
-        $path = 'exports/booking_outcall_queues_'.time().'.csv';
+        $path = 'exports/booking_outcall_queues_' . time() . '.csv';
         \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->put($path, $csv);
 
         $url = \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->url($path);

@@ -2,33 +2,29 @@
 
 namespace Adultdate\FilamentBooking\Filament\Resources\Booking\ServicePeriods\Pages;
 
-use Adultdate\FilamentBooking\Filament\Resources\Booking\ServicePeriods\BookingServicePeriodResource;
-use Filament\Actions\CreateAction;
-use Filament\Resources\Pages\ListRecords;
-use Filament\Actions\Action;
-use App\Models\Post;
-use App\Models\User;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\TimePicker;
-use Filament\Forms\Components\Repeater;
-use Adultdate\FilamentBooking\Models\Booking\BookingLocation;
-use Adultdate\FilamentBooking\Models\Booking\Client as Client;
-use Adultdate\FilamentBooking\Models\Booking\Service;
 use Adultdate\FilamentBooking\Enums\BookingStatus;
-use Illuminate\Database\Eloquent\Builder;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\ServicePeriods\BookingServicePeriodResource;
+use Adultdate\FilamentBooking\Models\Booking\BookingLocation;
+use Adultdate\FilamentBooking\Models\Booking\Client;
+use Adultdate\FilamentBooking\Models\Booking\Service;
+use App\Models\User;
+use Filament\Actions\Action;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\TimePicker;
+use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\FusedGroup;
-use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
-
 
 class ListBookingServicePeriods extends ListRecords
 {
+    protected static ?int $sort = -1;
 
-     protected static ?int $sort = -1;
-     protected static ?int $navigationSort = -3;
+    protected static ?int $navigationSort = -3;
+
     protected static string $resource = BookingServicePeriodResource::class;
 
     protected function getHeaderActions(): array
@@ -39,7 +35,6 @@ class ListBookingServicePeriods extends ListRecords
                 ->modalWidth('xl')
                 ->schema([
 
-
                     Select::make('service_id')
                         ->label('Service')
                         ->options(Service::pluck('name', 'id'))
@@ -48,7 +43,6 @@ class ListBookingServicePeriods extends ListRecords
                         ->preload()
                         ->required(),
                     FusedGroup::make([
-
 
                         Select::make('service_user_id')
                             ->placeholder('Service Technician')
@@ -62,35 +56,36 @@ class ListBookingServicePeriods extends ListRecords
                             ->preload()
                             ->placeholder('Customer / Client')
                             ->createOptionForm([
-Section::make('')
-   ->inlineLabel()
-    ->schema([
-                                TextInput::make('name')
-                                    ->required()
-                                    ->maxLength(255),
+                                Section::make('')
+                                    ->inlineLabel()
+                                    ->schema([
+                                        TextInput::make('name')
+                                            ->required()
+                                            ->maxLength(255),
 
-                                           TextInput::make('phone')
-                                    ->tel()
-                                    ->maxLength(255),
-                                TextInput::make('email')
-                                    ->email()
-                                    ->maxLength(255),
-                         
-                                TextInput::make('address')
-                                    ->maxLength(255),
-                                TextInput::make('city')
-                                    ->maxLength(255),
-                                TextInput::make('postal_code')
-                                    ->maxLength(20),
-                                TextInput::make('country')
-                                    ->default('Sweden')
-                                    ->dehydrated(false)
-                                    ->hidden(),
-                            ])
+                                        TextInput::make('phone')
+                                            ->tel()
+                                            ->maxLength(255),
+                                        TextInput::make('email')
+                                            ->email()
+                                            ->maxLength(255),
+
+                                        TextInput::make('address')
+                                            ->maxLength(255),
+                                        TextInput::make('city')
+                                            ->maxLength(255),
+                                        TextInput::make('postal_code')
+                                            ->maxLength(20),
+                                        TextInput::make('country')
+                                            ->default('Sweden')
+                                            ->dehydrated(false)
+                                            ->hidden(),
+                                    ]),
                             ])
                             ->createOptionUsing(function (array $data) {
                                 $data['country'] = 'Sweden';
                                 $client = Client::create($data);
+
                                 return $client->id;
                             })
                             ->required(),
@@ -104,8 +99,6 @@ Section::make('')
                         ->preload()
                         ->hidden()
                         ->required(),
-
-
 
                     FusedGroup::make([
 
@@ -125,11 +118,9 @@ Section::make('')
                             ->seconds(false)
                             ->native(false),
 
-
                     ])
                         ->label('Service Date - Start ⏰ Time')
                         ->columns(3),
-
 
                     Select::make('status')
                         ->label('Status')
@@ -174,11 +165,11 @@ Section::make('')
                                 ->required(),
                         ]),
 
-                                            Textarea::make('notes')
+                    Textarea::make('notes')
                         ->label('Notes')
                         ->rows(3),
                 ])
-                ->action(function (array $data): void {})
+                ->action(function (array $data): void {}),
 
         ];
     }
@@ -187,7 +178,6 @@ Section::make('')
     {
         return [];
     }
-
 
     protected function getHeaderWidgets(): array
     {

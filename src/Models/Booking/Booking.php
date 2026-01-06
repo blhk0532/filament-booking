@@ -3,8 +3,6 @@
 namespace Adultdate\FilamentBooking\Models\Booking;
 
 use Adultdate\FilamentBooking\Enums\BookingStatus;
-use Adultdate\FilamentBooking\Models\Booking\OrderAddress as OrderAddress;
-use Adultdate\FilamentBooking\Models\Booking\Service;
 use App\Models\User;
 use Database\Factories\Booking\BookingFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -144,22 +142,23 @@ class Booking extends Model
         $end = null;
 
         if ($this->service_date && $this->start_time) {
-            $start = $this->service_date->toDateString().'T'.
+            $start = $this->service_date->toDateString() . 'T' .
                 str($this->start_time)->padRight(8, ':00');
         } elseif ($this->starts_at) {
             $start = $this->starts_at->toIso8601String();
         }
 
         if ($this->service_date && $this->end_time) {
-            $end = $this->service_date->toDateString().'T'.
+            $end = $this->service_date->toDateString() . 'T' .
                 str($this->end_time)->padRight(8, ':00');
         } elseif ($this->ends_at) {
             $end = $this->ends_at->toIso8601String();
         }
-                        $timeStamp = time();
-                        $dateStamp = date('m-d-Y', $timeStamp);
-                        $bookingNumber = 'BK-' . strrev($timeStamp) . '-NDS-' . $dateStamp;
-        return [ 
+        $timeStamp = time();
+        $dateStamp = date('m-d-Y', $timeStamp);
+        $bookingNumber = 'BK-' . strrev($timeStamp) . '-NDS-' . $dateStamp;
+
+        return [
             'id' => $this->id,
             'title' => $this->bookingUser?->name ?? 'Booking #' . ($this->number ?? 'New'),
             'start' => $start,
