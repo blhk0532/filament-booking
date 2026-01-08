@@ -24,7 +24,9 @@ class BookingObserver
             'booking_user_id' => $booking->booking_user_id,
             'admin_id' => $booking->admin_id,
         ]);
-        $this->syncToGoogleCalendar($booking);
+        
+        // Dispatch async job for Google Calendar sync and WhatsApp notification
+        \App\Jobs\SyncBookingToGoogleCalendar::dispatch($booking, sendWhatsapp: true);
     }
 
     /**
@@ -34,7 +36,8 @@ class BookingObserver
     {
         // Only sync if relevant fields have changed
         if ($this->shouldSync($booking)) {
-            $this->syncToGoogleCalendar($booking);
+            // Don't send WhatsApp for updates, only for creation
+            \App\Jobs\SyncBookingToGoogleCalendar::dispatch($booking, sendWhatsapp: false);
         }
     }
 
@@ -128,23 +131,32 @@ class BookingObserver
             }
 
             $serviceName = $booking->service?->name ?? 'Service';
-            $date = $booking->service_date?->format('Y-m-d') ?? $booking->starts_at?->format('Y-m-d');
-            $start = $booking->start_time ?? $booking->starts_at?->format('H:i');
-            $end = $booking->end_time ?? $booking->ends_at?->format('H:i');
-            $addr = trim(($booking->client?->address ?? '').' '.($booking->client?->city ?? ''));
+            $clientName = $booking->client?->name ?? 'Client';
+            $clientPhone = $booking->client?->phone ?? 'Unknown';
+            $BookingNumber = $booking->number ?? 'N/A';
+$date = $booking->service_date?->format('Y-m-d') ?? $booking->starts_at?->format('Y-m-d');
+$start = $booking->start_time ?? $booking->starts_at?->format('H:i');
+$end = $booking->end_time ?? $booking->ends_at?->format('H:i');
+$addr = trim(($booking->client?->address ?? '').' '.($booking->client?->city ?? ''));
+$datenow = now()->format('d-m-Y');
+$serviceUserName = $booking->serviceUser?->user?->name ?? null;
+$lines = array_filter([
+    "🗓️⌯⌲NDS⋆｡˚{$date}", 
+    $serviceUserName ? "👷🏼 {$serviceUserName} 🕓 " : null,
+    $start ? "{$start}" : null,
+    $end ? "{$end}" : null,
+    $clientName ? "🙋🏻‍♂️ {$clientName}" : null,
+    $clientPhone ? "📞 {$clientPhone}" : null,
+    $addr ? "🏠 {$addr}" : null,
+    $serviceName ? "📋 {$serviceName}" : null,
+    $BookingNumber ? "# {$BookingNumber}" : null,
+]);
 
-            $lines = array_filter([
-                'New booking confirmed',
-                "No: {$booking->number}",
-                $serviceName,
-                $date && $start ? "When: {$date} {$start}" : null,
-                $end ? "Ends: {$end}" : null,
-                $addr ? "Where: {$addr}" : null,
-            ]);
 
             $message = implode("\n", $lines);
 
-            $this->whatsapp->sendText($instanceId, $to, $message);
+            // Send raw number directly to Evolution API (no formatting)
+            app(\App\Services\RawWhatsappService::class)->sendTextRaw($instanceId, (string) $to, (string) $message);
 
             Log::info('Whatsapp booking notification sent', [
                 'booking_id' => $booking->id,

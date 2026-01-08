@@ -24,7 +24,7 @@
             <div class="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                 <div class="flex">
                     <div class="flex-shrink-0">
-                        <x-heroicon-o-information-circle class="h-5 w-5 text-blue-400" />
+                       
                     </div>
                     <div class="ml-3">
                         <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">

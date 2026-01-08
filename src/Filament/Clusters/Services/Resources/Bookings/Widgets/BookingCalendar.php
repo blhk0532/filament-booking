@@ -792,16 +792,7 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
 
                 $booking->updateTotalPrice();
 
-                // Manually trigger Google Calendar sync
-                try {
-                    $syncService = app(\Adultdate\FilamentBooking\Services\GoogleCalendarSyncService::class);
-                    $syncService->syncBooking($booking);
-                } catch (\Throwable $e) {
-                    logger('Failed to sync booking to Google Calendar from BookingCalendar widget', [
-                        'booking_id' => $booking->id,
-                        'error' => $e->getMessage(),
-                    ]);
-                }
+                // The Observer will handle Google Calendar sync and WhatsApp notification automatically
 
                 $this->refreshRecords();
                 \Filament\Notifications\Notification::make()
