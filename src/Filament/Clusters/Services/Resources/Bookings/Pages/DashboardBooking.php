@@ -70,7 +70,7 @@ class DashboardBooking extends BaseDashboard
                 Section::make()
                     ->schema([
                         Select::make('booking_calendars')
-                            ->options(fn () => BookingCalendarModel::whereHas('owner', fn($q) => $q->where('role', UserRole::SERVICE))->pluck('name', 'id')->toArray())
+                            ->options(fn () => BookingCalendarModel::pluck('name', 'id')->toArray())
                             ->label('Tekninker')
                             ->placeholder('Select a calendar owner')
                             ->searchable()

@@ -22,13 +22,17 @@ class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
 
+    protected static bool $isScopedToTenant = false;
+
     protected static ?string $cluster = ProductsCluster::class;
 
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-bolt';
 
-    protected static ?string $navigationLabel = 'Products';
+    protected static ?string $navigationLabel = 'Produkt';
+
+
 
     protected static ?int $navigationSort = 0;
 

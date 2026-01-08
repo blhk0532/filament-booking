@@ -133,3 +133,13 @@ div.fc-daygrid-day-events{
 .fc-event-start {
     padding:6px!important;
 }
+.fc-event-time{
+    font-size: 12px;
+  margin-top: -4px;
+  font-weight: bold;
+}
+div.fc-event-time{
+    font-size: 12px;
+  margin-top: -4px;
+  font-weight: bold;
+}

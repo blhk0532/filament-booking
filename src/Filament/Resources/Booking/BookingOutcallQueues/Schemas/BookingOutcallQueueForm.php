@@ -13,7 +13,7 @@ use Ysfkaya\FilamentPhoneInput\Tables\PhoneColumn;
 use Ysfkaya\FilamentPhoneInput\Infolists\PhoneEntry;
 use Ysfkaya\FilamentPhoneInput\PhoneInputNumberType;
 use DashedDEV\FilamentNumpadField\NumpadField;
-
+use Fahiem\FilamentPinpoint\Pinpoint;
 
 class BookingOutcallQueueForm
 {
@@ -64,6 +64,18 @@ PhoneInput::make('phone')
                 DateTimePicker::make('end_time'),
                 Toggle::make('is_active')
                     ->required(),
+                            Pinpoint::make('location')
+                ->label('Location')
+                ->latField('lat')
+                ->lngField('lng'),
+
+            TextInput::make('lat')
+                ->label('Latitude')
+                ->readOnly(),
+
+            TextInput::make('lng')
+                ->label('Longitude')
+                ->readOnly(),
             ]);
     }
 }

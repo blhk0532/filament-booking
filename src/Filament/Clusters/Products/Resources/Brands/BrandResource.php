@@ -30,6 +30,8 @@ class BrandResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
+    protected static bool $isScopedToTenant = false;
+
     public static function form(Schema $schema): Schema
     {
         return BrandForm::configure($schema);

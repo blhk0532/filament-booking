@@ -24,7 +24,13 @@ class UsersTable
                     ->label('Email address')
                     ->searchable(),
                 TextColumn::make('role')
-                    ->formatStateUsing(fn ($state) => $state->label() ?? $state)
+                    ->formatStateUsing(function ($state) {
+                        if (is_object($state) && method_exists($state, 'label')) {
+                            return $state->label() ?? (string) $state;
+                        }
+
+                        return (string) $state;
+                    })
                     ->badge()
                     ->color(function ($state): ?string {
                         $role = $state;
@@ -33,11 +39,22 @@ class UsersTable
                             return null;
                         }
 
+                        if (is_string($role)) {
+                            return match (strtolower($role)) {
+                                'admin' => 'primary',
+                                'user' => 'gray',
+                                'service' => 'success',
+                                'booking' => 'warning',
+                                default => 'secondary',
+                            };
+                        }
+
                         return match ($role) {
                             UserRole::ADMIN => 'primary',
                             UserRole::USER => 'gray',
                             UserRole::SERVICE => 'success',
                             UserRole::BOOKING => 'warning',
+                            default => 'secondary',
                         };
                     })
                     ->searchable(),

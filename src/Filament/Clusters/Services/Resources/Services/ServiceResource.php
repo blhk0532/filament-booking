@@ -32,6 +32,12 @@ class ServiceResource extends Resource
 
     protected static ?int $navigationSort = 0;
 
+    /**
+     * Disable Filament tenant scoping for this resource to avoid
+     * requiring a `team` relationship on the Service model.
+     */
+    protected static bool $isScopedToTenant = false;
+
     public static function form(Schema $schema): Schema
     {
         return ServiceForm::configure($schema);

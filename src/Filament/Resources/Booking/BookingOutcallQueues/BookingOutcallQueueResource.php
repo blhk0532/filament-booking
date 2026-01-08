@@ -25,7 +25,9 @@ class BookingOutcallQueueResource extends Resource
 
     protected static ?string $navigationLabel = 'Queues';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Bookings';
+    protected static string|UnitEnum|null $navigationGroup = 'Nummer';
+
+    protected static bool $isScopedToTenant = false;
 
     public static function form(Schema $schema): Schema
     {

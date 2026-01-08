@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\BookingDataLeads\Tables;
+namespace Adultdate\FilamentBooking\Filament\Resources\BookingDataLeads\Tables;
 
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;

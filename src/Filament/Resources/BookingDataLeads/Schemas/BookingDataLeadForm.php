@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\BookingDataLeads\Schemas;
+namespace Adultdate\FilamentBooking\Filament\Resources\BookingDataLeads\Schemas;
 
 use App\Models\BookingDataLead;
 use Filament\Forms\Components\DatePicker;
@@ -55,8 +55,8 @@ class BookingDataLeadForm
                             ->maxDate(now()),
                         TextInput::make('age')
                             ->numeric()
-                            ->min(0)
-                            ->max(150),
+                            ->minValue(0)
+                            ->maxValue(150),
                         Select::make('sex')
                             ->options([
                                 'male' => 'Male',
@@ -92,10 +92,10 @@ class BookingDataLeadForm
                         TextInput::make('attempt_count')
                             ->numeric()
                             ->default(0)
-                            ->min(0),
+                            ->minValue(0),
                         Placeholder::make('last_contacted_at')
                             ->label('Last Contacted')
-                            ->content(fn (BookingDataLead $record): string => $record->last_contacted_at ? $record->last_contacted_at->diffForHumans() : 'Never'),
+                            ->content(fn (?BookingDataLead $record): string => ($record && $record->last_contacted_at) ? $record->last_contacted_at->diffForHumans() : 'Never'),
                         Toggle::make('is_active')
                             ->label('Active')
                             ->default(true),

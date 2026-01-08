@@ -24,13 +24,21 @@ class ClientResource extends Resource
 
     protected static ?string $slug = 'services/clients';
 
+        protected static ?string $navigationLabel = 'Kunder';
+
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static string | UnitEnum | null $navigationGroup = 'Bookings';
+    protected static string | UnitEnum | null $navigationGroup = 'Bokning';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-user-group';
 
     protected static ?int $navigationSort = 4;
+
+    /**
+     * Disable Filament tenant scoping for this resource to avoid
+     * requiring a `team` relationship on the Client model.
+     */
+    protected static bool $isScopedToTenant = false;
 
     public static function form(Schema $schema): Schema
     {

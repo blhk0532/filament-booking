@@ -13,7 +13,7 @@ class NumpadField extends Field
     /** Config */
     protected bool $storesCents = false;        // DB als euro's (DECIMAL) = false, als centen (INT) = true
 
-    protected string $currencySymbol = '€';
+    protected string $currencySymbol = '';
 
     protected bool $allowNegative = false;
 

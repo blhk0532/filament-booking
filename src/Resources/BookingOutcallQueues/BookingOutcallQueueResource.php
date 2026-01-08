@@ -23,9 +23,11 @@ class BookingOutcallQueueResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedServerStack;
 
-    protected static ?string $navigationLabel = 'Queues';
+    protected static ?string $navigationLabel = 'Outcall';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Bookings';
+    protected static string|UnitEnum|null $navigationGroup = 'UnitEnum';
+
+    protected static bool $isScopedToTenant = false;
 
     public static function form(Schema $schema): Schema
     {

@@ -27,13 +27,15 @@ class BookingServicePeriodResource extends Resource
 
  protected static ?string $modelLabel =  'Calendar Bookings';
 
-    protected static ?string $navigationLabel = 'Periods';
+    protected static ?string $navigationLabel = 'Stopptid';
 
-    protected static string | UnitEnum | null $navigationGroup = 'Bookings';
+    protected static string | UnitEnum | null $navigationGroup = 'Kalender';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClock;
 
     protected static ?int $sort = 1;
+
+    protected static bool $isScopedToTenant = false;
 
     public static function form(Schema $schema): Schema
     {

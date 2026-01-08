@@ -3,7 +3,7 @@
 namespace Adultdate\FilamentBooking\Models\Booking;
 
 use Adultdate\FilamentBooking\Models\Address;
-use Adultdate\FilamentBooking\Models\Comment;
+use Adultdate\FilamentBooking\Models\BookingComment;
 use Database\Factories\Booking\ClientFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -102,7 +102,7 @@ class Client extends Model
     /** @return HasMany<Comment, $this> */
     public function comments(): HasMany
     {
-        return $this->hasMany(Comment::class);
+        return $this->hasMany(BookingComment::class);
     }
 
     /** @return HasManyThrough<Payment, Order, $this> */

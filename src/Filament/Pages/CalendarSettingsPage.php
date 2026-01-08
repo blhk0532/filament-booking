@@ -26,7 +26,7 @@ final class CalendarSettingsPage extends Page implements HasForms
 
     protected static ?string $navigationLabel = 'Settings';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Bookings';
+    protected static string|UnitEnum|null $navigationGroup = 'Kalender';
 
      protected static ?int $sort = 12;
      protected static ?int $navigationSort = 12;

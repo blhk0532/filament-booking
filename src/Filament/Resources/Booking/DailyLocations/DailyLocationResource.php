@@ -26,13 +26,15 @@ class DailyLocationResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'location';
 
-    protected static ?string $navigationLabel = 'Locations';
+    protected static ?string $navigationLabel = 'Områden';
 
-    protected static string | UnitEnum | null $navigationGroup = 'Bookings';
+    protected static string | UnitEnum | null $navigationGroup = 'Kalender';
 
     protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedMapPin;
 
     protected static ?int $navigationSort = 5;
+
+    protected static bool $isScopedToTenant = false;
 
     public static function form(Schema $schema): Schema
     {

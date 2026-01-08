@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('booking_calendars', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
             $table->unsignedBigInteger('creator_id');
             $table->unsignedBigInteger('owner_id');
             $table->json('access')->nullable(); // Array of user IDs that can access

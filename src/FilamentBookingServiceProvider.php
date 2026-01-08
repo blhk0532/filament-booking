@@ -17,6 +17,7 @@ use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Adultdate\FilamentBooking\Commands\FilamentBookingCommand;
 use Adultdate\FilamentBooking\Testing\TestsFilamentBooking;
+use Filament\Facades\Filament;
 
 class FilamentBookingServiceProvider extends PackageServiceProvider
 {
@@ -136,6 +137,15 @@ class FilamentBookingServiceProvider extends PackageServiceProvider
 
         // Testing
         Testable::mixin(new TestsFilamentBooking);
+
+        // Register Filament resources when Filament is available
+        if (class_exists(Filament::class)) {
+            Filament::serving(function (): void {
+                Filament::registerResources([
+                    \Adultdate\FilamentBooking\Filament\Resources\BookingCalendars\BookingCalendarResource::class,
+                ]);
+            });
+        }
     }
 
     protected function getAssetPackageName(): ?string

@@ -19,6 +19,8 @@ class BookingServicePeriod extends Model
         'service_location',
         'start_time',
         'end_time',
+        'starts_at',
+        'ends_at',
         'period_type',
         'created_by',
     ]; 
@@ -30,9 +32,19 @@ class BookingServicePeriod extends Model
         'service_date' => 'date',
         'start_time' => 'string',
         'end_time' => 'string',
-        'id', 
+        'starts_at' => 'datetime',
+        'ends_at' => 'datetime',
+        // keep casts explicit
     ];
 
+    /**
+     * Safe accessor for `status` attribute.
+     * Return raw attribute if present, otherwise null to avoid MissingAttributeException.
+     */
+    public function getStatusAttribute()
+    {
+        return $this->attributes['status'] ?? null;
+    }
     /**
      * The user this service period belongs to.
      */
@@ -77,31 +89,38 @@ class BookingServicePeriod extends Model
             $end = $this->ends_at->toIso8601String();
         }
 
+        $attrs = $this->getAttributes();
+
+        $clientName = method_exists($this, 'client') ? $this->client?->name : null;
+        $serviceName = method_exists($this, 'service') ? $this->service?->name : null;
+        $bookingUserName = method_exists($this, 'bookingUser') ? $this->bookingUser?->name : null;
+        $serviceUserName = method_exists($this, 'serviceUser') ? $this->serviceUser?->name : null;
+
         return [
             'id' => $this->id,
-            'title' => $this->client?->name ?? 'ⓘ zzz',
+            'title' => $clientName ?? 'ⓘ upptagen',
             'start' => $start,
             'end' => $end,
             'type' => 'blocking',
-            'backgroundColor' => $this->status?->getColor() ?? '#f3f4f6',
+            'backgroundColor' => $this->status?->getColor() ?? '#e7000b',
             'borderColor' => $this->status?->getColor() ?? 'transparent',
             'extendedProps' => [
                 'key' => $this->id,  // Required: Record ID for event resolution
                 'booking_id' => $this->id,
-                'number' => $this->number,
-                'client_name' => $this->client?->name,
+                'number' => $attrs['number'] ?? null,
+                'client_name' => $clientName,
                 'service_date' => $this->service_date?->format('Y-m-d'),
-                'service_name' => $this->service?->name,
-                'service_user' => $this->serviceUser?->name,
-                'booking_user' => $this->bookingUser?->name,
-                'location' => $this->location?->name,
-                'displayLocation' => $this->location?->name,
+                'service_name' => $serviceName,
+                'service_user' => $serviceUserName,
+                'booking_user' => $bookingUserName,
+                'location' => method_exists($this, 'location') ? $this->location?->name : null,
+                'displayLocation' => method_exists($this, 'location') ? $this->location?->name : null,
                 // Model FQCN used by calendar to select custom event content
                 'model' => static::class,
                 'status' => $this->status?->value,
-                'total_price' => $this->total_price,
-                'currency' => $this->currency,
-                'notes' => $this->notes,
+                'total_price' => $attrs['total_price'] ?? null,
+                'currency' => $attrs['currency'] ?? null,
+                'notes' => $attrs['notes'] ?? null,
                 'type' => 'blocking',
             ],
         ];

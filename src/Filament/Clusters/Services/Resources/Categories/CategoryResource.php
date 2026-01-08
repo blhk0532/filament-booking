@@ -20,6 +20,9 @@ class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
 
+    // This resource's models are not tenant-owned in this plugin, opt-out of tenant scoping
+    protected static bool $isScopedToTenant = false;
+
     protected static ?string $cluster = ServicesCluster::class;
 
     protected static ?string $recordTitleAttribute = 'name';

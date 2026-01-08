@@ -275,7 +275,7 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
                         $dateVal = $this->calendarData['date_val'];
                         $timeStamp = time();
                         $dateStamp = date('dmY', $timeStamp);
-                        $bookingNumber = 'NDS-' . $timeStamp . '-' . Str::upper(Str::substr(Auth::user()->name, 0, 3)) . '-' . $dateStamp;
+                        $bookingNumber = 'NDS-' . $timeStamp . '-' . Str::upper(Str::substr(Auth::user()->name, 0, 3)) . '-' . $dateStamp . '-' . $timeStamp;
                         if ($this->calendarData['allDay']) {
                             $startTime = '00:00';
                             $endTime = '23:59';
@@ -589,7 +589,7 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
         logger()->info('xxx: EVENT zzz PAYLOAD', ['event' => $event]);
         //    logger()->info('BookingCalendarWidget: EVENT CLICK PAYLOAD', ['title' => $event['title']]);
 
-        if ($event['title'] == 'ⓘ zzz') {
+        if ($event['title'] == 'ⓘ upptagen') {
 
             $recId = $event['extendedProps']['booking_id'] ?? null;
             $this->model = BookingServicePeriod::class;
@@ -621,7 +621,7 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
                 'data' => $payload,
             ]);
         }
-        if ($event['title'] != 'ⓘ zzz' && (! isset($event['allDay']) || $event['allDay'] === false)) {
+        if ($event['title'] != 'ⓘ upptagen' && (! isset($event['allDay']) || $event['allDay'] === false)) {
             //  dd($event)  ;
             $recId = $event['id'] ?? null;
             $this->model = Booking::class;
@@ -904,7 +904,7 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
                 'start' => $loc->date?->toDateString(),
                 'number' => 0,
                 'allDay' => true,
-                'backgroundColor' => '#f3f4f6',
+                'backgroundColor' => '#e7000b',
                 'borderColor' => 'transparent',
                 'textColor' => '#111827',
                 'extendedProps' => [

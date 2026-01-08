@@ -24,11 +24,17 @@ class UserResource extends Resource
 
     protected static ?string $navigationLabel = 'Users';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Bookings';
+    protected static string|UnitEnum|null $navigationGroup = 'Bokning';
 
     protected static ?string $recordTitleAttribute = 'name';
 
       protected static ?int $navigationSort = 20;
+
+    /**
+     * Disable Filament tenant scoping for this resource to avoid
+     * requiring a `team` relationship on the User model.
+     */
+    protected static bool $isScopedToTenant = false;
 
     public static function form(Schema $schema): Schema
     {

@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\BookingDataLeads;
+namespace Adultdate\FilamentBooking\Filament\Resources\BookingDataLeads;
 
-use App\Filament\Resources\BookingDataLeads\Pages\CreateBookingDataLead;
-use App\Filament\Resources\BookingDataLeads\Pages\EditBookingDataLead;
-use App\Filament\Resources\BookingDataLeads\Pages\ListBookingDataLeads;
-use App\Filament\Resources\BookingDataLeads\Pages\ViewBookingDataLead;
-use App\Filament\Resources\BookingDataLeads\Schemas\BookingDataLeadForm;
-use App\Filament\Resources\BookingDataLeads\Schemas\BookingDataLeadInfolist;
-use App\Filament\Resources\BookingDataLeads\Tables\BookingDataLeadsTable;
+use Adultdate\FilamentBooking\Filament\Resources\BookingDataLeads\Pages\CreateBookingDataLead;
+use Adultdate\FilamentBooking\Filament\Resources\BookingDataLeads\Pages\EditBookingDataLead;
+use Adultdate\FilamentBooking\Filament\Resources\BookingDataLeads\Pages\ListBookingDataLeads;
+use Adultdate\FilamentBooking\Filament\Resources\BookingDataLeads\Pages\ViewBookingDataLead;
+use Adultdate\FilamentBooking\Filament\Resources\BookingDataLeads\Schemas\BookingDataLeadForm;
+use Adultdate\FilamentBooking\Filament\Resources\BookingDataLeads\Schemas\BookingDataLeadInfolist;
+use Adultdate\FilamentBooking\Filament\Resources\BookingDataLeads\Tables\BookingDataLeadsTable;
 use App\Models\BookingDataLead;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -23,7 +23,9 @@ class BookingDataLeadResource extends Resource
 
     protected static ?string $navigationLabel = 'Leads';
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Bookings';
+        protected static bool $isScopedToTenant = false;
+
+    protected static \UnitEnum|string|null $navigationGroup = 'Nummer';
 
     protected static ?int $navigationSort = 11;
 

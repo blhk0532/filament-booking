@@ -405,7 +405,7 @@ class BookingCalendarWidget extends FullCalendarWidget implements HasCalendar
                 'title' => $title,
                 'start' => $loc->date?->toDateString(),
                 'allDay' => true,
-                'backgroundColor' => '#f3f4f6',
+                'backgroundColor' => '#e7000b',
                 'borderColor' => 'transparent',
                 'textColor' => '#111827',
                 'extendedProps' => [

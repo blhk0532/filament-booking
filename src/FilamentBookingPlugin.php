@@ -26,6 +26,8 @@ use Adultdate\FilamentBooking\Filament\Resources\Booking\ServicePeriods\BookingS
 use Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Widgets\EventCalendar;
 use Adultdate\FilamentBooking\Filament\Resources\Booking\BookingOutcallQueues\BookingOutcallQueueResource; 
 use Adultdate\FilamentBooking\Filament\Resources\Booking\Users\UserResource;
+use Adultdate\FilamentBooking\Filament\Resources\BookingCalendars\BookingCalendarResource;
+use Adultdate\FilamentBooking\Filament\Resources\BookingDataLeads\BookingDataLeadResource;
 use Adultdate\FilamentBooking\Filament\Pages\Dashboard; 
 use Illuminate\Support\Facades\Auth;
 
@@ -60,7 +62,7 @@ class FilamentBookingPlugin implements Plugin
                 Css::make('event-calendar', 'https://cdn.jsdelivr.net/npm/@event-calendar/build@4.5.0/dist/event-calendar.min.css'),
             ])
             ->discoverClusters(in: app_path('../plugins/adultdate/filament-booking/src/Filament/Clusters'), for: 'Adultdate\\FilamentBooking\\Filament\\Clusters')
-
+            ->discoverResources(in: app_path('../plugins/adultdate/filament-booking/src/Filament/Resources'), for: 'Adultdate\\FilamentBooking\\Filament\\Resources')
             ->databaseNotifications()
             ->pages([
                 BookingCalendar::class,
@@ -72,6 +74,8 @@ class FilamentBookingPlugin implements Plugin
                 BookingServicePeriodResource::class,
                 BookingOutcallQueueResource::class,
                 UserResource::class,
+                BookingCalendarResource::class,
+                BookingDataLeadResource::class,
             ])
             ->widgets([
                 BookingCalendarWidget::class,

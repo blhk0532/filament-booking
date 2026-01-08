@@ -516,8 +516,104 @@ class ServiceCalendar extends FullCalendarWidget implements HasCalendar
             ->label('Admin Actions')
             ->icon('heroicon-o-cog-6-tooth')
             ->color('gray')
-            ->modalHeading('Edit booking')
-            ->modalDescription('')
+            ->modalHeading(function (array $arguments) {
+                $data = $arguments['data'] ?? [];
+
+                $startRaw = $data['start_time'] ?? $data['start'] ?? ($data['start_val'] ?? null);
+                $endRaw = $data['end_time'] ?? $data['end'] ?? ($data['end_val'] ?? null);
+
+                $fmt = function ($raw) {
+                    if (! $raw) {
+                        return null;
+                    }
+                    try {
+                        return \Carbon\Carbon::parse($raw)->format('H:i');
+                    } catch (\Throwable $e) {
+                        return preg_match('/^(\d{2}:\d{2})/', (string) $raw, $m) ? $m[1] : (string) $raw;
+                    }
+                };
+
+                $start = $fmt($startRaw);
+                $end = $fmt($endRaw);
+
+                $bookingUser = data_get($data, 'booking_user') ?: ($data['booking_user_name'] ?? data_get($data, 'extendedProps.booking_user'));
+
+                $serviceUser = data_get($data, 'service_user') ?: ($data['service_user_name'] ?? data_get($data, 'extendedProps.service_user'));
+                if (! $serviceUser && ! empty($data['service_user_id'])) {
+                    try {
+                        $svcUser = \App\Models\User::find($data['service_user_id']);
+                        $serviceUser = $svcUser?->name ?: $serviceUser;
+                    } catch (\Throwable $e) {
+                        // ignore
+                    }
+                }
+
+                $prefix = $serviceUser ? "{$serviceUser} — " : '';
+
+                if ($start && $end) {
+                    return $bookingUser ? "{$prefix}{$start} - {$end} — {$bookingUser}" : "{$prefix}{$start} - {$end}";
+                }
+
+                if ($start) {
+                    return $bookingUser ? "{$prefix}{$start} — {$bookingUser}" : ($prefix ? trim($prefix) : $start);
+                }
+
+                return 'Edit booking';
+            })
+            ->modalContent(function (array $arguments) {
+                $data = $arguments['data'] ?? [];
+
+                $client = $data['client'] ?? null;
+                $clientName = $client['name'] ?? $data['booking_client_name'] ?? $data['client_name'] ?? null;
+                $address = $client['address'] ?? $data['address'] ?? '';
+                $phone = $client['phone'] ?? $data['phone'] ?? '';
+
+                // Split address into street/city if possible
+                $street = $address;
+                $city = '';
+                if (is_string($address) && str_contains($address, ',')) {
+                    [$streetPart, $cityPart] = array_map('trim', explode(',', $address, 2));
+                    $street = $streetPart;
+                    $city = $cityPart;
+                }
+
+                $items = $data['items'] ?? data_get($data, 'items', []);
+                $services = [];
+                if (is_array($items)) {
+                    foreach ($items as $it) {
+                        if (! is_array($it)) {
+                            continue;
+                        }
+                        $name = $it['booking_service_name'] ?? $it['service_name'] ?? $it['name'] ?? null;
+                        if (! $name && isset($it['booking_service_id'])) {
+                            $svc = \Adultdate\FilamentBooking\Models\Booking\Service::find($it['booking_service_id']);
+                            $name = $svc?->name;
+                        }
+                        $qty = isset($it['qty']) ? (int) $it['qty'] : (isset($it['quantity']) ? (int) $it['quantity'] : 1);
+                        $unit = isset($it['unit_price']) ? (float) $it['unit_price'] : (isset($it['price']) ? (float) $it['price'] : 0.0);
+                        $currency = $data['currency'] ?? ($data['currency_code'] ?? ($data['currency'] ?? 'SEK'));
+                        if ($name) {
+                            $total = $qty * $unit;
+                            $formatted = $unit > 0 ? sprintf('%s x%d — %s %s', $name, $qty, number_format($total, 0, ',', ' '), $currency) : sprintf('%s x%d', $name, $qty);
+                            $services[] = $formatted;
+                        }
+                    }
+                }
+
+                if (empty($services) && ! empty($data['service_name'])) {
+                    $services[] = $data['service_name'];
+                }
+
+                $services = array_values(array_unique(array_filter(array_map('trim', $services))));
+
+                return view('filament-booking.modal.booking-description', [
+                    'client_name' => $clientName,
+                    'phone' => $phone,
+                    'street' => $street,
+                    'city' => $city,
+                    'services' => $services,
+                ]);
+            })
             ->modalWidth('sm')
             ->model(Booking::class)
             ->mountUsing(function (array $arguments) {
@@ -589,7 +685,7 @@ class ServiceCalendar extends FullCalendarWidget implements HasCalendar
         logger()->info('xxx: EVENT zzz PAYLOAD', ['event' => $event]);
         //    logger()->info('BookingCalendarWidget: EVENT CLICK PAYLOAD', ['title' => $event['title']]);
 
-        if ($event['title'] == 'ⓘ zzz') {
+        if ($event['title'] == 'ⓘ upptagen') {
 
             $recId = $event['extendedProps']['booking_id'] ?? null;
             $this->model = BookingServicePeriod::class;
@@ -621,7 +717,7 @@ class ServiceCalendar extends FullCalendarWidget implements HasCalendar
                 'data' => $payload,
             ]);
         }
-        if ($event['title'] != 'ⓘ zzz' && (! isset($event['allDay']) || $event['allDay'] === false)) {
+        if ($event['title'] != 'ⓘ upptagen' && (! isset($event['allDay']) || $event['allDay'] === false)) {
             //  dd($event)  ;
             $recId = $event['id'] ?? null;
             $this->model = Booking::class;
@@ -635,6 +731,7 @@ class ServiceCalendar extends FullCalendarWidget implements HasCalendar
             $user = Auth::user();
             $canEdit = $user->id == $booking->booking_user_id || Auth::user()->role === 'admin' || Auth::user()->role === 'super_admin';
             $action = $canEdit ? 'options' : '';
+            $payload['booking_user_name'] = $this->record->bookingUser?->name ?? ($payload['booking_user_name'] ?? null);
             $this->mountAction($action, [
                 'data' => $payload,
             ]);

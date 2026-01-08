@@ -9,6 +9,7 @@ use Adultdate\FilamentBooking\Models\Booking\Client;
 use Adultdate\FilamentBooking\Models\Booking\Service;
 use App\Models\User;
 use Filament\Actions\Action;
+
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Repeater\TableColumn;
 use Filament\Forms\Components\RichEditor;
@@ -60,11 +61,12 @@ class BookingForm
      */
     public static function canShowStatus(?Booking $record): bool
     {
+        
         $user = Auth::user();
         if (! $user) {
             return false;
         }
-
+  
         if (method_exists($user, 'hasRole') && $user->hasRole('admin')) {
             return true;
         }
@@ -73,10 +75,23 @@ class BookingForm
             return true;
         }
 
-        return $user->id === 3;
+        if ( $user->role === 'admin' ||  $user->role === 'super'){
+                return true;
+        }
+
+        return false;
+        
     }
 
     /** @return array<Component> */
+    public static function getClientComponents(): array
+    {
+        return [            
+         
+        ];
+    }
+
+       /** @return array<Component> */
     public static function getDetailsComponents(): array
     {
         return [            
@@ -101,40 +116,47 @@ class BookingForm
                 ->default(Auth::id())
                 ->dehydrated(),
  
-            Select::make('booking_client_id')
+                Select::make('booking_client_id')
                 ->relationship('client', 'name')
                 ->searchable()
                 ->required()
                 ->createOptionForm([
+                Group::make()
+                    ->columns(2)
+                    ->schema([
                     TextInput::make('name')
                         ->required()
-                        ->maxLength(255),
-
+                        ->maxLength(255)
+                       ->required(),
                     TextInput::make('phone')
-                        ->maxLength(255),
-
+                        ->maxLength(255)
+                       ->required(),
                     TextInput::make('email')
                         ->label('Email address')
-                        ->required()
+ 
                         ->email()
                         ->maxLength(255)
                         ->unique(),
 
                     TextInput::make('street')
                         ->label('Street address')
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->required(),
 
                     TextInput::make('zip')
                         ->label('Postal code')
-                        ->maxLength(20),
+                        ->maxLength(20)
+                        ->required(),
 
                     TextInput::make('city')
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->required(),
 
                     TextInput::make('country')
                         ->hidden()
                         ->placeholder('Sweden'),
                 ])
+                 ])
                 ->createOptionAction(function (Action $action) {
                     return $action
                         ->modalHeading('Create client')
@@ -177,7 +199,7 @@ class BookingForm
                 ->options(BookingStatus::class)
                 ->columnSpan('full')
                 ->required()
-                ->hidden(fn (?Booking $record) => !static::canShowStatus($record)),
+                ->hidden(fn (?Booking $record) => ! static::canShowStatus($record)),
 
             // Address moved to client create modal; no address field on booking form
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\BookingDataLeads\Schemas;
+namespace Adultdate\FilamentBooking\Filament\Resources\BookingDataLeads\Schemas;
 
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;

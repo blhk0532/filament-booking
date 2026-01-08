@@ -26,13 +26,15 @@ class CustomerResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static ?string $navigationLabel = 'Customer';
+    protected static ?string $navigationLabel = 'Kunder';
 
-    protected static string | UnitEnum | null $navigationGroup = 'Bookings';
+    protected static string | UnitEnum | null $navigationGroup = 'Produkt';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-user-circle';
 
     protected static ?int $navigationSort = 2;
+
+    protected static bool $isScopedToTenant = false;
 
     public static function form(Schema $schema): Schema
     {

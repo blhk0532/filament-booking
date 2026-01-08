@@ -45,6 +45,8 @@ class Booking extends Model
         'notified_at',
         'confirmed_at',
         'completed_at',
+        'schedulable_type',
+        'schedulable_id',
     ];
 
     protected $casts = [
@@ -158,10 +160,12 @@ class Booking extends Model
         }
                         $timeStamp = time();
                         $dateStamp = date('m-d-Y', $timeStamp);
-                        $bookingNumber = 'BK-' . strrev($timeStamp) . '-NDS-' . $dateStamp;
+                        $bookingNumber = 'BK-' . strrev($timeStamp) . '-NDS-' . $dateStamp . '-' . $timeStamp;
+        $baseTitle = ($this->client?->address ?? '') . '  '  . ($this->client?->city ?? '');
+
         return [ 
             'id' => $this->id,
-            'title' => $this->bookingUser?->name ?? 'Booking #' . ($this->number ?? 'New'),
+            'title' => $baseTitle,
             'start' => $start,
             'end' => $end,
             'type' => 'booking',
@@ -173,6 +177,8 @@ class Booking extends Model
                 'type' => 'booking',
                 'number' => $bookingNumber,
                 'client_name' => $this->client?->name,
+                'client_address' => $this->client?->address,
+                'client_city' => $this->client?->city,
                 'service_date' => $this->service_date?->format('Y-m-d'),
                 'service_name' => $this->service?->name,
                 'service_user' => $this->serviceUser?->name,

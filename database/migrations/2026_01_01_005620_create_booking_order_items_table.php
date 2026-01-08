@@ -16,8 +16,9 @@ return new class extends Migration
         if (! Schema::hasTable('booking_order_items')) {
             Schema::create('booking_order_items', function (Blueprint $table): void {
                 $table->id();
-                $table->foreignId('booking_order_id')->nullable();
-                $table->foreignId('booking_product_id')->nullable();
+                $table->integer('sort')->default(0);
+                $table->foreignId('booking_order_id')->nullable()->constrained('booking_orders')->cascadeOnDelete();
+                $table->foreignId('booking_product_id')->nullable()->constrained('booking_products')->cascadeOnDelete();
                 $table->integer('qty');
                 $table->decimal('unit_price', 10, 2);
                 $table->timestamps();

@@ -39,7 +39,7 @@ class ManageAppointments extends Page implements HasForms, HasTable
          protected static ?int $sort = 10;
      protected static ?int $navigationSort = 10;
 
-    protected static string|UnitEnum|null $navigationGroup = 'Bookings';
+    protected static string|UnitEnum|null $navigationGroup = 'Bokning';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
 

@@ -83,3 +83,25 @@ html.dark .filament-fullcalendar {
 .filament-fullcalendar .fc-list-sticky .fc-list-day th {
     @apply bg-inherit;
 }
+
+
+.fc-event-time{
+    font-size: 12px!important;
+  margin-top: -4px!important;
+  font-weight: bold!important;
+}
+div.fc-event-time{
+    font-size: 12px!important;
+  margin-top: -4px!important;
+  font-weight: bold!important;
+}
+.fc-timegrid-event .fc-event-time{
+    font-size: 12px!important;
+  margin-top: -4px!important;
+  font-weight: bold!important;
+}
+div.fc-timegrid-event .fc-event-time{
+    font-size: 12px!important;
+  margin-top: -4px!important;
+  font-weight: bold!important;
+}

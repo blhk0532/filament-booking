@@ -23,9 +23,11 @@ class BookingCalendarResource extends Resource
 {
     protected static ?string $model = BookingCalendar::class;
 
-    protected static ?string $navigationLabel = 'Calendars';
+    protected static ?string $navigationLabel = 'Kalender';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Bookings';
+    protected static bool $isScopedToTenant = false;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Kalender';
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-calendar-days';
 
@@ -48,6 +50,11 @@ class BookingCalendarResource extends Resource
         return [
             //
         ];
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return true;
     }
 
     public static function getPages(): array

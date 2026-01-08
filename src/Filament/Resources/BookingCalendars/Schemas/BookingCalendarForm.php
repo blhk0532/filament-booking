@@ -3,7 +3,7 @@
 namespace Adultdate\FilamentBooking\Filament\Resources\BookingCalendars\Schemas;
 
 use Adultdate\FilamentBooking\Models\User;
-use Adultdate\FilamentBooking\UserRole;
+use App\UserRole;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;

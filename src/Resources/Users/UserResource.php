@@ -20,7 +20,7 @@ class UserResource extends Resource
 
     protected static ?string $navigationLabel = 'Users';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Bookings';
+    protected static string|UnitEnum|null $navigationGroup = 'Bokning';
 
     protected static ?string $recordTitleAttribute = 'name';
 

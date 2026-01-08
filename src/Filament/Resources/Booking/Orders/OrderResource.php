@@ -27,11 +27,17 @@ class OrderResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'number';
 
-    protected static string | UnitEnum | null $navigationGroup = 'Bookings';
+    protected static string | UnitEnum | null $navigationGroup = 'Produkt';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-shopping-bag';
 
     protected static ?int $navigationSort = 11;
+
+    /**
+     * Disable Filament tenant scoping for this resource to avoid
+     * requiring a `team` relationship on the Order model.
+     */
+    protected static bool $isScopedToTenant = false;
 
     public static function form(Schema $schema): Schema
     {

@@ -18,7 +18,7 @@ class BookingCalendar extends Page
 
     protected static ?int $sort = 1;
 
-    protected static string | UnitEnum | null $navigationGroup = 'Bookings';
+    protected static string | UnitEnum | null $navigationGroup = 'Bokning';
 
     /**
      * Return header widgets for the page.
