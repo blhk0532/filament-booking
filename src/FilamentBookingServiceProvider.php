@@ -74,6 +74,9 @@ class FilamentBookingServiceProvider extends PackageServiceProvider
 
     public function packageBooted(): void
     {
+        // Register observers
+        \Adultdate\FilamentBooking\Models\Booking\Booking::observe(\Adultdate\FilamentBooking\Observers\BookingObserver::class);
+
         // Asset Registration
         FilamentAsset::registerScriptData(
             $this->getScriptData(),

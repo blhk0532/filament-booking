@@ -26,11 +26,14 @@ class Booking extends Model
 
     protected $fillable = [
         'number',
+        'google_event_id',
         'service_id',
         'service_user_id',
         'booking_user_id',
+        'admin_id',
         'booking_client_id',
         'booking_location_id',
+        'booking_calendar_id',
         'total_price',
         'currency',
         'status',
@@ -48,6 +51,13 @@ class Booking extends Model
         'schedulable_type',
         'schedulable_id',
     ];
+    /**
+     * Get the admin who created the booking (if any).
+     */
+    public function admin(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Admin::class, 'admin_id');
+    }
 
     protected $casts = [
         'status' => BookingStatus::class,
@@ -70,8 +80,18 @@ class Booking extends Model
     protected static function booted(): void
     {
         static::creating(function (Booking $booking): void {
-            if (! $booking->booking_user_id) {
-                $booking->booking_user_id = Auth::id();
+            $user = Auth::user();
+            if (! $booking->booking_user_id && $user && $user instanceof \App\Models\User) {
+                $booking->booking_user_id = $user->id;
+                logger('Booking::creating - Set booking_user_id from Auth::user()', [
+                    'user_id' => $user->id,
+                    'booking_id' => $booking->id ?? null,
+                ]);
+            } else {
+                logger('Booking::creating - booking_user_id not set or user is not App\\Models\\User', [
+                    'auth_user' => $user ? get_class($user) : null,
+                    'booking_id' => $booking->id ?? null,
+                ]);
             }
         });
     }
@@ -107,9 +127,21 @@ class Booking extends Model
     }
 
     /** @return BelongsTo<BookingLocation, $this> */
-    public function location(): BelongsTo
+    public function bookingLocation(): BelongsTo
     {
         return $this->belongsTo(BookingLocation::class, 'booking_location_id');
+    }
+
+    /** Alias for bookingLocation to satisfy widgets expecting `location` */
+    public function location(): BelongsTo
+    {
+        return $this->bookingLocation();
+    }
+
+    /** @return BelongsTo<\Adultdate\FilamentBooking\Models\BookingCalendar, $this> */
+    public function bookingCalendar(): BelongsTo
+    {
+        return $this->belongsTo(\Adultdate\FilamentBooking\Models\BookingCalendar::class, 'booking_calendar_id');
     }
 
     /** @return HasMany<BookingItem, $this> */

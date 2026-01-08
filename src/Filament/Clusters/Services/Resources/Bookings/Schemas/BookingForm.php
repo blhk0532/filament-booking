@@ -191,7 +191,10 @@ class BookingForm
 
             TextInput::make('booking_user_id')
                 ->hidden()
-                ->default(Auth::id())
+                ->dehydrated(),
+
+            TextInput::make('admin_id')
+                ->hidden()
                 ->dehydrated(),
 
             ToggleButtons::make('status')

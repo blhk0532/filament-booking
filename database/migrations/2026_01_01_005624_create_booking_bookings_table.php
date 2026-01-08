@@ -43,7 +43,7 @@ return new class extends Migration
                 // Relations introduced by modifier migrations
                 $table->foreignId('service_id')->nullable()->constrained('booking_services')->nullOnDelete();
                 $table->foreignId('service_user_id')->nullable()->constrained('users')->nullOnDelete();
-                $table->foreignId('booking_user_id')->constrained('users');
+                $table->foreignId('booking_user_id')->nullable()->constrained('users')->nullOnDelete();
 
                 // Service scheduling fields
                 $table->date('service_date')->nullable();

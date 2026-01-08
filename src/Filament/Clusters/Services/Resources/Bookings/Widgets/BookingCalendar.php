@@ -27,6 +27,7 @@ use Adultdate\FilamentBooking\ValueObjects\FetchInfo;
 use App\Models\User;
 use App\UserRole;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Hidden;
@@ -39,7 +40,6 @@ use Filament\Forms\Components\TimePicker;
 use Filament\Notifications\Notification;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
@@ -286,9 +286,11 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
             return;
         }
 
+        $bookingCalendarId = $resource['id'] ?? $this->getSelectedCalendarId() ?? $this->getDefaultCalendarId();
+
         $this->mountAction('create', [
             'service_date' => $startDate->format('Y-m-d'),
-                'service_location' => $data['service_location'] ?? $data['location'] ?? '',
+            'booking_calendar_id' => $bookingCalendarId,
             'notes' => '',
         ]);
     }
@@ -351,6 +353,18 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
             $serviceUserId = $calendar?->owner_id ?? $serviceUserId;
         }
 
+        // Get booking_calendar_id based on resource, filter, or service user
+        $bookingCalendarId = null;
+        if ($resource && isset($resource['id'])) {
+            $bookingCalendarId = $resource['id'];
+        } elseif ($selectedCalendarId = $this->getSelectedCalendarId()) {
+            $bookingCalendarId = $selectedCalendarId;
+        } elseif ($serviceUserId) {
+            // Find calendar for this service user
+            $calendar = \App\Models\BookingCalendar::where('owner_id', $serviceUserId)->first();
+            $bookingCalendarId = $calendar?->id;
+        }
+
         $data = [
             'start' => $startTime,
             'end' => $endTime,
@@ -360,6 +374,7 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
             'date' => $startDate,
             'service_date' => $startDate,
             'service_user_id' => $serviceUserId,
+            'booking_calendar_id' => $bookingCalendarId,
             'timezone' => $timezone,
             'start_val' => $startVal,
             'end_val' => $endVal,
@@ -491,7 +506,7 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                         $timeStamp = time();
                         $dateStamp = date('Ymd', $timeStamp);
                         $startStamp = date('Ymd', strtotime($startDate));
-                        $bookingNumber = 'NDS-' . $startStamp . '-' . Str::upper(Str::substr(Auth::user()->name, 0, 3)) . '-' . $dateStamp;
+                        $bookingNumber = 'NDS-' . $startStamp . '-' . Str::upper(Str::substr(Auth::user()->name, 0, 3)) . '-' . $timeStamp;
                         if ($this->calendarData['allDay']) {
                             $startTime = '00:00';
                             $endTime = '23:59';
@@ -504,7 +519,7 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                             $startTime = \Carbon\Carbon::parse($startVal)->format('H:i');
                             $endTime = \Carbon\Carbon::parse($endVal)->format('H:i');
                         }
-                        $data = ['number' => $bookingNumber, 'notes' => '', 'service_user_id' => $serviceUserId, 'booking_client_id' => null, 'date' => $startDate, 'start' => $startTime, 'end' => $endTime, 'service_date' => $startDate, 'start_time' => $startTime, 'end_time' => $endTime, 'start_val' => $startVal, 'end_val' => $endVal, 'date_val' => $dateVal];
+                        $data = ['number' => $bookingNumber, 'notes' => '', 'service_user_id' => $serviceUserId, 'booking_client_id' => null, 'booking_calendar_id' => $this->calendarData['booking_calendar_id'] ?? null, 'date' => $startDate, 'start' => $startTime, 'end' => $endTime, 'service_date' => $startDate, 'start_time' => $startTime, 'end_time' => $endTime, 'start_val' => $startVal, 'end_val' => $endVal, 'date_val' => $dateVal];
                         logger()->info('BookingCalendarWidget: B BOOK DATA', $data);
                         $this->replaceMountedAction('create', ['data' => $data]);
                         $newIndex = max(0, count($this->mountedActions) - 1);
@@ -702,7 +717,7 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
             });
     }
 
-    public function createBookingAction(): Action
+    public function createAction(): Action
     {
         return Action::make('create')
             ->label('Create Booking')
@@ -717,15 +732,54 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                 $user = Auth::user();
                 $roleValue = $user && $user->role instanceof \UnitEnum ? $user->role->value : (string) $user->role;
                 $isAdmin = in_array($roleValue, ['admin', 'super_admin'], true);
-                $merged['service_user_id'] = Auth::id();
+                // Preserve service_user_id from data if provided (from calendar context), otherwise use current user
+                if (!isset($merged['service_user_id']) || empty($merged['service_user_id'])) {
+                    $merged['service_user_id'] = Auth::id();
+                }
                 return $merged;
             })
             ->schema($this->getFormSchema())
             ->action(function (array $data) {
+                // Ensure number exists
+                if (!isset($data['number']) || empty($data['number'])) {
+                    $data['number'] = $this->generateNumber();
+                }
+                
+                // Always set booking_calendar_id from selected or default if missing or null
+                if (!isset($data['booking_calendar_id']) || empty($data['booking_calendar_id'])) {
+                    $calendarId = method_exists($this, 'getSelectedCalendarId') ? $this->getSelectedCalendarId() : null;
+                    if (!$calendarId && method_exists($this, 'getDefaultCalendarId')) {
+                        $calendarId = $this->getDefaultCalendarId();
+                    }
+                    $data['booking_calendar_id'] = $calendarId;
+                }
+                
+                // Extract items before creating booking (items are not a fillable field)
+                $items = $data['items'] ?? [];
+                unset($data['items']);
+                
+                // Build proper starts_at and ends_at from service_date + times
+                if (isset($data['service_date']) && isset($data['start_time'])) {
+                    $startDateTime = \Carbon\Carbon::parse($data['service_date'] . ' ' . $data['start_time']);
+                    $data['starts_at'] = $startDateTime->toDateTimeString();
+                }
+                if (isset($data['service_date']) && isset($data['end_time'])) {
+                    $endDateTime = \Carbon\Carbon::parse($data['service_date'] . ' ' . $data['end_time']);
+                    $data['ends_at'] = $endDateTime->toDateTimeString();
+                }
+                
+                logger()->info('BookingCalendarWidget: BEFORE Booking::create()', [
+                    'booking_calendar_id' => $data['booking_calendar_id'] ?? 'NOT SET',
+                    'full_data' => $data
+                ]);
                 $booking = Booking::create($data);
+                logger()->info('BookingCalendarWidget: AFTER Booking::create()', [
+                    'booking_id' => $booking->id,
+                    'booking_calendar_id_in_db' => $booking->booking_calendar_id,
+                ]);
 
-                if (isset($data['items']) && is_array($data['items'])) {
-                    foreach ($data['items'] as $item) {
+                if (is_array($items)) {
+                    foreach ($items as $item) {
                         if (isset($item['booking_service_id'])) {
                             $booking->items()->create([
                                 'booking_service_id' => $item['booking_service_id'],
@@ -737,6 +791,18 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                 }
 
                 $booking->updateTotalPrice();
+
+                // Manually trigger Google Calendar sync
+                try {
+                    $syncService = app(\Adultdate\FilamentBooking\Services\GoogleCalendarSyncService::class);
+                    $syncService->syncBooking($booking);
+                } catch (\Throwable $e) {
+                    logger('Failed to sync booking to Google Calendar from BookingCalendar widget', [
+                        'booking_id' => $booking->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+
                 $this->refreshRecords();
                 \Filament\Notifications\Notification::make()
                     ->title('Booking created successfully')
@@ -1430,8 +1496,14 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
         ];
     }
 
-    protected function isAdmin(User $user): bool
+    protected function isAdmin(Model $user): bool
     {
+        // If it's an Admin model, always return true
+        if ($user instanceof \App\Models\Admin) {
+            return true;
+        }
+
+        // For User model, check the role attribute
         $userRole = $user->role;
         
         // Handle enum instances
@@ -1571,14 +1643,15 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                         ->label('Location')
                         ->options(BookingLocation::where('is_active', true)->pluck('name', 'id'))
                         ->searchable()
-                        ->preload()
-                        ->required(),
+                        ->preload(),
 
                     Select::make('service_user_id')
                         ->label('Service Technician')
                         ->options(User::pluck('name', 'id'))
                         ->searchable()
                         ->preload(),
+
+                    Hidden::make('booking_calendar_id'),
 
                     DatePicker::make('service_date')
                         ->label('Service Date')
@@ -1655,6 +1728,7 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
             'service_id' => null,
             'booking_user_id' => null,
             'booking_location_id' => null,
+            'booking_calendar_id' => null,
             'service_user_id' => null,
             'service_date' => null,
             'start_time' => null,
@@ -1779,6 +1853,24 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
         }
 
         return null;
+    }
+
+    protected function getSelectedCalendarId(): ?int
+    {
+        $filters = $this->pageFilters ?? [];
+        return $filters['booking_calendars'] ?? null;
+    }
+
+    protected function getDefaultCalendarId(): ?int
+    {
+        $serviceUserId = $this->getSelectedServiceUserId();
+        if (!$serviceUserId) {
+            return null;
+        }
+        logger()->info('GOOGLE CALENDAR', ['service_user_id' => $serviceUserId]);
+        // Find a calendar owned by the selected service user
+        $calendar = \App\Models\BookingCalendar::where('owner_id', $serviceUserId)->first();
+        return $calendar ? $calendar->id : null;
     }
 
     public function onEventResizeLegacy(array $event, array $oldEvent, array $relatedEvents, array $startDelta, array $endDelta): bool

@@ -23,8 +23,14 @@ class CreateBooking extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $data['booking_user_id'] = auth()->id();
-
+        $user = Auth::user();
+        if ($user instanceof \App\Models\Admin) {
+            $data['admin_id'] = $user->id;
+            $data['booking_user_id'] = null;
+        } else {
+            $data['booking_user_id'] = $user?->id;
+            $data['admin_id'] = null;
+        }
         return $data;
     }
 

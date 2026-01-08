@@ -26,6 +26,7 @@ use Adultdate\FilamentBooking\ValueObjects\DateSelectInfo;
 use Adultdate\FilamentBooking\Models\BookingServicePeriod;
 use App\Models\User;
 use App\UserRole;
+use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
@@ -611,10 +612,22 @@ class BookingCalendarWidget extends FullCalendarWidget implements HasCalendar
         ]);
     }
 
-    protected function isAdmin(User $user): bool
+    protected function isAdmin(Model $user): bool
     {
-        // Only treat a user as admin when their `role` attribute equals 'admin' or 'super_admin'
-        return isset($user->role) && ($user->role === UserRole::ADMIN || $user->role === UserRole::SUPER_ADMIN);
+        // Admin model is always treated as admin
+        if ($user instanceof \App\Models\Admin) {
+            return true;
+        }
+
+        $userRole = $user->role ?? null;
+
+        if ($userRole instanceof \UnitEnum) {
+            $roleValue = $userRole->value;
+        } else {
+            $roleValue = (string) $userRole;
+        }
+
+        return in_array($roleValue, ['admin', 'super_admin'], true);
     }
 
     protected function getDateClickContextMenuActions(): array

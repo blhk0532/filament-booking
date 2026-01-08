@@ -8,6 +8,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
+use WallaceMartinss\FilamentEvolution\Models\WhatsappInstance;
 
 class BookingCalendarForm
 {
@@ -17,6 +18,21 @@ class BookingCalendarForm
             ->components([
                 TextInput::make('name')
                     ->required(),
+                TextInput::make('google_calendar_id')
+                    ->label('Google Calendar ID')
+                    ->helperText('The ID of the Google Calendar to sync with (e.g., your-calendar-id@group.calendar.google.com)')
+                    ->placeholder('your-calendar-id@group.calendar.google.com'),
+                Select::make('whatsapp_id')
+                    ->label('WhatsApp Instance')
+                    ->helperText('Connect or refresh instances at /admin/whatsapp-instances?connectInstanceId=')
+                    ->options(fn () => WhatsappInstance::query()
+                        ->orderBy('name')
+                        ->get()
+                        ->mapWithKeys(fn (WhatsappInstance $instance) => [
+                            $instance->id => sprintf('%s (%s)', $instance->name, $instance->number),
+                        ]))
+                    ->searchable()
+                    ->placeholder('Select WhatsApp instance'),
                 Select::make('creator_id')
                     ->relationship('creator', 'name')
                     ->required(),

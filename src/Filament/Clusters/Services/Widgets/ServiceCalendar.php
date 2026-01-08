@@ -275,7 +275,7 @@ class ServiceCalendar extends FullCalendarWidget implements HasCalendar
                         $dateVal = $this->calendarData['date_val'];
                         $timeStamp = time();
                         $dateStamp = date('dmY', $timeStamp);
-                        $bookingNumber = 'NDS-' . $timeStamp . '-' . Str::upper(Str::substr(Auth::user()->name, 0, 3)) . '-' . $dateStamp;
+                        $bookingNumber = 'NDS-' . $timeStamp . '-' . Str::upper(Str::substr(Auth::user()->name, 0, 3)) . '-' . $timeStamp;
                         if ($this->calendarData['allDay']) {
                             $startTime = '00:00';
                             $endTime = '23:59';
