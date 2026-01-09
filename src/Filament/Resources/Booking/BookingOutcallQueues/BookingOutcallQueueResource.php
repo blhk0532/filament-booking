@@ -21,11 +21,11 @@ class BookingOutcallQueueResource extends Resource
 {
     protected static ?string $model = BookingOutcallQueue::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedServerStack;
+    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedServerStack;
 
     protected static ?string $navigationLabel = 'Queues';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Nummer';
+    protected static string | UnitEnum | null $navigationGroup = 'Nummer';
 
     protected static bool $isScopedToTenant = false;
 

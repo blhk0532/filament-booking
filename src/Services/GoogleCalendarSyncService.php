@@ -89,7 +89,7 @@ class GoogleCalendarSyncService
         }
 
         if (! $event instanceof Event) {
-            throw new \RuntimeException('Google event not found for id: '.$booking->google_event_id);
+            throw new \RuntimeException('Google event not found for id: ' . $booking->google_event_id);
         }
 
         $properties = [
@@ -184,14 +184,14 @@ class GoogleCalendarSyncService
      */
     protected function getEventTitle(Booking $booking): string
     {
-        $title = 'Booking #'.$booking->number;
+        $title = 'Booking #' . $booking->number;
 
         if ($booking->service) {
-            $title .= ' - '.$booking->service->name;
+            $title .= ' - ' . $booking->service->name;
         }
 
         if ($booking->bookingUser) {
-            $title .= ' with '.$booking->bookingUser->name;
+            $title .= ' with ' . $booking->bookingUser->name;
         }
 
         return $title;
@@ -204,28 +204,27 @@ class GoogleCalendarSyncService
     {
         $description = [];
 
-        $description[] = 'Booking Number: '.$booking->number;
-        $description[] = 'Status: '.($booking->status?->value ?? 'N/A');
-
+        $description[] = 'Booking Number: ' . $booking->number;
+        $description[] = 'Status: ' . ($booking->status?->value ?? 'N/A');
 
         if ($booking->service) {
-            $description[] = 'Service: '.$booking->service->name;
+            $description[] = 'Service: ' . $booking->service->name;
         }
 
         if ($booking->bookingUser) {
-            $description[] = 'Client: '.$booking->bookingUser->name;
+            $description[] = 'Client: ' . $booking->bookingUser->name;
         }
 
         $adminId = $booking->getAttributes()['admin_id'] ?? null;
         if ($adminId) {
             $adminName = $booking->admin?->name;
             if ($adminName) {
-                $description[] = 'Created by Admin: '.$adminName;
+                $description[] = 'Created by Admin: ' . $adminName;
             }
         }
 
         if ($booking->client) {
-            $description[] = 'Client Info: '.$booking->client->name;
+            $description[] = 'Client Info: ' . $booking->client->name;
         }
 
         if ($booking->notes) {
@@ -248,7 +247,7 @@ class GoogleCalendarSyncService
      */
     protected function getStartDateTime(Booking $booking): Carbon
     {
-        $dateTime = $booking->starts_at ?? Carbon::parse($booking->service_date.' '.$booking->start_time);
+        $dateTime = $booking->starts_at ?? Carbon::parse($booking->service_date . ' ' . $booking->start_time);
 
         return $dateTime instanceof \Carbon\CarbonImmutable ? $dateTime->toMutable() : $dateTime;
     }
@@ -258,7 +257,7 @@ class GoogleCalendarSyncService
      */
     protected function getEndDateTime(Booking $booking): Carbon
     {
-        $dateTime = $booking->ends_at ?? Carbon::parse($booking->service_date.' '.$booking->end_time);
+        $dateTime = $booking->ends_at ?? Carbon::parse($booking->service_date . ' ' . $booking->end_time);
 
         return $dateTime instanceof \Carbon\CarbonImmutable ? $dateTime->toMutable() : $dateTime;
     }

@@ -15,12 +15,11 @@ use Adultdate\FilamentBooking\Filament\Widgets\Concerns\CanBeConfigured;
 use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithEvents;
 use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithRawJS;
 use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithRecords;
-use Adultdate\FilamentBooking\Filament\Widgets\SimpleCalendarWidget;
-use Adultdate\FilamentBooking\Models\BookingMeeting;
-use Adultdate\FilamentBooking\Models\BookingSprint;
-use Adultdate\FilamentBooking\Models\BookingServicePeriod;
 use Adultdate\FilamentBooking\Models\Booking\Booking;
 use Adultdate\FilamentBooking\Models\Booking\DailyLocation;
+use Adultdate\FilamentBooking\Models\BookingMeeting;
+use Adultdate\FilamentBooking\Models\BookingServicePeriod;
+use Adultdate\FilamentBooking\Models\BookingSprint;
 // use Adultdate\FilamentBooking\Filament\Actions\CreateAction;
 use Adultdate\FilamentBooking\Models\CalendarSettings;
 use Adultdate\FilamentBooking\ValueObjects\DateClickInfo;
@@ -29,17 +28,18 @@ use Adultdate\FilamentBooking\ValueObjects\EventDropInfo;
 use Adultdate\FilamentBooking\ValueObjects\EventResizeInfo;
 use Adultdate\FilamentBooking\ValueObjects\FetchInfo;
 use Filament\Actions\CreateAction;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
-use Filament\Forms\Components\Hidden;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Schema;
+use Filament\Widgets\Widget;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-use Filament\Widgets\Widget;
+
 final class LocationCalendarWidget extends Widget implements HasCalendar
 {
     use CanBeConfigured, CanRefreshCalendar, HasOptions, HasSchema, InteractsWithCalendar, InteractsWithEventRecord, InteractsWithEvents, InteractsWithRawJS, InteractsWithRecords {
@@ -59,10 +59,10 @@ final class LocationCalendarWidget extends Widget implements HasCalendar
         InteractsWithEvents::onEventResizeLegacy insteadof InteractsWithCalendar;
     }
 
-
     protected bool $dateClickEnabled = true;
 
     protected bool $dateSelectEnabled = true;
+
     protected static ?int $sort = 1;
 
     public function schema(Schema $schema): Schema
@@ -163,14 +163,14 @@ final class LocationCalendarWidget extends Widget implements HasCalendar
         return $config;
     }
 
-    protected function getEvents(FetchInfo $info): Collection|array|Builder
+    protected function getEvents(FetchInfo $info): Collection | array | Builder
     {
         $start = $info->start->toMutable()->startOfDay();
         $end = $info->end->toMutable()->endOfDay();
 
         \Illuminate\Support\Facades\Log::info('getEvents called', ['start' => $start, 'end' => $end]);
 
-        $dailyLocations = DailyLocation::query()    
+        $dailyLocations = DailyLocation::query()
             ->whereBetween('date', [$start, $end])
             ->with(['serviceUser'])
             ->get();

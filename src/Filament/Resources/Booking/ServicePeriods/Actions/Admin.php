@@ -2,7 +2,6 @@
 
 namespace Adultdate\FilamentBooking\Filament\Resources\Booking\ServicePeriods\Actions;
 
-use Filament\Actions\CreateAction as BaseCreateAction;
 use Filament\Actions\Action;
 
 if (! class_exists(\Adultdate\FilamentBooking\Filament\Resources\Booking\ServicePeriods\Actions\AdminAction::class)) {

@@ -2,7 +2,6 @@
 
 namespace Adultdate\FilamentBooking\BookingOutcallQueues;
 
-use App\Models\BookingOutcallQueue;
 use Adultdate\FilamentBooking\BookingOutcallQueues\Pages\CreateBookingOutcallQueue;
 use Adultdate\FilamentBooking\BookingOutcallQueues\Pages\EditBookingOutcallQueue;
 use Adultdate\FilamentBooking\BookingOutcallQueues\Pages\ListBookingOutcallQueues;
@@ -10,6 +9,7 @@ use Adultdate\FilamentBooking\BookingOutcallQueues\Pages\ViewBookingOutcallQueue
 use Adultdate\FilamentBooking\BookingOutcallQueues\Schemas\BookingOutcallQueueForm;
 use Adultdate\FilamentBooking\BookingOutcallQueues\Schemas\BookingOutcallQueueInfolist;
 use Adultdate\FilamentBooking\BookingOutcallQueues\Tables\BookingOutcallQueuesTable;
+use App\Models\BookingOutcallQueue;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -21,11 +21,11 @@ class BookingOutcallQueueResource extends Resource
 {
     protected static ?string $model = BookingOutcallQueue::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedServerStack;
+    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedServerStack;
 
     protected static ?string $navigationLabel = 'Outcall';
 
-    protected static string|UnitEnum|null $navigationGroup = 'UnitEnum';
+    protected static string | UnitEnum | null $navigationGroup = 'UnitEnum';
 
     protected static bool $isScopedToTenant = false;
 

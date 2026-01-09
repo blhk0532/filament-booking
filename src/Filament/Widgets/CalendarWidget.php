@@ -30,7 +30,7 @@ class CalendarWidget extends FullCalendarWidget implements \Adultdate\FilamentBo
         InteractsWithCalendar::getOptions insteadof CanBeConfigured;
     }
 
-    public Model|string|null $model = 'Adultdate\FilamentBooking\Models\CalendarEvent';
+    public Model | string | null $model = 'Adultdate\FilamentBooking\Models\CalendarEvent';
 
     protected static ?int $sort = 2;
 
@@ -40,12 +40,12 @@ class CalendarWidget extends FullCalendarWidget implements \Adultdate\FilamentBo
 
     protected static string $viewIdentifier = 'adultdate/filament-booking::calendar-widget';
 
-    protected int|string|array $columnSpan = 'full';
+    protected int | string | array $columnSpan = 'full';
 
-//    public function getModel(): string
-//    {
-//        return $this->model;
-//    }
+    //    public function getModel(): string
+    //    {
+    //        return $this->model;
+    //    }
 
     public function config(): array
     {
@@ -119,7 +119,7 @@ class CalendarWidget extends FullCalendarWidget implements \Adultdate\FilamentBo
         return $schema->components($this->getFormSchema());
     }
 
-    protected function getEvents(FetchInfo $info): Collection|array|Builder
+    protected function getEvents(FetchInfo $info): Collection | array | Builder
     {
         $start = $info->start->toMutable()->startOfDay();
         $end = $info->end->toMutable()->endOfDay();

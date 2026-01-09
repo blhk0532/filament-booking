@@ -2,12 +2,12 @@
 
 namespace Adultdate\FilamentBooking\Filament\Widgets\Concerns;
 
-use function Filament\Support\get_model_label;
-
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Livewire\Attributes\Locked;
+
+use function Filament\Support\get_model_label;
 
 trait InteractsWithRecords
 {
@@ -23,7 +23,7 @@ trait InteractsWithRecords
         $record = $this->resolveRecordRouteBinding($key);
 
         if ($record === null) {
-            throw (new ModelNotFoundException())->setModel($this->getModel(), [$key]);
+            throw (new ModelNotFoundException)->setModel($this->getModel(), [$key]);
         }
 
         return $record;

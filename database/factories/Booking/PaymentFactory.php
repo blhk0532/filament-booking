@@ -2,8 +2,8 @@
 
 namespace Database\Factories\Booking;
 
-use Akaunting\Money\Currency;
 use Adultdate\FilamentBooking\Models\Booking\Payment;
+use Akaunting\Money\Currency;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

@@ -37,7 +37,8 @@ class BookingResource extends Resource
      * requiring a `team` relationship on the Booking model.
      */
     protected static bool $isScopedToTenant = false;
-public static function form(Schema $schema): Schema
+
+    public static function form(Schema $schema): Schema
     {
         return BookingForm::configure($schema);
     }
@@ -140,5 +141,4 @@ public static function form(Schema $schema): Schema
     {
         return parent::getTableQuery()->withoutGlobalScope(SoftDeletingScope::class);
     }
-
 }

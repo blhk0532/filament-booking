@@ -37,11 +37,11 @@ class BookingCalendar extends Page
         return false;
     }
 
-//    protected function getHeaderActions(): array
-//    {
-//        return [            
-//            \Filament\Actions\CreateAction::make('create-new-booking')::make()
-//                ->label('New schedule')
-//                ->icon('heroicon-o-calendar'),];
-//    }
+    //    protected function getHeaderActions(): array
+    //    {
+    //        return [
+    //            \Filament\Actions\CreateAction::make('create-new-booking')::make()
+    //                ->label('New schedule')
+    //                ->icon('heroicon-o-calendar'),];
+    //    }
 }

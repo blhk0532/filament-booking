@@ -2,41 +2,39 @@
 
 namespace Adultdate\FilamentBooking\Filament\Widgets;
 
+use Adultdate\FilamentBooking\Attributes\CalendarEventContent;
 use Adultdate\FilamentBooking\Enums\CalendarViewType;
 use Adultdate\FilamentBooking\Enums\Priority;
-use Adultdate\FilamentBooking\Models\Booking\DailyLocation;
-use Filament\Notifications\Notification;
-use Illuminate\Support\Facades\Auth;
-use Adultdate\FilamentBooking\Attributes\CalendarEventContent;
 use Adultdate\FilamentBooking\Filament\Actions\CreateAction;
-use Adultdate\FilamentBooking\Filament\CalendarWidget;
-use Adultdate\FilamentBooking\ValueObjects\DateClickInfo;
+use Adultdate\FilamentBooking\Models\Booking\DailyLocation;
+use Adultdate\FilamentBooking\Models\BookingMeeting;
+use Adultdate\FilamentBooking\Models\BookingSprint;
+use Adultdate\FilamentBooking\Models\CalendarSettings;
 use Adultdate\FilamentBooking\ValueObjects\DateSelectInfo;
 use Adultdate\FilamentBooking\ValueObjects\EventDropInfo;
 use Adultdate\FilamentBooking\ValueObjects\EventResizeInfo;
 use Adultdate\FilamentBooking\ValueObjects\FetchInfo;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
-use Illuminate\Support\HtmlString;
-use Filament\Schemas\Schema;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
+use Filament\Notifications\Notification;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
-use Adultdate\FilamentBooking\Models\CalendarSettings;
-use Adultdate\FilamentBooking\Models\BookingMeeting;
-use Adultdate\FilamentBooking\Models\BookingSprint;
-
+use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\HtmlString;
 
 final class LocationCalendarWidget extends FullCalendarWidget implements HasActions, HasSchemas
 {
     use InteractsWithActions;
     use InteractsWithSchemas;
+
     protected static string $viewIdentifier = 'adultdate/filament-booking::calendar-widget';
 
-    protected string|HtmlString|bool|null $heading = 'Calendar';
+    protected string | HtmlString | bool | null $heading = 'Calendar';
 
     protected bool $eventClickEnabled = true;
 
@@ -74,7 +72,7 @@ final class LocationCalendarWidget extends FullCalendarWidget implements HasActi
 
         $openingStart = $settings?->opening_hour_start?->format('H:i:s') ?? '07:00:00';
         $openingEnd = $settings?->opening_hour_end?->format('H:i:s') ?? '21:00:00';
- 
+
         $config = [
             'initialView' => 'dayGridMonth',
             'headerToolbar' => [
@@ -145,10 +143,10 @@ final class LocationCalendarWidget extends FullCalendarWidget implements HasActi
                 if (isset($arguments['date'])) {
                     $data['date'] = $arguments['date'];
                 }
-                
+
                 // Create the record
                 DailyLocation::create($data);
-                
+
                 // Send notification
                 Notification::make()
                     ->title('Daily location created successfully')
@@ -174,6 +172,7 @@ final class LocationCalendarWidget extends FullCalendarWidget implements HasActi
             ->icon('heroicon-o-pencil')
             ->fillForm(function (array $arguments) {
                 $dailyLocation = DailyLocation::find($arguments['id']);
+
                 return $dailyLocation ? $dailyLocation->toArray() : [];
             })
             ->schema(fn (Schema $schema) => \Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Schemas\DailyLocationForm::configure($schema))
@@ -191,7 +190,7 @@ final class LocationCalendarWidget extends FullCalendarWidget implements HasActi
             ->slideOver();
     }
 
-    protected function getEvents(FetchInfo $info): Collection|array|Builder
+    protected function getEvents(FetchInfo $info): Collection | array | Builder
     {
         $start = $info->start->toMutable()->startOfDay();
         $end = $info->end->toMutable()->endOfDay();
@@ -204,11 +203,11 @@ final class LocationCalendarWidget extends FullCalendarWidget implements HasActi
             ->with(['serviceUser'])
             ->get();
 
-      $locationEvents = $dailyLocations->map(function (DailyLocation $loc) {
-      $title = $loc->location ?: ($loc->serviceUser?->name ?? 'Location');
+        $locationEvents = $dailyLocations->map(function (DailyLocation $loc) {
+            $title = $loc->location ?: ($loc->serviceUser?->name ?? 'Location');
 
             return [
-                'id' => 'location-'.$loc->id,
+                'id' => 'location-' . $loc->id,
                 'title' => $title,
                 'start' => $loc->date?->toDateString(),
                 'allDay' => true,
@@ -226,7 +225,6 @@ final class LocationCalendarWidget extends FullCalendarWidget implements HasActi
 
         return $locationEvents;
     }
-
 
     protected function getEventClickContextMenuActions(): array
     {

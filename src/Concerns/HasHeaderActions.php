@@ -68,7 +68,6 @@ trait HasHeaderActions
     public function getCachedHeaderActionsComponent(): Actions
     {
         return Actions::make($this->getCachedHeaderActions())
-            ->container(Schema::make($this))
-        ;
+            ->container(Schema::make($this));
     }
 }

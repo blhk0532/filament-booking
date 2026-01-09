@@ -151,7 +151,7 @@ trait HasDashArrange
      *
      * @return int|array<int|string, int>
      */
-    public function getColumns(): int|array
+    public function getColumns(): int | array
     {
         return 2;
     }
@@ -517,6 +517,7 @@ trait HasDashArrange
 
                     if ($value !== null && $value !== '') {
                         $title = $value;
+
                         break;
                     }
                 } catch (Throwable $e) {

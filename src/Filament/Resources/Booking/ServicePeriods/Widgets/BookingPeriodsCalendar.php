@@ -1,5 +1,5 @@
 <?php
- 
+
 namespace Adultdate\FilamentBooking\Filament\Resources\Booking\ServicePeriods\Widgets;
 
 use Adultdate\FilamentBooking\Attributes\CalendarEventContent;
@@ -14,7 +14,7 @@ use Adultdate\FilamentBooking\Filament\Widgets\Concerns\CanBeConfigured;
 use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithEvents;
 use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithRawJS;
 use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithRecords;
-use Adultdate\FilamentBooking\Filament\Widgets\FullCalendarWidget;
+use Adultdate\FilamentBooking\Filament\Widgets\SimpleCalendarWidget;
 use Adultdate\FilamentBooking\Models\Booking\Booking;
 use Adultdate\FilamentBooking\Models\Booking\BookingLocation;
 use Adultdate\FilamentBooking\Models\Booking\Client;
@@ -22,13 +22,12 @@ use Adultdate\FilamentBooking\Models\Booking\DailyLocation;
 use Adultdate\FilamentBooking\Models\Booking\Service;
 use Adultdate\FilamentBooking\Models\BookingServicePeriod;
 use Adultdate\FilamentBooking\Models\CalendarSettings;
-use Adultdate\FilamentBooking\ValueObjects\FetchInfo;
 use Adultdate\FilamentBooking\ValueObjects\DateClickInfo;
 use Adultdate\FilamentBooking\ValueObjects\DateSelectInfo;
 use Adultdate\FilamentBooking\ValueObjects\EventClickInfo;
+use Adultdate\FilamentBooking\ValueObjects\FetchInfo;
 use App\Models\User;
 use App\UserRole;
-use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Hidden;
@@ -37,24 +36,22 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
-use Adultdate\FilamentBooking\Filament\Widgets\SimpleCalendarWidget;
+
 class BookingPeriodsCalendar extends SimpleCalendarWidget implements HasCalendar
 {
     public ?int $recordId = null;
 
-    public Model|string|null $model = null;
+    public Model | string | null $model = null;
 
     protected $settings;
 
-   // protected bool $dateClickEnabled = true;
- 
+    // protected bool $dateClickEnabled = true;
 
     protected static ?int $sort = -1;
 
@@ -77,8 +74,6 @@ class BookingPeriodsCalendar extends SimpleCalendarWidget implements HasCalendar
         InteractsWithEvents::onEventResizeLegacy insteadof InteractsWithCalendar;
         InteractsWithEvents::refreshRecords insteadof InteractsWithCalendar;
     }
-
- 
 
     public function getHeading(): string
     {
@@ -116,7 +111,7 @@ class BookingPeriodsCalendar extends SimpleCalendarWidget implements HasCalendar
         return $this->model instanceof Model ? $this->getModel() : Booking::class;
     }
 
-      public function getEventRecord(): ?Model
+    public function getEventRecord(): ?Model
     {
         return $this->record instanceof Model ? $this->record : null;
     }
@@ -125,8 +120,6 @@ class BookingPeriodsCalendar extends SimpleCalendarWidget implements HasCalendar
     {
         return $model::query();
     }
-
- 
 
     public function config(): array
     {
@@ -618,7 +611,7 @@ class BookingPeriodsCalendar extends SimpleCalendarWidget implements HasCalendar
                 $extended = $event->getExtendedProps();
                 $isAllDay = isset($extended['allDay']) && $extended['allDay'] === true;
             } elseif ($event instanceof \stdClass) {
-              //  $isAllDay = isset($event->allDay) && $event->allDay === true;
+                //  $isAllDay = isset($event->allDay) && $event->allDay === true;
             } elseif (property_exists($event, 'allDay')) {
                 // Safely attempt to read the property only if it's publicly accessible,
                 // otherwise fall back to known getter-like methods or extended props.
@@ -627,8 +620,8 @@ class BookingPeriodsCalendar extends SimpleCalendarWidget implements HasCalendar
                     if ($ref->hasProperty('allDay')) {
                         $prop = $ref->getProperty('allDay');
                         if ($prop->isPublic()) {
-                         
-                         //   $isAllDay = $event->allDay === true;
+
+                            //   $isAllDay = $event->allDay === true;
                         } else {
                             // Avoid calling a potentially undefined isAllDay method;
                             // prefer existing getters or extended props instead.
@@ -709,11 +702,11 @@ class BookingPeriodsCalendar extends SimpleCalendarWidget implements HasCalendar
         if ($user instanceof \App\Models\Admin) {
             return true; // Admins can perform admin actions
         }
-        
+
         if ($user instanceof \App\Models\User) {
             return $user->role === UserRole::ADMIN || $user->role === UserRole::SUPER_ADMIN;
         }
-        
+
         return false;
     }
 
@@ -918,10 +911,10 @@ class BookingPeriodsCalendar extends SimpleCalendarWidget implements HasCalendar
 
     protected function generateNumber(): string
     {
-        return 'BK-'.now()->format('Ymd').'-'.Str::upper(Str::random(6));
+        return 'BK-' . now()->format('Ymd') . '-' . Str::upper(Str::random(6));
     }
 
-    public function getEvents(FetchInfo $info): Collection|array|\Illuminate\Database\Eloquent\Builder
+    public function getEvents(FetchInfo $info): Collection | array | \Illuminate\Database\Eloquent\Builder
     {
         $start = $info->start->toMutable()->startOfDay();
         $end = $info->end->toMutable()->endOfDay();
@@ -957,7 +950,7 @@ class BookingPeriodsCalendar extends SimpleCalendarWidget implements HasCalendar
             $title = $loc->location ?: ($loc->serviceUser?->name ?? 'Location');
 
             return [
-                'id' => 'location-'.$loc->id,
+                'id' => 'location-' . $loc->id,
                 'title' => $title,
                 'start' => $loc->date?->toDateString(),
                 'number' => 0,
@@ -997,7 +990,6 @@ class BookingPeriodsCalendar extends SimpleCalendarWidget implements HasCalendar
         ];
     }
 
-
     #[CalendarEventContent(model: Booking::class)]
     protected function bookingEventContent(): string
     {
@@ -1010,7 +1002,7 @@ class BookingPeriodsCalendar extends SimpleCalendarWidget implements HasCalendar
     public function mount(): void
     {
         $this->eventClickEnabled = true;
-    //    $this->dateClickEnabled = true;
+        //    $this->dateClickEnabled = true;
         $this->eventDragEnabled = true;
         $this->eventResizeEnabled = true;
         $this->dateSelectEnabled = true;

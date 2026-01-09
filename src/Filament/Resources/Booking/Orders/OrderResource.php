@@ -71,7 +71,7 @@ class OrderResource extends Resource
             'edit' => EditOrder::route('/{record}/edit'),
         ];
     }
- 
+
     /** @return Builder<Order> */
     public static function getEloquentQuery(): Builder
     {

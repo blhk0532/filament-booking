@@ -2,8 +2,8 @@
 
 namespace Adultdate\FilamentBooking\Actions;
 
-use Filament\Actions\DeleteAction as BaseDeleteAction;
 use Adultdate\FilamentBooking\Filament\Widgets\FullCalendarWidget;
+use Filament\Actions\DeleteAction as BaseDeleteAction;
 
 class DeleteAction extends BaseDeleteAction
 {

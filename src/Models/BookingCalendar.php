@@ -2,9 +2,9 @@
 
 namespace Adultdate\FilamentBooking\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Models\User;
 use WallaceMartinss\FilamentEvolution\Models\WhatsappInstance;
 
 class BookingCalendar extends Model

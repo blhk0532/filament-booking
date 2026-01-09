@@ -13,17 +13,16 @@ class BookingService extends Page
     protected string $view = 'filament-booking::pages.page';
 
     protected static ?string $navigationLabel = 'Booking';
- 
-     protected static string $routePath = '/booking/service';
+
+    protected static string $routePath = '/booking/service';
 
     protected static BackedEnum | string | null $navigationIcon = 'heroicon-o-calendar';
-    
 
     protected static ?int $sort = 1;
 
     protected static bool $shouldRegisterNavigation = false;
 
- protected static bool $isDiscovered = false;
+    protected static bool $isDiscovered = false;
 
     protected static string | UnitEnum | null $navigationGroup = '';
 
@@ -35,7 +34,7 @@ class BookingService extends Page
     protected function getHeaderWidgets(): array
     {
         return [
-     //       BookingCalendarWidget::class,
+            //       BookingCalendarWidget::class,
         ];
     }
 
@@ -46,9 +45,9 @@ class BookingService extends Page
 
     protected function getHeaderActions(): array
     {
-        return [            
+        return [
             \Filament\Actions\CreateAction::make('create-new-booking')::make()
                 ->label('New schedule')
-                ->icon('heroicon-o-calendar'),];
+                ->icon('heroicon-o-calendar'), ];
     }
 }

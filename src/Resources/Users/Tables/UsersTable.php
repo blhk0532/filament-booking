@@ -2,8 +2,8 @@
 
 namespace Adultdate\FilamentBooking\Users\Tables;
 
-use App\Models\User;
 use Adultdate\FilamentBooking\Users\Pages\ManageServiceProviderSchedules;
+use App\Models\User;
 use App\UserRole;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;

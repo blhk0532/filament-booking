@@ -2,54 +2,48 @@
 
 namespace Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings\Pages;
 
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings\Widgets\BokningCalendar;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\ServicePeriods\Widgets\BookingPeriodsCalendar;
+use App\Models\BookingCalendar as BookingCalendarModel;
+use BackedEnum;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
 use Filament\Schemas\Components\Section;
-use BackedEnum; 
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
-use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings\Widgets\BokningCalendar;
-use App\Models\BookingCalendar as BookingCalendarModel;
-use App\UserRole;
 use Filament\Support\Enums\Width;
-use Adultdate\FilamentBooking\Filament\Widgets\FilamentInfosWidget;
-use Adultdate\FilamentBooking\Filament\Widgets\AccountWidget;
-use Adultdate\FilamentBooking\Filament\Widgets\FullCalendarWidget;
-use Adultdate\FilamentBooking\Filament\Resources\Booking\ServicePeriods\Widgets\BookingPeriodsCalendar;
+use Filament\Support\Icons\Heroicon;
+use Illuminate\Support\Str;
 
 class DashboardBokning extends BaseDashboard
 {
+    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedChartPie;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChartPie;
+    //    protected static ?string $navigationLabel = 'Dash';
 
-//    protected static ?string $navigationLabel = 'Dash';
-
-     protected static ?string $title = '';
+    protected static ?string $title = '';
 
     protected static string $routePath = 'service/bokning';
 
-  //  protected static ?string $slug = 'dashboard';
+    //  protected static ?string $slug = 'dashboard';
 
-        protected string $view = 'filament-booking::pages.page';
+    protected string $view = 'filament-booking::pages.page';
 
     public static function shouldRegisterNavigation(): bool
     {
         return true;
     }
 
-        public function getWidgets(): array
+    public function getWidgets(): array
     {
         return [
-           //     BokningCalendar::class,
+            //     BokningCalendar::class,
         ];
     }
 
-    public static function getNavigationLabel(): string                       
+    public static function getNavigationLabel(): string
     {
         return '' . Str::ucfirst('Bokning') ?? 'User';
     }
@@ -82,8 +76,7 @@ class DashboardBokning extends BaseDashboard
                             ->afterStateUpdated(function () {
                                 $this->dispatch('refreshCalendar');
                             }),
-                      
-                       
+
                         DatePicker::make('startDate')
                             ->maxDate(fn (Get $get) => $get('endDate') ?: now()),
                         DatePicker::make('endDate')
@@ -100,35 +93,32 @@ class DashboardBokning extends BaseDashboard
         return fn (string $widgetClass) => true;
     }
 
-
-public function getMaxContentWidth(): Width
-{
-    return Width::Full;
-}
-
-
-public function getHeaderWidgetsColumns(): int | array
-{
-    return 3;
-}
-
-public function getWidgetsColumns(): int | array
-{
-    return 2;
-}
-
-public function getColumns(): int | array
-{
-    return 2;
-}
-
-public function getHeaderWidgets(): array
+    public function getMaxContentWidth(): Width
     {
-        return [
-                 BokningCalendar::class,
-                BokningCalendar::class,
-                BookingPeriodsCalendar::class,
-        ];
+        return Width::Full;
     }
 
+    public function getHeaderWidgetsColumns(): int | array
+    {
+        return 3;
+    }
+
+    public function getWidgetsColumns(): int | array
+    {
+        return 2;
+    }
+
+    public function getColumns(): int | array
+    {
+        return 2;
+    }
+
+    public function getHeaderWidgets(): array
+    {
+        return [
+            BokningCalendar::class,
+            BokningCalendar::class,
+            BookingPeriodsCalendar::class,
+        ];
+    }
 }

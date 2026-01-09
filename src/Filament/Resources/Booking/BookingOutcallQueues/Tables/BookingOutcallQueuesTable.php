@@ -9,15 +9,8 @@ use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Tables;
-use Filament\Infolists;
-use Filament\Infolists\Infolist;
-use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
-use Ysfkaya\FilamentPhoneInput\Tables\PhoneColumn;
-use Ysfkaya\FilamentPhoneInput\Infolists\PhoneEntry;
 use Ysfkaya\FilamentPhoneInput\PhoneInputNumberType;
+use Ysfkaya\FilamentPhoneInput\Tables\PhoneColumn;
 
 class BookingOutcallQueuesTable
 {
@@ -43,7 +36,7 @@ class BookingOutcallQueuesTable
                 //            ->sortable(),
                 //     TextColumn::make('phone')
                 //    ->searchable(),
-               PhoneColumn::make('phone')->displayFormat(PhoneInputNumberType::NATIONAL)->defaultCountry('SE') ->countryColumn('SE'),
+                PhoneColumn::make('phone')->displayFormat(PhoneInputNumberType::NATIONAL)->defaultCountry('SE')->countryColumn('SE'),
                 TextColumn::make('status')
                     ->searchable(),
                 //        TextColumn::make('type')

@@ -2,9 +2,9 @@
 
 namespace Adultdate\FilamentBooking\Users;
 
-use App\Models\User;
 use Adultdate\FilamentBooking\Users\Schemas\UserForm;
 use Adultdate\FilamentBooking\Users\Tables\UsersTable;
+use App\Models\User;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -16,11 +16,11 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $navigationLabel = 'Users';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Bokning';
+    protected static string | UnitEnum | null $navigationGroup = 'Bokning';
 
     protected static ?string $recordTitleAttribute = 'name';
 

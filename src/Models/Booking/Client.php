@@ -4,7 +4,6 @@ namespace Adultdate\FilamentBooking\Models\Booking;
 
 use Adultdate\FilamentBooking\Models\Address;
 use Adultdate\FilamentBooking\Models\BookingComment;
-use Database\Factories\Booking\ClientFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;

@@ -3,27 +3,24 @@
 namespace Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings\Schemas;
 
 use Adultdate\FilamentBooking\Enums\BookingStatus;
-use Adultdate\FilamentBooking\Forms\Components\AddressForm;
 use Adultdate\FilamentBooking\Models\Booking\Booking;
 use Adultdate\FilamentBooking\Models\Booking\Client;
 use Adultdate\FilamentBooking\Models\Booking\Service;
 use App\Models\User;
 use Filament\Actions\Action;
-
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Repeater\TableColumn;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
-use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+
 class BookingForm
 {
     public static function configure(Schema $schema): Schema
@@ -51,22 +48,22 @@ class BookingForm
                     ])
                     ->columnSpan(['lg' => 3]),
 
-                        // Removed created_at / updated_at display section — not needed in modal
+                // Removed created_at / updated_at display section — not needed in modal
             ])
-                ->columns(3);
-            }
+            ->columns(3);
+    }
 
-            /**
+    /**
      * Determine if the current user may see and edit the booking `status` field.
      */
     public static function canShowStatus(?Booking $record): bool
     {
-        
+
         $user = Auth::user();
         if (! $user) {
             return false;
         }
-  
+
         if (method_exists($user, 'hasRole') && $user->hasRole('admin')) {
             return true;
         }
@@ -75,26 +72,26 @@ class BookingForm
             return true;
         }
 
-        if ( $user->role === 'admin' ||  $user->role === 'super'){
-                return true;
+        if ($user->role === 'admin' || $user->role === 'super') {
+            return true;
         }
 
         return false;
-        
+
     }
 
     /** @return array<Component> */
     public static function getClientComponents(): array
     {
-        return [            
-         
+        return [
+
         ];
     }
 
-       /** @return array<Component> */
+    /** @return array<Component> */
     public static function getDetailsComponents(): array
     {
-        return [            
+        return [
             TextInput::make('number')
                 ->default('OR-' . random_int(100000, 999999))
                 ->disabled()
@@ -112,51 +109,51 @@ class BookingForm
                 ->dehydrated(),
 
             TextInput::make('end_time')
-              
+
                 ->default(Auth::id())
                 ->dehydrated(),
- 
-                Select::make('booking_client_id')
+
+            Select::make('booking_client_id')
                 ->relationship('client', 'name')
                 ->searchable()
                 ->required()
                 ->createOptionForm([
-                Group::make()
-                    ->columns(2)
-                    ->schema([
-                    TextInput::make('name')
-                        ->required()
-                        ->maxLength(255)
-                       ->required(),
-                    TextInput::make('phone')
-                        ->maxLength(255)
-                       ->required(),
-                    TextInput::make('email')
-                        ->label('Email address')
- 
-                        ->email()
-                        ->maxLength(255)
-                        ->unique(),
+                    Group::make()
+                        ->columns(2)
+                        ->schema([
+                            TextInput::make('name')
+                                ->required()
+                                ->maxLength(255)
+                                ->required(),
+                            TextInput::make('phone')
+                                ->maxLength(255)
+                                ->required(),
+                            TextInput::make('email')
+                                ->label('Email address')
 
-                    TextInput::make('street')
-                        ->label('Street address')
-                        ->maxLength(255)
-                        ->required(),
+                                ->email()
+                                ->maxLength(255)
+                                ->unique(),
 
-                    TextInput::make('zip')
-                        ->label('Postal code')
-                        ->maxLength(20)
-                        ->required(),
+                            TextInput::make('street')
+                                ->label('Street address')
+                                ->maxLength(255)
+                                ->required(),
 
-                    TextInput::make('city')
-                        ->maxLength(255)
-                        ->required(),
+                            TextInput::make('zip')
+                                ->label('Postal code')
+                                ->maxLength(20)
+                                ->required(),
 
-                    TextInput::make('country')
-                        ->hidden()
-                        ->placeholder('Sweden'),
+                            TextInput::make('city')
+                                ->maxLength(255)
+                                ->required(),
+
+                            TextInput::make('country')
+                                ->hidden()
+                                ->placeholder('Sweden'),
+                        ]),
                 ])
-                 ])
                 ->createOptionAction(function (Action $action) {
                     return $action
                         ->modalHeading('Create client')
@@ -210,6 +207,7 @@ class BookingForm
                 ->columnSpan('full'),
         ];
     }
+
     public static function getItemsRepeater(): Repeater
     {
         return Repeater::make('items')

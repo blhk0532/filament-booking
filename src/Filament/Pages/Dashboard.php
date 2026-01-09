@@ -2,9 +2,9 @@
 
 namespace Adultdate\FilamentBooking\Filament\Pages;
 
-use Shreejan\DashArrange\Traits\HasDashArrange;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Illuminate\Contracts\Support\Htmlable;
+use Shreejan\DashArrange\Traits\HasDashArrange;
 
 class Dashboard extends BaseDashboard
 {
@@ -18,7 +18,7 @@ class Dashboard extends BaseDashboard
         $this->mountHasDashArrange();
     }
 
-    public function getTitle(): string|Htmlable
+    public function getTitle(): string | Htmlable
     {
         return '';
     }

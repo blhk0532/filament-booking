@@ -2,9 +2,8 @@
 
 namespace Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Actions;
 
-use Filament\Actions\EditAction as BaseEditAction;
-use Adultdate\FilamentBooking\Filament\Widgets\FullCalendarWidget;
 use Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Widgets\EventCalendar;
+use Filament\Actions\EditAction as BaseEditAction;
 
 class EditAction extends BaseEditAction
 {

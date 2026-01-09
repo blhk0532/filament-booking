@@ -14,10 +14,8 @@ use Adultdate\FilamentBooking\Filament\Widgets\Concerns\CanBeConfigured;
 use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithEvents;
 use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithRawJS;
 use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithRecords;
-use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Adultdate\FilamentBooking\Filament\Widgets\FullCalendarWidget;
 use Adultdate\FilamentBooking\Models\Booking\Booking;
-use Adultdate\FilamentBooking\Models\Booking\BookingLocation;
 use Adultdate\FilamentBooking\Models\Booking\Client;
 use Adultdate\FilamentBooking\Models\Booking\DailyLocation;
 use Adultdate\FilamentBooking\Models\Booking\Service;
@@ -26,29 +24,27 @@ use Adultdate\FilamentBooking\Models\CalendarSettings;
 use Adultdate\FilamentBooking\ValueObjects\EventResizeInfo;
 use Adultdate\FilamentBooking\ValueObjects\FetchInfo;
 use App\Models\User;
-use App\UserRole;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Model;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Repeater\TableColumn;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Group;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
-use Filament\Schemas\Components\Utilities\Set;
-
 
 class BookingCalendar extends FullCalendarWidget implements HasCalendar
 {
@@ -56,11 +52,11 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
 
     public ?array $lastMountedData = null;
 
-    public Model|int|string|null $record;
+    public Model | int | string | null $record;
 
     public ?Model $eventRecord = null;
 
-    public Model|string|null $model = null;
+    public Model | string | null $model = null;
 
     protected $settings;
 
@@ -98,7 +94,7 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
 
     protected string $view = 'adultdate/filament-booking::service-periods-fullcalendar';
 
-    public function getHeading(): string|Htmlable
+    public function getHeading(): string | Htmlable
     {
         return 'Calenar';
     }
@@ -224,7 +220,7 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
         return $this->getModel()::query();
     }
 
-    protected int|string|array $columnSpan = 'full';
+    protected int | string | array $columnSpan = 'full';
 
     public function config(): array
     {
@@ -289,6 +285,7 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
             $this->mountAction('createDailyLocation', [
                 'date' => $startDate->format('Y-m-d'),
             ]);
+
             return;
         }
 
@@ -330,6 +327,7 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
             $this->mountAction('createDailyLocation', [
                 'date' => $dateVal->format('Y-m-d'),
             ]);
+
             return;
         }
 
@@ -462,7 +460,7 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                     ->send();
 
                 $this->refreshRecords();
-                
+
                 // Sync to Google Calendar and send WhatsApp
                 \App\Jobs\SyncBookingToGoogleCalendar::dispatch($record, sendWhatsapp: true);
 
@@ -476,6 +474,7 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                     ->title('Failed to update booking')
                     ->danger()
                     ->send();
+
                 return false;
             }
         }
@@ -586,12 +585,12 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                         $this->dispatch('sync-action-modals', ['id' => $this->getId(), 'newActionNestingIndex' => $newIndex]);
                     }),
 
-                 Action::make('close')
-                 ->label('')
-                 ->color('gray')
-                 ->icon('heroicon-o-x-circle')
-                 ->close(true)
-                 ->action(function () { }),
+                Action::make('close')
+                    ->label('')
+                    ->color('gray')
+                    ->icon('heroicon-o-x-circle')
+                    ->close(true)
+                    ->action(function () {}),
 
             ]);
     }
@@ -662,7 +661,7 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
             ->modalSubmitActionLabel('Update')
             ->extraModalFooterActions(function (array $arguments) {
                 $id = $arguments['data']['id'] ?? null;
-                if (!$id) {
+                if (! $id) {
                     return [];
                 }
 
@@ -743,31 +742,32 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                 $roleValue = $user && $user->role instanceof \UnitEnum ? $user->role->value : (string) $user->role;
                 $isAdmin = in_array($roleValue, ['admin', 'super', 'super_admin'], true);
                 // Preserve service_user_id from data if provided (from calendar context), otherwise use current user
-                if (!isset($merged['service_user_id']) || empty($merged['service_user_id'])) {
+                if (! isset($merged['service_user_id']) || empty($merged['service_user_id'])) {
                     $merged['service_user_id'] = Auth::id();
                 }
+
                 return $merged;
             })
             ->schema($this->getFormSchema())
             ->action(function (array $data) {
                 // Ensure number exists
-                if (!isset($data['number']) || empty($data['number'])) {
+                if (! isset($data['number']) || empty($data['number'])) {
                     $data['number'] = $this->generateNumber();
                 }
-                
+
                 // Always set booking_calendar_id from selected or default if missing or null
-                if (!isset($data['booking_calendar_id']) || empty($data['booking_calendar_id'])) {
+                if (! isset($data['booking_calendar_id']) || empty($data['booking_calendar_id'])) {
                     $calendarId = method_exists($this, 'getSelectedCalendarId') ? $this->getSelectedCalendarId() : null;
-                    if (!$calendarId && method_exists($this, 'getDefaultCalendarId')) {
+                    if (! $calendarId && method_exists($this, 'getDefaultCalendarId')) {
                         $calendarId = $this->getDefaultCalendarId();
                     }
                     $data['booking_calendar_id'] = $calendarId;
                 }
-                
+
                 // Extract items before creating booking (items are not a fillable field)
                 $items = $data['items'] ?? [];
                 unset($data['items']);
-                
+
                 // Build proper starts_at and ends_at from service_date + times
                 if (isset($data['service_date']) && isset($data['start_time'])) {
                     $startDateTime = \Carbon\Carbon::parse($data['service_date'] . ' ' . $data['start_time']);
@@ -777,10 +777,10 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                     $endDateTime = \Carbon\Carbon::parse($data['service_date'] . ' ' . $data['end_time']);
                     $data['ends_at'] = $endDateTime->toDateTimeString();
                 }
-                
+
                 logger()->info('BookingCalendarWidget: BEFORE Booking::create()', [
                     'booking_calendar_id' => $data['booking_calendar_id'] ?? 'NOT SET',
-                    'full_data' => $data
+                    'full_data' => $data,
                 ]);
                 $booking = Booking::create($data);
                 logger()->info('BookingCalendarWidget: AFTER Booking::create()', [
@@ -866,6 +866,7 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                     if (! $raw) {
                         return null;
                     }
+
                     try {
                         return \Carbon\Carbon::parse($raw)->format('H:i');
                     } catch (\Throwable $e) {
@@ -990,8 +991,6 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                         $this->dispatch('sync-action-modals', id: $this->getId(), newActionNestingIndex: $newIndex);
                     }),
 
-    
-
             ]);
     }
 
@@ -1089,13 +1088,13 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
     {
         logger()->info('zzz: onEventClick', ['events' => $event]);
 
-         $title = $event['title'] ?? null;
-         $start = $event['start'] ?? null;
-         $end = $event['end'] ?? null;
-         $view = $event['view'] ?? null;
-         $resource = $event['resource'] ?? null;
+        $title = $event['title'] ?? null;
+        $start = $event['start'] ?? null;
+        $end = $event['end'] ?? null;
+        $view = $event['view'] ?? null;
+        $resource = $event['resource'] ?? null;
         // logger()->info('zzz: onEventClick', ['events' => $start . ' ' . $end . ' ' . ($allDay ? 'allDay' : 'notAllDay')]);
-    
+
         $allDay = (bool) ($event['allDay']);
 
         logger()->info('BookingCalendarWidget CALENDAR WAS CLICKED', [
@@ -1115,27 +1114,29 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
             case 'blocking':
                 $recId = $event['extendedProps']['booking_id'] ?? null;
                 logger()->info('BookingCalendarWidget: Blocking period click', ['recId' => $recId]);
-                
-                if (!$recId) {
+
+                if (! $recId) {
                     logger()->error('BookingCalendarWidget: No record ID found for blocking period');
+
                     return;
                 }
-                
+
                 try {
                     $this->model = BookingServicePeriod::class;
-                    
+
                     // Directly query the record instead of using resolveRecord
                     $this->record = BookingServicePeriod::find($recId);
-                    
-                    if (!$this->record) {
+
+                    if (! $this->record) {
                         logger()->error('BookingCalendarWidget: Record not found', ['id' => $recId]);
                         \Filament\Notifications\Notification::make()
                             ->title('Period not found')
                             ->danger()
                             ->send();
+
                         return;
                     }
-                    
+
                     if ($this->record instanceof Model) {
                         $this->eventRecord = $this->record;
                         $this->recordId = $this->record->id;
@@ -1146,26 +1147,28 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                             ->title('Invalid record type')
                             ->danger()
                             ->send();
+
                         return;
                     }
-                    
+
                     $user = Auth::user();
-                    if (!$user) {
+                    if (! $user) {
                         logger()->error('BookingCalendarWidget: No authenticated user');
                         \Filament\Notifications\Notification::make()
                             ->title('Authentication required')
                             ->danger()
                             ->send();
+
                         return;
                     }
-                    
+
                     $userRole = $user->role;
                     if ($userRole instanceof \UnitEnum) {
                         $roleValue = $userRole->value;
                     } else {
                         $roleValue = (string) $userRole;
                     }
-                    
+
                     $canEdit = in_array($roleValue, ['admin', 'super', 'super_admin'], true);
                     logger()->info('BookingCalendarWidget: Mounting editServicePeriod for blocking', [
                         'canEdit' => $canEdit,
@@ -1199,15 +1202,17 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                         ->danger()
                         ->send();
                 }
+
                 break;
 
             case 'location':
                 if ($allDay) {
                     $recId = $event['extendedProps']['daily_location_id'] ?? null;
+
                     try {
                         $this->model = DailyLocation::class;
                         $this->record = DailyLocation::find($recId);
-                        if (!$this->record) {
+                        if (! $this->record) {
                             throw new \Exception("Location record not found: {$recId}");
                         }
                         if ($this->record instanceof Model) {
@@ -1216,27 +1221,15 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                             $payload = $this->record->toArray();
                         }
                         $user = Auth::user();
-                        if (!$user) {
+                        if (! $user) {
                             logger()->error('BookingCalendarWidget: No authenticated user for location');
                             \Filament\Notifications\Notification::make()
                                 ->title('Authentication required')
                                 ->danger()
                                 ->send();
+
                             return;
                         }
-                        
-                    $userRole = $user->role;
-                    if ($userRole instanceof \UnitEnum) {
-                        $roleValue = $userRole->value;
-                    } else {
-                        $roleValue = (string) $userRole;
-                    }
-                    
-                    $canEdit = in_array($roleValue, ['admin', 'super', 'super_admin'], true);
-                    
-                    // For bookings we mount the booking `options` action below
-                    // based on the user's permissions; do not mount the
-                    // service-period editor here (copy/paste leftover).
 
                         $userRole = $user->role;
                         if ($userRole instanceof \UnitEnum) {
@@ -1244,7 +1237,20 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                         } else {
                             $roleValue = (string) $userRole;
                         }
-                        
+
+                        $canEdit = in_array($roleValue, ['admin', 'super', 'super_admin'], true);
+
+                        // For bookings we mount the booking `options` action below
+                        // based on the user's permissions; do not mount the
+                        // service-period editor here (copy/paste leftover).
+
+                        $userRole = $user->role;
+                        if ($userRole instanceof \UnitEnum) {
+                            $roleValue = $userRole->value;
+                        } else {
+                            $roleValue = (string) $userRole;
+                        }
+
                         $canEdit = in_array($roleValue, ['admin', 'super', 'super_admin'], true);
                         \Illuminate\Support\Facades\Log::info('BookingCalendarWidget: Location click', [
                             'canEdit' => $canEdit,
@@ -1269,16 +1275,18 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                             ->send();
                     }
                 }
+
                 break;
 
             case 'booking':
             default:
-                if (!$allDay) {
+                if (! $allDay) {
                     $recId = $event['id'] ?? null;
+
                     try {
                         $this->model = Booking::class;
                         $this->record = Booking::find($recId);
-                        if (!$this->record) {
+                        if (! $this->record) {
                             throw new \Exception("Booking record not found: {$recId}");
                         }
                         if ($this->record instanceof Model) {
@@ -1292,32 +1300,21 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                             $payload['address'] = $this->record->client?->address ?? ($payload['address'] ?? null);
                             $payload['phone'] = $this->record->client?->phone ?? ($payload['phone'] ?? null);
                         }
-                            $payload['service_date'] = $this->record->service_date?->format('Y-m-d') ?? ($payload['service_date'] ?? null);
-                            // Ensure booking user name is available for the modal header
-                            $payload['booking_user_name'] = $this->record->bookingUser?->name ?? ($payload['booking_user_name'] ?? null);
+                        $payload['service_date'] = $this->record->service_date?->format('Y-m-d') ?? ($payload['service_date'] ?? null);
+                        // Ensure booking user name is available for the modal header
+                        $payload['booking_user_name'] = $this->record->bookingUser?->name ?? ($payload['booking_user_name'] ?? null);
                         $booking = $this->record;
                         $user = Auth::user();
-                        
-                        if (!$user) {
+
+                        if (! $user) {
                             logger()->error('BookingCalendarWidget: No authenticated user for booking');
                             \Filament\Notifications\Notification::make()
                                 ->title('Authentication required')
                                 ->danger()
                                 ->send();
+
                             return;
                         }
-                        
-
-                    $userRole = $user->role;
-                    if ($userRole instanceof \UnitEnum) {
-                        $roleValue = $userRole->value;
-                    } else {
-                        $roleValue = (string) $userRole;
-                    }
-                    
-                    // Intentionally do not mount the service-period editor here.
-                    // Booking-specific actions are mounted further below
-                    // (see the $action = $canEdit ? 'options' : '' logic).
 
                         $userRole = $user->role;
                         if ($userRole instanceof \UnitEnum) {
@@ -1325,7 +1322,18 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                         } else {
                             $roleValue = (string) $userRole;
                         }
-                        
+
+                        // Intentionally do not mount the service-period editor here.
+                        // Booking-specific actions are mounted further below
+                        // (see the $action = $canEdit ? 'options' : '' logic).
+
+                        $userRole = $user->role;
+                        if ($userRole instanceof \UnitEnum) {
+                            $roleValue = $userRole->value;
+                        } else {
+                            $roleValue = (string) $userRole;
+                        }
+
                         $canEdit = $user->id == $booking->booking_user_id || in_array($roleValue, ['admin', 'super', 'super_admin'], true);
                         \Illuminate\Support\Facades\Log::info('BookingCalendarWidget: Booking click', [
                             'canEdit' => $canEdit,
@@ -1362,6 +1370,7 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                         'created_by' => Auth::id(),
                     ]);
                 }
+
                 break;
         }
     }
@@ -1377,12 +1386,13 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
         ]);
 
         // Only allow admins to drag and drop
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             logger('BookingCalendarWidget: Not authenticated');
             $this->dispatch('notify', 'error', 'You must be authenticated to modify events.');
+
             return;
         }
-        
+
         $user = Auth::user();
         logger('BookingCalendarWidget: User authenticated', ['user_id' => $user->id, 'user_class' => get_class($user)]);
         $userRole = $user->role;
@@ -1391,10 +1401,11 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
         } else {
             $roleValue = (string) $userRole;
         }
-        
-        if (!in_array($roleValue, ['admin', 'super', 'super_admin'], true)) {
+
+        if (! in_array($roleValue, ['admin', 'super', 'super_admin'], true)) {
             logger('BookingCalendarWidget: Insufficient permissions', ['role' => $roleValue]);
             $this->dispatch('notify', 'error', 'You do not have permission to modify events.');
+
             return;
         }
 
@@ -1416,24 +1427,29 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                 // Timed events cannot be dropped to all-day row
                 if ($allDay) {
                     $this->dispatch('notify', 'error', 'Timed events cannot be moved to the all-day row.');
+
                     return;
                 }
                 $startTime = $start->format('H:i:s');
                 $endTime = $end?->format('H:i:s');
+
                 break;
 
             case 'location':
                 // Location events are always all-day and should stay that way
-                if (!$allDay) {
+                if (! $allDay) {
                     $this->dispatch('notify', 'error', 'Location events can only be moved within the all-day row.');
+
                     return;
                 }
                 $startTime = null;
                 $endTime = null;
+
                 break;
 
             default:
                 $this->dispatch('notify', 'error', 'Unknown event type.');
+
                 return;
         }
 
@@ -1457,12 +1473,13 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                         'end_time' => $endTime,
                     ]);
                     $this->dispatch('notify', 'success', 'Booking moved successfully.');
-                    
+
                     // Sync to Google Calendar and send WhatsApp
                     \App\Jobs\SyncBookingToGoogleCalendar::dispatch($booking, sendWhatsapp: true);
                 } else {
                     logger('BookingCalendarWidget: Booking not found', ['id' => $eventId]);
                 }
+
                 break;
 
             case 'location':
@@ -1474,6 +1491,7 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                     ]);
                     $this->dispatch('notify', 'success', 'Location moved successfully.');
                 }
+
                 break;
 
             case 'blocking':
@@ -1489,6 +1507,7 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
                     ]);
                     $this->dispatch('notify', 'success', 'Blocking period moved successfully.');
                 }
+
                 break;
         }
 
@@ -1535,14 +1554,14 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
 
         // For User model, check the role attribute
         $userRole = $user->role;
-        
+
         // Handle enum instances
         if ($userRole instanceof \UnitEnum) {
             $roleValue = $userRole->value;
         } else {
             $roleValue = (string) $userRole;
         }
-        
+
         return in_array($roleValue, ['admin', 'super', 'super_admin'], true);
     }
 
@@ -1555,6 +1574,7 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
             if ($allDay) {
                 return 'createDailyLocation';
             }
+
             return 'admin';
         }
 
@@ -1706,10 +1726,10 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
 
     protected function generateNumber(): string
     {
-        return 'BK-'.now()->format('Ymd').'-'.Str::upper(Str::random(6));
+        return 'BK-' . now()->format('Ymd') . '-' . Str::upper(Str::random(6));
     }
 
-    public function getEvents(FetchInfo $info): Collection|array|Builder
+    public function getEvents(FetchInfo $info): Collection | array | Builder
     {
         $start = $info->start->toMutable()->startOfDay();
         $end = $info->end->toMutable()->endOfDay();
@@ -1755,6 +1775,7 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
 
         $locationEvents = $dailyLocations->map(function (DailyLocation $loc) {
             $title = $loc->location ?: ($loc->serviceUser?->name ?? 'Location');
+
             return [
                 'id' => $loc->id,
                 'title' => $title,
@@ -1821,18 +1842,20 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
     protected function getSelectedCalendarId(): ?int
     {
         $filters = $this->pageFilters ?? [];
+
         return $filters['booking_calendars'] ?? null;
     }
 
     protected function getDefaultCalendarId(): ?int
     {
         $serviceUserId = $this->getSelectedServiceUserId();
-        if (!$serviceUserId) {
+        if (! $serviceUserId) {
             return null;
         }
         logger()->info('GOOGLE CALENDAR', ['service_user_id' => $serviceUserId]);
         // Find a calendar owned by the selected service user
         $calendar = \App\Models\BookingCalendar::where('owner_id', $serviceUserId)->first();
+
         return $calendar ? $calendar->id : null;
     }
 
@@ -1846,12 +1869,13 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
         if ($this->record instanceof Booking) {
             $endDeltaMs = $endDelta['milliseconds'] ?? 0;
             $newEnd = Carbon::parse($oldEvent['end'])->addMilliseconds($endDeltaMs);
-            
+
             $this->record->forceFill([
                 'ends_at' => $newEnd,
             ])->save();
 
             $this->refreshRecords();
+
             return true;
         }
 
@@ -1861,7 +1885,7 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
     public function mount(): void
     {
         $this->eventClickEnabled = true;
-    //    $this->dateClickEnabled = true;
+        //    $this->dateClickEnabled = true;
         $this->eventDragEnabled = true;
         $this->eventResizeEnabled = true;
         $this->dateSelectEnabled = true;

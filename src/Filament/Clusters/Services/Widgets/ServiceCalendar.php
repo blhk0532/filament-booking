@@ -45,7 +45,7 @@ class ServiceCalendar extends FullCalendarWidget implements HasCalendar
 {
     public ?int $recordId = null;
 
-    public Model|string|null $model = null;
+    public Model | string | null $model = null;
 
     protected $settings;
 
@@ -78,7 +78,7 @@ class ServiceCalendar extends FullCalendarWidget implements HasCalendar
 
     protected string $view = 'adultdate/filament-booking::service-periods-fullcalendar';
 
-    public function getHeading(): string|Htmlable
+    public function getHeading(): string | Htmlable
     {
         return 'Calenar';
     }
@@ -124,7 +124,7 @@ class ServiceCalendar extends FullCalendarWidget implements HasCalendar
         return $this->getModel()::query();
     }
 
-    protected int|string|array $columnSpan = 'full';
+    protected int | string | array $columnSpan = 'full';
 
     public function config(): array
     {
@@ -528,6 +528,7 @@ class ServiceCalendar extends FullCalendarWidget implements HasCalendar
                     if (! $raw) {
                         return null;
                     }
+
                     try {
                         return \Carbon\Carbon::parse($raw)->format('H:i');
                     } catch (\Throwable $e) {
@@ -959,10 +960,10 @@ class ServiceCalendar extends FullCalendarWidget implements HasCalendar
 
     protected function generateNumber(): string
     {
-        return 'BK-'.now()->format('Ymd').'-'.Str::upper(Str::random(6));
+        return 'BK-' . now()->format('Ymd') . '-' . Str::upper(Str::random(6));
     }
 
-    public function getEvents(FetchInfo $info): Collection|array|Builder
+    public function getEvents(FetchInfo $info): Collection | array | Builder
     {
         $start = $info->start->toMutable()->startOfDay();
         $end = $info->end->toMutable()->endOfDay();
@@ -998,7 +999,7 @@ class ServiceCalendar extends FullCalendarWidget implements HasCalendar
             $title = $loc->location ?: ($loc->serviceUser?->name ?? 'Location');
 
             return [
-                'id' => 'location-'.$loc->id,
+                'id' => 'location-' . $loc->id,
                 'title' => $title,
                 'start' => $loc->date?->toDateString(),
                 'number' => 0,
@@ -1041,7 +1042,7 @@ class ServiceCalendar extends FullCalendarWidget implements HasCalendar
     public function mount(): void
     {
         $this->eventClickEnabled = true;
-    //    $this->dateClickEnabled = true;
+        //    $this->dateClickEnabled = true;
         $this->eventDragEnabled = true;
         $this->eventResizeEnabled = true;
         $this->dateSelectEnabled = true;

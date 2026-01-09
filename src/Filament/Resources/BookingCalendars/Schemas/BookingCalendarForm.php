@@ -3,14 +3,15 @@
 namespace Adultdate\FilamentBooking\Filament\Resources\BookingCalendars\Schemas;
 
 use Adultdate\FilamentBooking\Models\User;
-use App\UserRole;
 use App\Models\Admin;
+use App\UserRole;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
-use WallaceMartinss\FilamentEvolution\Models\WhatsappInstance;
 use Illuminate\Support\Facades\Auth;
+use WallaceMartinss\FilamentEvolution\Models\WhatsappInstance;
+
 class BookingCalendarForm
 {
     public static function configure(Schema $schema): Schema
@@ -46,8 +47,8 @@ class BookingCalendarForm
                     ->helperText('Users and admins to receive database notifications for new bookings')
                     ->multiple()
                     ->options(collect([
-                        ...User::all()->mapWithKeys(fn($user) => ["user-{$user->id}" => "User: {$user->name}"]),
-                        ...Admin::all()->mapWithKeys(fn($admin) => ["admin-{$admin->id}" => "Admin: {$admin->name}"]),
+                        ...User::all()->mapWithKeys(fn ($user) => ["user-{$user->id}" => "User: {$user->name}"]),
+                        ...Admin::all()->mapWithKeys(fn ($admin) => ["admin-{$admin->id}" => "Admin: {$admin->name}"]),
                     ]))
                     ->searchable()
                     ->placeholder('Select users and admins for notifications'),

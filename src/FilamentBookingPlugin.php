@@ -2,33 +2,29 @@
 
 namespace Adultdate\FilamentBooking;
 
+use Adultdate\FilamentBooking\Filament\Pages\BookingCalendar;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\BookingOutcallQueues\BookingOutcallQueueResource;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\Customers\CustomerResource;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\DailyLocationResource;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Widgets\EventCalendar;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\Orders\OrderResource;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\ServicePeriods\BookingServicePeriodResource;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\Users\UserResource;
+use Adultdate\FilamentBooking\Filament\Resources\BookingCalendars\BookingCalendarResource;
+use Adultdate\FilamentBooking\Filament\Resources\BookingDataLeads\BookingDataLeadResource;
+use Adultdate\FilamentBooking\Filament\Widgets\BookingCalendarWidget;
+use Adultdate\FilamentBooking\Filament\Widgets\CustomersChart;
+use Adultdate\FilamentBooking\Filament\Widgets\LatestOrders;
+use Adultdate\FilamentBooking\Filament\Widgets\OrdersChart;
+use Adultdate\FilamentBooking\Filament\Widgets\StatsOverviewWidget;
 use Closure;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Assets\Css;
 use Filament\Support\Assets\Js;
-use Filament\Support\Facades\FilamentAsset;
-use Filament\Navigation\NavigationGroup;
 use Filament\Support\Concerns\EvaluatesClosures;
-use Adultdate\FilamentBooking\Filament\Clusters\Products\ProductsCluster;
-use Adultdate\FilamentBooking\Filament\Clusters\Services\ServicesCluster;
-use Adultdate\FilamentBooking\Filament\Pages\BookingCalendar;
-use Adultdate\FilamentBooking\Filament\Resources\Booking\Customers\CustomerResource;
-use Adultdate\FilamentBooking\Filament\Resources\Booking\Orders\OrderResource;
-use Adultdate\FilamentBooking\Filament\Widgets\BookingCalendarWidget;
-use Adultdate\FilamentBooking\Filament\Widgets\CustomersChart;
-use Adultdate\FilamentBooking\Filament\Widgets\LatestOrders;
-use Adultdate\FilamentBooking\Filament\Widgets\OrdersChart;
-use Adultdate\FilamentBooking\Filament\Widgets\StatsOverviewWidget;
-use Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\DailyLocationResource;
-use Adultdate\FilamentBooking\Filament\Resources\Booking\ServicePeriods\BookingServicePeriodResource;
-use Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Widgets\EventCalendar;
-use Adultdate\FilamentBooking\Filament\Resources\Booking\BookingOutcallQueues\BookingOutcallQueueResource; 
-use Adultdate\FilamentBooking\Filament\Resources\Booking\Users\UserResource;
-use Adultdate\FilamentBooking\Filament\Resources\BookingCalendars\BookingCalendarResource;
-use Adultdate\FilamentBooking\Filament\Resources\BookingDataLeads\BookingDataLeadResource;
-use Adultdate\FilamentBooking\Filament\Pages\Dashboard; 
+use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Support\Facades\Auth;
 
 class FilamentBookingPlugin implements Plugin
@@ -41,7 +37,7 @@ class FilamentBookingPlugin implements Plugin
 
     protected array $config = [];
 
-    protected string | Closure | null $timezone = "Europe/Stockholm";
+    protected string | Closure | null $timezone = 'Europe/Stockholm';
 
     protected string | Closure | null $locale = null;
 
@@ -65,26 +61,26 @@ class FilamentBookingPlugin implements Plugin
           //  ->discoverResources(in: app_path('../plugins/adultdate/filament-booking/src/Filament/Resources'), for: 'Adultdate\\FilamentBooking\\Filament\\Resources')
             ->databaseNotifications()
             ->pages([
-            //    BookingCalendar::class,
+                //    BookingCalendar::class,
             ])
             ->resources([
-            //    CustomerResource::class,
-            //    OrderResource::class,
-            //    DailyLocationResource::class,
-            //    BookingServicePeriodResource::class,
-            //    BookingOutcallQueueResource::class,
-            //    UserResource::class,
-            //    BookingCalendarResource::class,
-            //    BookingDataLeadResource::class,
+                //    CustomerResource::class,
+                //    OrderResource::class,
+                //    DailyLocationResource::class,
+                //    BookingServicePeriodResource::class,
+                //    BookingOutcallQueueResource::class,
+                //    UserResource::class,
+                //    BookingCalendarResource::class,
+                //    BookingDataLeadResource::class,
             ])
             ->widgets([
-            //    BookingCalendarWidget::class,
-            //    CustomersChart::class,
-            //    LatestOrders::class,
-            //    OrdersChart::class,
-            //    StatsOverviewWidget::class,
-            //    EventCalendar::class,
-            ]); 
+                //    BookingCalendarWidget::class,
+                //    CustomersChart::class,
+                //    LatestOrders::class,
+                //    OrdersChart::class,
+                //    StatsOverviewWidget::class,
+                //    EventCalendar::class,
+            ]);
 
         FilamentAsset::register([
             AlpineComponent::make('calendar', __DIR__ . '/../dist/js/calendar.js'),
@@ -181,11 +177,12 @@ class FilamentBookingPlugin implements Plugin
 
     public function isEditable(): bool
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return false;
         }
 
         $user = Auth::user();
+
         return in_array($user->role, [\App\UserRole::ADMIN, \App\UserRole::SUPER_ADMIN]);
     }
 

@@ -2,10 +2,10 @@
 
 namespace Adultdate\FilamentBooking\Actions;
 
-use Filament\Actions\CreateAction as BaseCreateAction;
-use Filament\Actions\Action;
-use Filament\Schemas\Schema as FilamentSchema;
 use Adultdate\FilamentBooking\Filament\Widgets\FullCalendarWidget;
+use Filament\Actions\Action;
+use Filament\Actions\CreateAction as BaseCreateAction;
+use Filament\Schemas\Schema as FilamentSchema;
 
 class CreateAction extends BaseCreateAction
 {

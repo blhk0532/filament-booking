@@ -4,7 +4,6 @@ namespace Adultdate\FilamentBooking\Filament\Clusters\Products\Resources\Product
 
 use Adultdate\FilamentBooking\Filament\Clusters\Products\Resources\Brands\RelationManagers\ProductsRelationManager;
 use Adultdate\FilamentBooking\Models\Booking\Product;
-use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;

@@ -13,7 +13,10 @@ use Zap\Models\Concerns\HasSchedules;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, HasSchedules, Notifiable, TwoFactorAuthenticatable;
+    use HasFactory;
+    use HasSchedules;
+    use Notifiable;
+    use TwoFactorAuthenticatable;
 
     /**
      * @method array getBookableSlots(string $date, int $slotDuration = 60, ?int $bufferMinutes = null)

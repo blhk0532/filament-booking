@@ -24,7 +24,7 @@ class ClientResource extends Resource
 
     protected static ?string $slug = 'services/clients';
 
-        protected static ?string $navigationLabel = 'Kunder';
+    protected static ?string $navigationLabel = 'Kunder';
 
     protected static ?string $recordTitleAttribute = 'name';
 

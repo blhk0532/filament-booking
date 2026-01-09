@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Adultdate\FilamentBooking\Models;
 
-use Adultdate\FilamentBooking\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 

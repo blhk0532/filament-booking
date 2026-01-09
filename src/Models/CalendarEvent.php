@@ -4,7 +4,6 @@ namespace Adultdate\FilamentBooking\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Adultdate\FilamentBooking\Models\User;
 
 class CalendarEvent extends Model
 {

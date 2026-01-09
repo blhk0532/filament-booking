@@ -19,13 +19,13 @@ class BookingDataLeadResource extends Resource
 {
     protected static ?string $model = BookingDataLead::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
+    protected static string | \BackedEnum | null $navigationIcon = Heroicon::OutlinedUsers;
 
     protected static ?string $navigationLabel = 'Leads';
 
-        protected static bool $isScopedToTenant = false;
+    protected static bool $isScopedToTenant = false;
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Nummer';
+    protected static \UnitEnum | string | null $navigationGroup = 'Nummer';
 
     protected static ?int $navigationSort = 11;
 

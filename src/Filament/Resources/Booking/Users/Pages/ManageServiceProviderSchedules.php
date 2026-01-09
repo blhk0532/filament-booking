@@ -23,13 +23,15 @@ use Zap\Facades\Zap;
 
 class ManageServiceProviderSchedules extends Page implements HasForms, HasTable
 {
-    use InteractsWithForms, InteractsWithRecord, InteractsWithTable;
+    use InteractsWithForms;
+    use InteractsWithRecord;
+    use InteractsWithTable;
 
     protected static string $resource = UserResource::class;
 
     protected string $view = 'filament.resources.users.pages.manage-service-provider-schedules';
 
-    public function mount(int|string $record): void
+    public function mount(int | string $record): void
     {
         $this->record = $this->resolveRecord($record);
     }

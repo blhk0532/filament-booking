@@ -2,17 +2,13 @@
 
 namespace Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Services\Schemas;
 
-use Adultdate\FilamentBooking\Enums\ServiceStatus;
-use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Services\ServiceResource;
 use Adultdate\FilamentBooking\Models\Booking\Service;
-use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\ToggleButtons;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;

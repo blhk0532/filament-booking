@@ -2,9 +2,9 @@
 
 namespace Adultdate\FilamentBooking\Filament\Actions;
 
-use Filament\Schemas\Schema;
 use Adultdate\FilamentBooking\Concerns\CalendarAction;
 use Adultdate\FilamentBooking\Contracts\HasCalendar;
+use Filament\Schemas\Schema;
 
 class CreateAction extends \Filament\Actions\CreateAction
 {
@@ -30,6 +30,7 @@ class CreateAction extends \Filament\Actions\CreateAction
                         }
                     }
                 }
+
                 return $data;
             })
             // Ensure forms are prefilled when the action is mounted programmatically
@@ -83,6 +84,7 @@ class CreateAction extends \Filament\Actions\CreateAction
                     foreach ($eventModelClasses as $eventModelClass) {
                         if (is_a($model, $eventModelClass, true)) {
                             $isEventModel = true;
+
                             break;
                         }
                     }
@@ -223,7 +225,6 @@ class CreateAction extends \Filament\Actions\CreateAction
                 }
             })
             ->after(fn (HasCalendar $livewire) => $livewire->refreshRecords())
-            ->cancelParentActions()
-        ;
+            ->cancelParentActions();
     }
 }

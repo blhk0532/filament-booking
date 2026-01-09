@@ -2,7 +2,6 @@
 
 namespace Adultdate\FilamentBooking\Filament\Pages;
 
-use Adultdate\FilamentBooking\Filament\Resources\Users\Pages\ManageServiceProviderSchedules;
 use App\Models\User;
 use App\UserRole;
 use BackedEnum;
@@ -30,18 +29,21 @@ use Zap\Models\Schedule;
 
 class ManageAppointments extends Page implements HasForms, HasTable
 {
-    use HasTabs, InteractsWithForms, InteractsWithTable;
+    use HasTabs;
+    use InteractsWithForms;
+    use InteractsWithTable;
 
     protected string $view = 'filament.pages.manage-appointments';
 
     protected static ?string $navigationLabel = 'Shedule';
 
-         protected static ?int $sort = 10;
-     protected static ?int $navigationSort = 10;
+    protected static ?int $sort = 10;
 
-    protected static string|UnitEnum|null $navigationGroup = 'Bokning';
+    protected static ?int $navigationSort = 10;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
+    protected static string | UnitEnum | null $navigationGroup = 'Bokning';
+
+    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedCalendarDays;
 
     public function mount(): void
     {
@@ -65,7 +67,8 @@ class ManageAppointments extends Page implements HasForms, HasTable
                     ->sortable(),
                 TextColumn::make('time_range')
                     ->label('Time Range')
-                    ->getStateUsing(fn ($record) => ($record->periods->first()?->start_time ?? 'N/A').' - '.($record->periods->first()?->end_time ?? 'N/A')
+                    ->getStateUsing(
+                        fn ($record) => ($record->periods->first()?->start_time ?? 'N/A') . ' - ' . ($record->periods->first()?->end_time ?? 'N/A')
                     ),
 
                 TextColumn::make('reason')

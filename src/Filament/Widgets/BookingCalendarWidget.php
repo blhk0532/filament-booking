@@ -20,13 +20,11 @@ use Adultdate\FilamentBooking\Models\Booking\BookingLocation;
 use Adultdate\FilamentBooking\Models\Booking\Client;
 use Adultdate\FilamentBooking\Models\Booking\DailyLocation;
 use Adultdate\FilamentBooking\Models\Booking\Service;
-use Adultdate\FilamentBooking\ValueObjects\FetchInfo;
+use Adultdate\FilamentBooking\Models\BookingServicePeriod;
 use Adultdate\FilamentBooking\ValueObjects\DateClickInfo;
 use Adultdate\FilamentBooking\ValueObjects\DateSelectInfo;
-use Adultdate\FilamentBooking\Models\BookingServicePeriod;
+use Adultdate\FilamentBooking\ValueObjects\FetchInfo;
 use App\Models\User;
-use App\UserRole;
-use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
@@ -39,6 +37,7 @@ use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Set;
 use Filament\Schemas\Schema as FilamentSchema;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
@@ -48,7 +47,7 @@ class BookingCalendarWidget extends FullCalendarWidget implements HasCalendar
 {
     public ?int $recordId = null;
 
-    public Model|string|null $model = null;
+    public Model | string | null $model = null;
 
     use CanBeConfigured, CanRefreshCalendar, HasOptions, HasSchema, InteractsWithCalendar, InteractsWithEventRecord, InteractsWithEvents, InteractsWithRawJS, InteractsWithRecords {
         // Prefer the contract-compatible refreshRecords (chainable) from CanRefreshCalendar
@@ -78,7 +77,7 @@ class BookingCalendarWidget extends FullCalendarWidget implements HasCalendar
 
     protected static string $viewIdentifier = 'booking-calendar-widget';
 
-    protected int|string|array $columnSpan = 'full';
+    protected int | string | array $columnSpan = 'full';
 
     public function getModel(): string
     {
@@ -109,7 +108,7 @@ class BookingCalendarWidget extends FullCalendarWidget implements HasCalendar
     {
         return [
             'initialView' => 'timeGridWeek',
-            'timeZone' => config('app.timezone'), 
+            'timeZone' => config('app.timezone'),
             'headerToolbar' => [
                 'left' => 'prev,next today',
                 'center' => 'title',
@@ -291,7 +290,7 @@ class BookingCalendarWidget extends FullCalendarWidget implements HasCalendar
 
     protected function generateNumber(): string
     {
-        return 'BK-'.now()->format('Ymd').'-'.Str::upper(Str::random(6));
+        return 'BK-' . now()->format('Ymd') . '-' . Str::upper(Str::random(6));
     }
 
     protected function getDefaultFormData(array $seed = []): array
@@ -348,11 +347,11 @@ class BookingCalendarWidget extends FullCalendarWidget implements HasCalendar
 
         // Only set starts_at/ends_at when columns exist.
         if (Schema::hasColumn('booking_bookings', 'starts_at') && isset($data['service_date'], $data['start_time'])) {
-            $data['starts_at'] = Carbon::parse($data['service_date'].' '.$data['start_time']);
+            $data['starts_at'] = Carbon::parse($data['service_date'] . ' ' . $data['start_time']);
         }
 
         if (Schema::hasColumn('booking_bookings', 'ends_at') && isset($data['service_date'], $data['end_time'])) {
-            $data['ends_at'] = Carbon::parse($data['service_date'].' '.$data['end_time']);
+            $data['ends_at'] = Carbon::parse($data['service_date'] . ' ' . $data['end_time']);
         }
 
         logger()->debug('booking.form.normalize.after', $data);
@@ -380,7 +379,7 @@ class BookingCalendarWidget extends FullCalendarWidget implements HasCalendar
         $booking->refresh()->updateTotalPrice();
     }
 
-    public function getEvents(FetchInfo $info): Collection|array|Builder
+    public function getEvents(FetchInfo $info): Collection | array | Builder
     {
         $start = $info->start->toMutable()->startOfDay();
         $end = $info->end->toMutable()->endOfDay();
@@ -410,7 +409,7 @@ class BookingCalendarWidget extends FullCalendarWidget implements HasCalendar
             $title = $loc->location ?: ($loc->serviceUser?->name ?? 'Location');
 
             return [
-                'id' => 'location-'.$loc->id,
+                'id' => 'location-' . $loc->id,
                 'title' => $title,
                 'start' => $loc->date?->toDateString(),
                 'allDay' => true,
@@ -683,11 +682,13 @@ class BookingCalendarWidget extends FullCalendarWidget implements HasCalendar
 
                     if ($formOrSchema instanceof FilamentSchema) {
                         $formOrSchema->fillPartially($values, array_keys($values));
+
                         return;
                     }
 
                     if (is_object($formOrSchema) && method_exists($formOrSchema, 'fill')) {
                         $formOrSchema->fill($values);
+
                         return;
                     }
                 })
@@ -816,7 +817,7 @@ class BookingCalendarWidget extends FullCalendarWidget implements HasCalendar
                         }
                     } elseif (isset($args[1]) && (is_array($args[1]) || is_object($args[1]))) {
                         $arguments = is_object($args[1]) ? json_decode(json_encode($args[1]), true) : $args[1];
-                        if (!isset($arguments['start']) && !isset($arguments['startStr']) && !isset($arguments['service_date'])) {
+                        if (! isset($arguments['start']) && ! isset($arguments['startStr']) && ! isset($arguments['service_date'])) {
                             return;
                         }
 
@@ -891,6 +892,7 @@ class BookingCalendarWidget extends FullCalendarWidget implements HasCalendar
                 }),
         ];
     }
+
     protected function getActions(): array
     {
         return [

@@ -2,11 +2,11 @@
 
 namespace Adultdate\FilamentBooking\Concerns;
 
-use Filament\Actions\Action;
 use Adultdate\FilamentBooking\Filament\Actions\CreateAction;
 use Adultdate\FilamentBooking\Filament\Actions\DeleteAction;
 use Adultdate\FilamentBooking\Filament\Actions\EditAction;
 use Adultdate\FilamentBooking\Filament\Actions\ViewAction;
+use Filament\Actions\Action;
 use Illuminate\Support\Str;
 
 trait HasDefaultActions
@@ -69,7 +69,7 @@ trait HasDefaultActions
         } catch (\Throwable $e) {
             // Swallow
         }
-        
+
         try {
             $this->cacheAction($this->createAction(\Adultdate\FilamentBooking\Models\Booking\DailyLocation::class, 'ctxCreateDailyLocation'));
         } catch (\Throwable $e) {
@@ -81,7 +81,6 @@ trait HasDefaultActions
         } catch (\Throwable $e) {
             // Swallow
         }
-
 
         try {
             $this->cacheAction($this->createAction(\Adultdate\FilamentBooking\Models\BookingServicePeriod::class, 'ctxCreateServicePeriod'));
