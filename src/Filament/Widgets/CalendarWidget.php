@@ -42,10 +42,10 @@ class CalendarWidget extends FullCalendarWidget implements \Adultdate\FilamentBo
 
     protected int|string|array $columnSpan = 'full';
 
-    public function getModel(): string
-    {
-        return $this->model;
-    }
+//    public function getModel(): string
+//    {
+//        return $this->model;
+//    }
 
     public function config(): array
     {

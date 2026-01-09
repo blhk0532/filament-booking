@@ -50,13 +50,13 @@ use Illuminate\Support\Str;
 use Filament\Schemas\Components\Utilities\Set;
 
 
-class BookingCalendar extends FullCalendarWidget implements HasCalendar
+class BokningCalendar extends FullCalendarWidget implements HasCalendar
 {
     public ?int $recordId = null;
 
-    public ?array $lastMountedData = null;
+public ?array $lastMountedData = null;
 
-    public Model|int|string|null $record;
+public Model|int|string|null $record;
 
     public ?Model $eventRecord = null;
 
@@ -70,7 +70,7 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
     //    protected bool $eventResizeEnabled = true;
     //    protected bool $dateClickEnabled = true;
     //    protected bool $dateSelectEnabled = true;
-
+  
     protected static ?int $sort = -1;
 
     use CanBeConfigured, CanRefreshCalendar, HasOptions, HasSchema, InteractsWithCalendar, InteractsWithEventRecord, InteractsWithEvents, InteractsWithPageFilters, InteractsWithRawJS, InteractsWithRecords {
@@ -97,10 +97,12 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
     }
 
     protected string $view = 'adultdate/filament-booking::service-periods-fullcalendar';
+    // protected int | string | array $columnSpan = 3;
+
 
     public function getHeading(): string|Htmlable
     {
-        return 'Calenar';
+        return 'Calendar';
     }
 
     public function getFooterActions(): array
@@ -223,8 +225,6 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
     {
         return $this->getModel()::query();
     }
-
-    protected int|string|array $columnSpan = 'full';
 
     public function config(): array
     {
@@ -358,7 +358,7 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
             $calendar = \App\Models\BookingCalendar::find($resource['id']);
             $serviceUserId = $calendar?->owner_id ?? $serviceUserId;
         }
-
+ 
         // Get booking_calendar_id based on resource, filter, or service user
         $bookingCalendarId = null;
         if ($resource && isset($resource['id'])) {
@@ -1866,4 +1866,10 @@ class BookingCalendar extends FullCalendarWidget implements HasCalendar
         $this->eventResizeEnabled = true;
         $this->dateSelectEnabled = true;
     }
+
+    public function getView(): string
+    {
+        return 'adultdate/filament-booking::calendar-widget';
+    }
+
 }

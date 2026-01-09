@@ -15,12 +15,14 @@ class BookingCalendar extends Model
         'whatsapp_id',
         'creator_id',
         'owner_id',
+        'notification_user_ids',
         'access',
         'is_active',
     ];
 
     protected $casts = [
         'access' => 'array',
+        'notification_user_ids' => 'array',
         'is_active' => 'boolean',
     ];
 

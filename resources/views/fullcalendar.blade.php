@@ -9,7 +9,7 @@
         </div>
 
         {{-- Ensure the built Alpine component is available (fallback to public/vendor) --}}
-        <script defer src="{{ asset('vendor/adultdate/filament-booking/filament-fullcalendar.js') }}"></script>
+        <script defer src="{{ asset('plugins/adultdate/filament-booking/dist/filament-fullcalendar.js') }}"></script>
 
         <div wire:ignore x-load
             x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('filament-fullcalendar-alpine', 'adultdate/filament-booking') }}"
@@ -27,6 +27,6 @@
                 eventWillUnmount: {!! htmlspecialchars($this->eventWillUnmount(), ENT_COMPAT) !!},
             })" class="filament-fullcalendar" data-filament-fullcalendar="true"></div>
     </x-filament::section>
-
+ 
     <x-filament-actions::modals />
 </x-filament-widgets::widget>

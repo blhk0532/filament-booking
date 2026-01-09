@@ -27,7 +27,7 @@ class FullCalendarWidget extends Widget implements HasForms, HasActions
     /**
      * Widget width
      */
-    protected int | string | array $columnSpan = 'full';
+//    protected int | string | array $columnSpan = 'full';
 
     /**
      * Provide view data from the Booking plugin

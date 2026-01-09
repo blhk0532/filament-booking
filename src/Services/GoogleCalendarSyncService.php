@@ -216,8 +216,12 @@ class GoogleCalendarSyncService
             $description[] = 'Client: '.$booking->bookingUser->name;
         }
 
-        if ($booking->admin) {
-            $description[] = 'Created by Admin: '.$booking->admin->name;
+        $adminId = $booking->getAttributes()['admin_id'] ?? null;
+        if ($adminId) {
+            $adminName = $booking->admin?->name;
+            if ($adminName) {
+                $description[] = 'Created by Admin: '.$adminName;
+            }
         }
 
         if ($booking->client) {

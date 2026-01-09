@@ -101,6 +101,14 @@ class FilamentBookingServiceProvider extends PackageServiceProvider
                 'adultdate.filament-booking.filament.resources.booking.daily-locations.widgets.location-calendar-widget',
                 \Adultdate\FilamentBooking\Filament\Resources\Booking\DailyLocations\Widgets\LocationCalendarWidget::class
             );
+            \Livewire\Livewire::component(
+                'adultdate.filament-booking.filament.widgets.bokning-calendar',
+                \Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings\Widgets\BokningCalendar::class
+            );
+            \Livewire\Livewire::component(
+                'adultdate.filament-booking.filament.widgets.booking-calendar',
+                \Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings\Widgets\BookingCalendar::class
+            );
             \Livewire\Livewire::component('adultdate.filament-booking.filament.widgets.event-calendar', \Adultdate\FilamentBooking\Filament\Widgets\EventCalendar::class);
 
         }

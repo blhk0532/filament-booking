@@ -33,11 +33,11 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\ToggleButtons;
 use Adultdate\FilamentBooking\Enums\BookingStatus;
 
-final class EventCalendar extends CalendarWidget
+class EventCalendar extends CalendarWidget
 {
     protected static string $viewIdentifier = 'adultdate/filament-booking::calendar-widget';
 
-    protected string|HtmlString|bool|null $heading = 'Calendar';
+//    protected string|HtmlString|bool|null $heading = 'Calendar';
 
     protected bool $eventClickEnabled = true;
 
@@ -48,8 +48,6 @@ final class EventCalendar extends CalendarWidget
     protected bool $eventResizeEnabled = true;
 
     protected bool $dateClickEnabled = true;
-
-    protected bool $dateSelectEnabled = true;
 
     protected static ?int $sort = 1;
 

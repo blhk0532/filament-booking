@@ -15,13 +15,14 @@ use Adultdate\FilamentBooking\Filament\Widgets\Concerns\CanBeConfigured;
 use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithEvents;
 use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithRawJS;
 use Adultdate\FilamentBooking\Filament\Widgets\Concerns\InteractsWithRecords;
-use Adultdate\FilamentBooking\Filament\Widgets\SimpleCalendarWidget;
+use Adultdate\FilamentBooking\Filament\Widgets\EventCalendar as SimpleCalendarWidget;
 use Adultdate\FilamentBooking\Models\BookingMeeting;
 use Adultdate\FilamentBooking\Models\BookingSprint;
 use Adultdate\FilamentBooking\Models\BookingServicePeriod;
 use Adultdate\FilamentBooking\Models\Booking\DailyLocation;
 use Adultdate\FilamentBooking\Models\Booking\Booking;
 use Adultdate\FilamentBooking\Filament\Actions\CreateAction as FilamentCreateAction;
+use Filament\Widgets\Widget;
 use Adultdate\FilamentBooking\Models\CalendarSettings;
 use Adultdate\FilamentBooking\ValueObjects\DateClickInfo;
 use Adultdate\FilamentBooking\ValueObjects\DateSelectInfo;
@@ -54,7 +55,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Livewire\Attributes\Locked;
 
-final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
+class EventCalendar extends SimpleCalendarWidget implements HasCalendar
 {
 
    
@@ -88,7 +89,7 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
         return $this->getConfig();
     }
 
-    public function getModel(): ?string
+    public function getModel(): string
     {
         return Booking::class;
     }
@@ -180,7 +181,7 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
 
         $config = [
             'timeZone' => config('app.timezone'), // Set the calendar timezone
-            'view' => 'dayGridMonth',
+            'initialView' => 'dayGridMonth',
             'headerToolbar' => [
                 'start' => 'prev,next today',
                 'center' => 'title',
@@ -191,17 +192,14 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
                 'timeGridDay' => [
                     'slotMinTime' => $openingStart,
                     'slotMaxTime' => '24:00:00',
-                    'slotHeight' => 60,
                 ],
                 'timeGridWeek' => [
                     'slotMinTime' => '00:00:00',
                     'slotMaxTime' => '24:00:00',
-                    'slotHeight' => 60,
                 ],
                 'timeGridMonth' => [
                     'slotMinTime' => '00:00:00',
                     'slotMaxTime' => '24:00:00',
-                    'slotHeight' => 60,
                 ],
             ],
         ];
@@ -240,11 +238,11 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
             ->whereDate('starts_at', '<=', $end)
             ->get();
 
-        $events = collect();
-        //    ->push(...$dailyLocations)
-        //    ->push(...$bookings)
-        //    ->push(...$meetings)
-        //    ->push(...$sprints);
+        $events = collect()
+            ->push(...$dailyLocations)
+            ->push(...$bookings)
+            ->push(...$meetings)
+            ->push(...$sprints);
 
         \Illuminate\Support\Facades\Log::info('Events returned', ['count' => $events->count()]);
 
@@ -737,7 +735,7 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
     #[CalendarEventContent(model: Booking::class)]
     protected function bookingEventContent(): string
     {
-        return view('adultdate/filament-booking::components.calendar.events.booking')->render();
+        return view('adultdate/filament-booking::components.calendar.booking')->render();
     }
 
     public function mount(): void
@@ -749,13 +747,6 @@ final class EventCalendar extends SimpleCalendarWidget implements HasCalendar
         $this->dateSelectEnabled = true;
     }
 
-    /**
-     * Override the widget heading to hide the default header.
-     */
-    public function getHeading(): ?string
-    {
-        return null;
-    }
 
   
 }

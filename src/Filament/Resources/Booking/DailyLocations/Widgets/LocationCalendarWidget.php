@@ -39,8 +39,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-
-final class LocationCalendarWidget extends SimpleCalendarWidget implements HasCalendar
+use Filament\Widgets\Widget;
+final class LocationCalendarWidget extends Widget implements HasCalendar
 {
     use CanBeConfigured, CanRefreshCalendar, HasOptions, HasSchema, InteractsWithCalendar, InteractsWithEventRecord, InteractsWithEvents, InteractsWithRawJS, InteractsWithRecords {
         // Prefer the contract-compatible refreshRecords (chainable) from CanRefreshCalendar
@@ -59,6 +59,10 @@ final class LocationCalendarWidget extends SimpleCalendarWidget implements HasCa
         InteractsWithEvents::onEventResizeLegacy insteadof InteractsWithCalendar;
     }
 
+
+    protected bool $dateClickEnabled = true;
+
+    protected bool $dateSelectEnabled = true;
     protected static ?int $sort = 1;
 
     public function schema(Schema $schema): Schema

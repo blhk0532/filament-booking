@@ -4,12 +4,13 @@ namespace Adultdate\FilamentBooking\Filament\Resources\BookingCalendars\Schemas;
 
 use Adultdate\FilamentBooking\Models\User;
 use App\UserRole;
+use App\Models\Admin;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
 use WallaceMartinss\FilamentEvolution\Models\WhatsappInstance;
-
+use Illuminate\Support\Facades\Auth;
 class BookingCalendarForm
 {
     public static function configure(Schema $schema): Schema
@@ -35,10 +36,21 @@ class BookingCalendarForm
                     ->placeholder('Select WhatsApp instance'),
                 Select::make('creator_id')
                     ->relationship('creator', 'name')
-                    ->required(),
+                    ->default(Auth::id())
+                    ->hidden(),
                 Select::make('owner_id')
                     ->relationship('owner', 'name', fn ($query) => $query->where('role', UserRole::SERVICE))
                     ->required(),
+                Select::make('notification_user_ids')
+                    ->label('Notification Recipients')
+                    ->helperText('Users and admins to receive database notifications for new bookings')
+                    ->multiple()
+                    ->options(collect([
+                        ...User::all()->mapWithKeys(fn($user) => ["user-{$user->id}" => "User: {$user->name}"]),
+                        ...Admin::all()->mapWithKeys(fn($admin) => ["admin-{$admin->id}" => "Admin: {$admin->name}"]),
+                    ]))
+                    ->searchable()
+                    ->placeholder('Select users and admins for notifications'),
                 Select::make('access')
                     ->label('Users with Access')
                     ->multiple()

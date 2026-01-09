@@ -13,21 +13,25 @@ use Illuminate\Support\Str;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings\Widgets\BookingCalendar;
+use Adultdate\FilamentBooking\Filament\Clusters\Services\Resources\Bookings\Widgets\BokningCalendar;
 use App\Models\BookingCalendar as BookingCalendarModel;
 use App\UserRole;
 use Filament\Support\Enums\Width;
+use Adultdate\FilamentBooking\Filament\Widgets\FilamentInfosWidget;
+use Adultdate\FilamentBooking\Filament\Widgets\AccountWidget;
+use Adultdate\FilamentBooking\Filament\Widgets\FullCalendarWidget;
+use Adultdate\FilamentBooking\Filament\Resources\Booking\ServicePeriods\Widgets\BookingPeriodsCalendar;
 
-class DashboardBooking extends BaseDashboard
+class DashboardBokning extends BaseDashboard
 {
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChartPie;
 
-    protected static ?string $navigationLabel = 'Dash';
+//    protected static ?string $navigationLabel = 'Dash';
 
      protected static ?string $title = '';
 
-    protected static string $routePath = 'service/booking';
+    protected static string $routePath = 'service/bokning';
 
   //  protected static ?string $slug = 'dashboard';
 
@@ -41,18 +45,13 @@ class DashboardBooking extends BaseDashboard
         public function getWidgets(): array
     {
         return [
-                BookingCalendar::class,
+           //     BokningCalendar::class,
         ];
     }
 
-public function getMaxContentWidth(): Width
-{
-    return Width::Full;
-}
-
     public static function getNavigationLabel(): string                       
     {
-        return '' . Str::ucfirst('Booking') ?? 'User';
+        return '' . Str::ucfirst('Bokning') ?? 'User';
     }
 
     public static function getNavigationBadge(): ?string
@@ -101,5 +100,35 @@ public function getMaxContentWidth(): Width
         return fn (string $widgetClass) => true;
     }
 
+
+public function getMaxContentWidth(): Width
+{
+    return Width::Full;
+}
+
+
+public function getHeaderWidgetsColumns(): int | array
+{
+    return 3;
+}
+
+public function getWidgetsColumns(): int | array
+{
+    return 2;
+}
+
+public function getColumns(): int | array
+{
+    return 2;
+}
+
+public function getHeaderWidgets(): array
+    {
+        return [
+                 BokningCalendar::class,
+                BokningCalendar::class,
+                BookingPeriodsCalendar::class,
+        ];
+    }
 
 }

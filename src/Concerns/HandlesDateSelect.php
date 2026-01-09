@@ -12,7 +12,7 @@ trait HandlesDateSelect
      *
      * To enable date select, set this to true and override `onDateSelect` to implement your logic.
      */
-    protected bool $dateSelectEnabled = false;
+    protected bool $dateSelectEnabled = true;
 
     public function setDateSelectEnabled(bool $enabled): void
     {
@@ -26,7 +26,7 @@ trait HandlesDateSelect
      *
      * @param  DateSelectInfo  $info  contains information about the selected date range
      */
-    protected function onDateSelect(DateSelectInfo $info): void {}
+    public function onDateSelectLegacy(DateSelectInfo $info): void {}
 
     /**
      * Sets whether selecting a date range should be enabled for the calendar or not.
@@ -50,6 +50,6 @@ trait HandlesDateSelect
 
         $this->setRawCalendarContextData(Context::DateSelect, $data);
 
-        $this->onDateSelect($this->getCalendarContextInfo());
+        $this->onDateSelectLegacy($this->getCalendarContextInfo());
     }
 }

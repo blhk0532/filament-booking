@@ -48,8 +48,6 @@ final class LocationCalendarWidget extends FullCalendarWidget implements HasActi
 
     protected bool $dateClickEnabled = true;
 
-    protected bool $dateSelectEnabled = true;
-
     protected static ?int $sort = 1;
 
     public function getView(): string

@@ -45,6 +45,8 @@ class ServiceCalendar extends FullCalendarWidget implements HasCalendar
 {
     public ?int $recordId = null;
 
+    public Model|string|null $model = null;
+
     protected $settings;
 
     //    protected bool $eventDragEnabled = true;
@@ -275,7 +277,7 @@ class ServiceCalendar extends FullCalendarWidget implements HasCalendar
                         $dateVal = $this->calendarData['date_val'];
                         $timeStamp = time();
                         $dateStamp = date('dmY', $timeStamp);
-                        $bookingNumber = 'NDS-' . $timeStamp . '-' . Str::upper(Str::substr(Auth::user()->name, 0, 3)) . '-' . $timeStamp;
+                        $bookingNumber = Str::upper(Auth::user()->name) . $timeStamp;
                         if ($this->calendarData['allDay']) {
                             $startTime = '00:00';
                             $endTime = '23:59';
@@ -1039,7 +1041,7 @@ class ServiceCalendar extends FullCalendarWidget implements HasCalendar
     public function mount(): void
     {
         $this->eventClickEnabled = true;
-        $this->dateClickEnabled = true;
+    //    $this->dateClickEnabled = true;
         $this->eventDragEnabled = true;
         $this->eventResizeEnabled = true;
         $this->dateSelectEnabled = true;

@@ -11,9 +11,6 @@ use Livewire\Attributes\Locked;
 
 trait InteractsWithRecords
 {
-    #[Locked]
-    public Model | string | null $model = null;
-
     protected ?string $modelLabel = null;
 
     #[Locked]

@@ -1,7 +1,8 @@
 <?php
-
+ 
 namespace Adultdate\FilamentBooking\Filament\Resources\Booking\ServicePeriods\Widgets;
 
+use Adultdate\FilamentBooking\Attributes\CalendarEventContent;
 use Adultdate\FilamentBooking\Concerns\CanRefreshCalendar;
 use Adultdate\FilamentBooking\Concerns\HasOptions;
 use Adultdate\FilamentBooking\Concerns\HasSchema;
@@ -22,6 +23,9 @@ use Adultdate\FilamentBooking\Models\Booking\Service;
 use Adultdate\FilamentBooking\Models\BookingServicePeriod;
 use Adultdate\FilamentBooking\Models\CalendarSettings;
 use Adultdate\FilamentBooking\ValueObjects\FetchInfo;
+use Adultdate\FilamentBooking\ValueObjects\DateClickInfo;
+use Adultdate\FilamentBooking\ValueObjects\DateSelectInfo;
+use Adultdate\FilamentBooking\ValueObjects\EventClickInfo;
 use App\Models\User;
 use App\UserRole;
 use Carbon\Carbon;
@@ -40,17 +44,17 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
-
-class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
+use Adultdate\FilamentBooking\Filament\Widgets\SimpleCalendarWidget;
+class BookingPeriodsCalendar extends SimpleCalendarWidget implements HasCalendar
 {
     public ?int $recordId = null;
 
+    public Model|string|null $model = null;
+
     protected $settings;
 
-    //    protected bool $eventDragEnabled = true;
-    //    protected bool $eventResizeEnabled = true;
-    //    protected bool $dateClickEnabled = true;
-    //    protected bool $dateSelectEnabled = true;
+   // protected bool $dateClickEnabled = true;
+ 
 
     protected static ?int $sort = -1;
 
@@ -74,11 +78,11 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
         InteractsWithEvents::refreshRecords insteadof InteractsWithCalendar;
     }
 
-    protected string $view = 'adultdate/filament-booking::service-periods-fullcalendar';
+ 
 
-    public function getHeading(): string|Htmlable
+    public function getHeading(): string
     {
-        return 'Calenar';
+        return 'Calendar';
     }
 
     public function getFooterActions(): array
@@ -87,7 +91,7 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
             Action::make('create')
                 ->requiresConfirmation(true)
                 ->action(function (array $arguments) {
-                    dd('Admin action called', $arguments);
+                    // TODO: Implement create action
                 }),
         ];
     }
@@ -112,17 +116,17 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
         return $this->model instanceof Model ? $this->getModel() : Booking::class;
     }
 
-    public function getEventRecord(): ?Model
+      public function getEventRecord(): ?Model
     {
         return $this->record instanceof Model ? $this->record : null;
     }
 
-    protected function getEloquentQuery(): Builder
+    protected function getEloquentQuery(string $model): Builder
     {
-        return $this->getModel()::query();
+        return $model::query();
     }
 
-    protected int|string|array $columnSpan = 'full';
+ 
 
     public function config(): array
     {
@@ -132,7 +136,7 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
         $openingEnd = $this->settings?->opening_hour_end?->format('H:i:s') ?? '21:00:00';
 
         return [
-            'initialView' => 'timeGridWeek',
+            'view' => 'dayGridMonth',
             'timeZone' => 'UTC',
             // Start week on Monday (0 = Sunday, 1 = Monday)
             'firstDay' => 1,
@@ -168,32 +172,31 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
         ];
     }
 
-    public function onDateClick(string $date, bool $allDay, ?array $view, ?array $resource): void
+    protected function onDateClick(DateClickInfo $info): void
     {
-        $startDate = \Carbon\Carbon::parse($date);
+        $startDate = $info->date;
 
         $this->mountAction('create', [
             'service_date' => $startDate->format('Y-m-d'),
         ]);
     }
 
-    public function onDateSelect(string $start, ?string $end, bool $allDay, ?array $view, ?array $resource): void
+    protected function onDateSelectLegacy(DateSelectInfo $info): void
     {
-        $allDay = (bool) $allDay;
+        $allDay = $info->allDay;
 
         logger()->info('BookingCalendarWidget CALENDAR WAS CLICKED', [
-            'start' => $start,
-            'end' => $end,
+            'start' => $info->start,
+            'end' => $info->end,
             'allDay' => $allDay,
-            'view' => $view,
-            'resource' => $resource,
+            'view' => $info->view,
         ]);
 
         $timezone = config('app.timezone');
-        $startDate = Carbon::parse($start, $timezone);
+        $startDate = $info->start;
 
-        $startVal = $start;
-        $endVal = $end;
+        $startVal = $info->start->toISOString();
+        $endVal = $info->end ? $info->end->toISOString() : null;
         $dateVal = $startDate;
 
         $startTime = $startVal;
@@ -216,8 +219,8 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
         if (! $allDay && $startDate->format('H:i:s') !== '00:00:00') {
             $data['start_time'] = $startDate->format('H:i');
 
-            if ($end) {
-                $endDate = Carbon::parse($end, $timezone);
+            if ($info->end) {
+                $endDate = $info->end;
                 if ($endDate->format('H:i:s') !== '00:00:00') {
                     $data['end_time'] = $endDate->format('H:i');
                 }
@@ -226,15 +229,15 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
         if ($allDay) {
             $startTime = '00:00';
             $endTime = '23:59';
-            $endDate = Carbon::parse($end, $timezone);
+            $endDate = $info->end;
         }
 
         $data = [
             'start' => $startTime,
             'end' => $endTime,
             'allDay' => $allDay,
-            'view' => $view,
-            'resource' => $resource,
+            'view' => $info->view,
+            'resource' => null,
             'date' => $startDate,
             'service_date' => $startDate,
             'timezone' => $timezone,
@@ -275,7 +278,7 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
                         $dateVal = $this->calendarData['date_val'];
                         $timeStamp = time();
                         $dateStamp = date('dmY', $timeStamp);
-                        $bookingNumber = 'NDS-' . $timeStamp . '-' . Str::upper(Str::substr(Auth::user()->name, 0, 3)) . '-' . $dateStamp . '-' . $timeStamp;
+                        $bookingNumber = Str::upper(Auth::user()->name) . $timeStamp;
                         if ($this->calendarData['allDay']) {
                             $startTime = '00:00';
                             $endTime = '23:59';
@@ -584,14 +587,15 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
             ]);
     }
 
-    public function onEventClick(array $event): void
+    protected function onEventClick(EventClickInfo $info, Model $event, ?string $action = null): void
     {
-        logger()->info('xxx: EVENT zzz PAYLOAD', ['event' => $event]);
-        //    logger()->info('BookingCalendarWidget: EVENT CLICK PAYLOAD', ['title' => $event['title']]);
+        logger()->info('xxx: EVENT zzz PAYLOAD', ['event' => $info->event]);
+        //    logger()->info('BookingCalendarWidget: EVENT CLICK PAYLOAD', ['title' => $info->event->getTitle()]);
 
-        if ($event['title'] == 'ⓘ upptagen') {
+        if ($info->event->getTitle() == 'ⓘ upptagen') {
 
-            $recId = $event['extendedProps']['booking_id'] ?? null;
+            $extended = method_exists($info->event, 'getExtendedProps') ? $info->event->getExtendedProps() : [];
+            $recId = $extended['booking_id'] ?? null;
             $this->model = BookingServicePeriod::class;
             $this->record = $recId ? $this->resolveRecord($recId) : null;
             $payload = $this->record->toArray();
@@ -600,13 +604,58 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
             $action = $canEdit ? 'edit' : '';
             $this->mountAction($action, [
                 'type' => 'click',
-                'event' => $event,
+                'event' => $info->event,
                 'data' => $payload,
             ]);
         }
-        if (isset($event['allDay']) && $event['allDay'] === true) {
+        $isAllDay = false;
+        $event = $info->event;
 
-            $recId = $event['extendedProps']['daily_location_id'] ?? null;
+        if (is_object($event)) {
+            if (method_exists($event, 'getAllDay')) {
+                $isAllDay = $event->getAllDay() === true;
+            } elseif (method_exists($event, 'getExtendedProps')) {
+                $extended = $event->getExtendedProps();
+                $isAllDay = isset($extended['allDay']) && $extended['allDay'] === true;
+            } elseif ($event instanceof \stdClass) {
+              //  $isAllDay = isset($event->allDay) && $event->allDay === true;
+            } elseif (property_exists($event, 'allDay')) {
+                // Safely attempt to read the property only if it's publicly accessible,
+                // otherwise fall back to known getter-like methods or extended props.
+                try {
+                    $ref = new \ReflectionObject($event);
+                    if ($ref->hasProperty('allDay')) {
+                        $prop = $ref->getProperty('allDay');
+                        if ($prop->isPublic()) {
+                         
+                         //   $isAllDay = $event->allDay === true;
+                        } else {
+                            // Avoid calling a potentially undefined isAllDay method;
+                            // prefer existing getters or extended props instead.
+                            if (method_exists($event, 'getAllDay')) {
+                                $isAllDay = $event->getAllDay() === true;
+                            } elseif (method_exists($event, 'getExtendedProps')) {
+                                $extended = $event->getExtendedProps();
+                                $isAllDay = isset($extended['allDay']) && $extended['allDay'] === true;
+                            } else {
+                                $isAllDay = false;
+                            }
+                        }
+                    } else {
+                        $isAllDay = false;
+                    }
+                } catch (\ReflectionException $e) {
+                    $isAllDay = false;
+                }
+            }
+        } elseif (is_array($event)) {
+            $isAllDay = isset($event['allDay']) && $event['allDay'] === true;
+        }
+
+        if ($isAllDay) {
+
+            $extended = method_exists($info->event, 'getExtendedProps') ? $info->event->getExtendedProps() : [];
+            $recId = $extended['daily_location_id'] ?? null;
             $this->model = DailyLocation::class;
             $this->record = $this->resolveRecord($recId);
             $this->eventRecord = $this->record;
@@ -617,23 +666,24 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
             $action = $canEdit ? 'edit' : '';
             $this->mountAction($action, [
                 'type' => 'click',
-                'event' => $event,
+                'event' => $info->event,
                 'data' => $payload,
             ]);
         }
-        if ($event['title'] != 'ⓘ upptagen' && (! isset($event['allDay']) || $event['allDay'] === false)) {
-            //  dd($event)  ;
-            $recId = $event['id'] ?? null;
+
+        // Regular booking events (not the blocked or all-day ones)
+        if ($info->event->getTitle() != 'ⓘ upptagen' && $info->event->getAllDay() === false) {
+            $recId = $info->record?->getKey();
             $this->model = Booking::class;
             $this->record = $this->resolveRecord($recId);
             $this->eventRecord = $this->record;
-            $this->record->load('items');
-            $this->recordId = $this->record->id;
-            $payload = $this->record->toArray();
+            $this->record?->load('items');
+            $this->recordId = $this->record?->id;
+            $payload = $this->record?->toArray() ?? [];
             $payload['service_date'] = $this->record->service_date?->format('Y-m-d') ?? ($payload['service_date'] ?? null);
             $booking = $this->record;
             $user = Auth::user();
-            $canEdit = $user->id == $booking->booking_user_id || Auth::user()->role === 'admin' || Auth::user()->role === 'super_admin';
+            $canEdit = $booking && ($user->id == $booking->booking_user_id || $user->role === 'admin' || $user->role === 'super_admin');
             $action = $canEdit ? 'options' : '';
             $this->mountAction($action, [
                 'data' => $payload,
@@ -654,9 +704,17 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
         ];
     }
 
-    protected function isAdmin(User $user): bool
+    protected function isAdmin(Model $user): bool
     {
-        return $user->role === UserRole::ADMIN || $user->role === UserRole::SUPER_ADMIN;
+        if ($user instanceof \App\Models\Admin) {
+            return true; // Admins can perform admin actions
+        }
+        
+        if ($user instanceof \App\Models\User) {
+            return $user->role === UserRole::ADMIN || $user->role === UserRole::SUPER_ADMIN;
+        }
+        
+        return false;
     }
 
     public function getFormPeriod(): array
@@ -863,7 +921,7 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
         return 'BK-'.now()->format('Ymd').'-'.Str::upper(Str::random(6));
     }
 
-    public function getEvents(FetchInfo $info): Collection|array|Builder
+    public function getEvents(FetchInfo $info): Collection|array|\Illuminate\Database\Eloquent\Builder
     {
         $start = $info->start->toMutable()->startOfDay();
         $end = $info->end->toMutable()->endOfDay();
@@ -916,7 +974,7 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
             ];
         })->toArray();
 
-        return collect(array_merge($bookingEvents, $locationEvents, $blockingEvents));
+        return collect(array_merge($bookingEvents));
     }
 
     public function fetchEvents(array $info): array
@@ -939,10 +997,20 @@ class BookingPeriodsCalendar extends FullCalendarWidget implements HasCalendar
         ];
     }
 
+
+    #[CalendarEventContent(model: Booking::class)]
+    protected function bookingEventContent(): string
+    {
+        // Pass the booking model to the blade so the view can access all booking data
+        return view('adultdate/filament-booking::components.calendar.booking', [
+            'title' => $this->settings['title'] ?? 'Booking',
+        ])->render();
+    }
+
     public function mount(): void
     {
         $this->eventClickEnabled = true;
-        $this->dateClickEnabled = true;
+    //    $this->dateClickEnabled = true;
         $this->eventDragEnabled = true;
         $this->eventResizeEnabled = true;
         $this->dateSelectEnabled = true;

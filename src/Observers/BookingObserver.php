@@ -5,6 +5,7 @@ namespace Adultdate\FilamentBooking\Observers;
 use Adultdate\FilamentBooking\Models\Booking\Booking;
 use Adultdate\FilamentBooking\Services\GoogleCalendarSyncService;
 use Illuminate\Support\Facades\Log;
+use Filament\Notifications\Notification;
 use WallaceMartinss\FilamentEvolution\Services\WhatsappService;
 
 class BookingObserver
@@ -25,6 +26,48 @@ class BookingObserver
             'admin_id' => $booking->admin_id,
         ]);
         
+        // Send database notification if configured
+        if ($booking->bookingCalendar?->notification_user_ids) {
+            $recipients = collect();
+            $recipientIds = collect(); // Track IDs to avoid duplicates
+            
+            foreach ($booking->bookingCalendar->notification_user_ids as $id) {
+                if (str_starts_with($id, 'user-')) {
+                    $userId = str_replace('user-', '', $id);
+                    $user = \App\Models\User::find($userId);
+                    if ($user && !$recipientIds->contains("user-{$user->id}")) {
+                        $recipients->push($user);
+                        $recipientIds->push("user-{$user->id}");
+                    }
+                } elseif (str_starts_with($id, 'admin-')) {
+                    $adminId = str_replace('admin-', '', $id);
+                    $admin = \App\Models\Admin::find($adminId);
+                    if ($admin && !$recipientIds->contains("admin-{$admin->id}")) {
+                        $recipients->push($admin);
+                        $recipientIds->push("admin-{$admin->id}");
+                    }
+                }
+            }
+            
+            // Add the booking creator if not already in recipients
+            if ($booking->booking_user_id) {
+                $creator = \App\Models\User::find($booking->booking_user_id);
+                if ($creator && !$recipientIds->contains("user-{$creator->id}")) {
+                    $recipients->push($creator);
+                    $recipientIds->push("user-{$creator->id}");
+                }
+            }
+            
+            if ($recipients->isNotEmpty()) {
+                foreach ($recipients as $recipient) {
+                    Notification::make()
+                        ->title('New Booking Created')
+                        ->body("Booking #{$booking->number} for {$booking->service?->name} has been created.")
+                        ->sendToDatabase($recipient);
+                }
+            }
+        }
+        
         // Dispatch async job for Google Calendar sync and WhatsApp notification
         \App\Jobs\SyncBookingToGoogleCalendar::dispatch($booking, sendWhatsapp: true);
     }
@@ -36,8 +79,8 @@ class BookingObserver
     {
         // Only sync if relevant fields have changed
         if ($this->shouldSync($booking)) {
-            // Don't send WhatsApp for updates, only for creation
-            \App\Jobs\SyncBookingToGoogleCalendar::dispatch($booking, sendWhatsapp: false);
+            // Send WhatsApp for updates (move, resize, etc.)
+            \App\Jobs\SyncBookingToGoogleCalendar::dispatch($booking, sendWhatsapp: true);
         }
     }
 
@@ -134,12 +177,12 @@ class BookingObserver
             $clientName = $booking->client?->name ?? 'Client';
             $clientPhone = $booking->client?->phone ?? 'Unknown';
             $BookingNumber = $booking->number ?? 'N/A';
-$date = $booking->service_date?->format('Y-m-d') ?? $booking->starts_at?->format('Y-m-d');
-$start = $booking->start_time ?? $booking->starts_at?->format('H:i');
-$end = $booking->end_time ?? $booking->ends_at?->format('H:i');
+$date = \Carbon\Carbon::parse($booking->service_date ?: $booking->starts_at ?: now())->format('Y-m-d');
+$start = $booking->start_time ?: \Carbon\Carbon::parse($booking->starts_at ?: now())->format('H:i');
+$end = $booking->end_time ?: \Carbon\Carbon::parse($booking->ends_at ?: now())->format('H:i');
 $addr = trim(($booking->client?->address ?? '').' '.($booking->client?->city ?? ''));
 $datenow = now()->format('d-m-Y');
-$serviceUserName = $booking->serviceUser?->user?->name ?? null;
+$serviceUserName = $booking->serviceUser?->name ?? null;
 $lines = array_filter([
     "🗓️⌯⌲NDS⋆｡˚{$date}", 
     $serviceUserName ? "👷🏼 {$serviceUserName} 🕓 " : null,

@@ -85,22 +85,16 @@ trait InteractsWithEvents
     /**
      * Triggered when a date/time selection is made (single or multiple days).
      *
-     * @param  string  $start  An ISO8601 string representation of the start date. It will have a timezone offset similar to the calendar's timeZone. If selecting day cells, it won't have a time nor timezone part.
-     * @param  ?string  $end  An ISO8601 string representation of the end date. It will have a timezone offset similar to the calendar's timeZone. If selecting day cells, it won't have a time nor timezone part.
-     * @param  bool  $allDay  Whether the selection happened on day cells.
-     * @param  ?array  $view  A View array that contains information about a calendar view, such as title and date range.
-     * @param  ?array  $resource  A Resource Object that represents the selected resource.
+     * @param  object  $info  contains information about the selected date range (expects ->start, ->end, ->allDay)
      */
-    public function onDateSelectLegacy(string $start, ?string $end, bool $allDay, ?array $view, ?array $resource): void
+    public function onDateSelectLegacy(object $info): void
     {
-        [$start, $end] = $this->calculateTimezoneOffset($start, $end, $allDay);
-
         $this->mountAction('create', [
             'type' => 'select',
-            'start' => $start,
-            'end' => $end,
-            'allDay' => $allDay,
-            'resource' => $resource,
+            'start' => $info->start->toIsoString(),
+            'end' => $info->end ? $info->end->toIsoString() : null,
+            'allDay' => $info->allDay,
+            'resource' => null, // DateSelectInfo doesn't have resource
         ]);
     }
 

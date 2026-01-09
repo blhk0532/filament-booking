@@ -61,29 +61,29 @@ class FilamentBookingPlugin implements Plugin
                 Js::make('event-calendar', 'https://cdn.jsdelivr.net/npm/@event-calendar/build@4.5.0/dist/event-calendar.min.js'),
                 Css::make('event-calendar', 'https://cdn.jsdelivr.net/npm/@event-calendar/build@4.5.0/dist/event-calendar.min.css'),
             ])
-            ->discoverClusters(in: app_path('../plugins/adultdate/filament-booking/src/Filament/Clusters'), for: 'Adultdate\\FilamentBooking\\Filament\\Clusters')
-            ->discoverResources(in: app_path('../plugins/adultdate/filament-booking/src/Filament/Resources'), for: 'Adultdate\\FilamentBooking\\Filament\\Resources')
+          //  ->discoverClusters(in: app_path('../plugins/adultdate/filament-booking/src/Filament/Clusters'), for: 'Adultdate\\FilamentBooking\\Filament\\Clusters')
+          //  ->discoverResources(in: app_path('../plugins/adultdate/filament-booking/src/Filament/Resources'), for: 'Adultdate\\FilamentBooking\\Filament\\Resources')
             ->databaseNotifications()
             ->pages([
-                BookingCalendar::class,
+            //    BookingCalendar::class,
             ])
             ->resources([
-                CustomerResource::class,
-                OrderResource::class,
-                DailyLocationResource::class,
-                BookingServicePeriodResource::class,
-                BookingOutcallQueueResource::class,
-                UserResource::class,
-                BookingCalendarResource::class,
-                BookingDataLeadResource::class,
+            //    CustomerResource::class,
+            //    OrderResource::class,
+            //    DailyLocationResource::class,
+            //    BookingServicePeriodResource::class,
+            //    BookingOutcallQueueResource::class,
+            //    UserResource::class,
+            //    BookingCalendarResource::class,
+            //    BookingDataLeadResource::class,
             ])
             ->widgets([
-                BookingCalendarWidget::class,
-                CustomersChart::class,
-                LatestOrders::class,
-                OrdersChart::class,
-                StatsOverviewWidget::class,
-                EventCalendar::class,
+            //    BookingCalendarWidget::class,
+            //    CustomersChart::class,
+            //    LatestOrders::class,
+            //    OrdersChart::class,
+            //    StatsOverviewWidget::class,
+            //    EventCalendar::class,
             ]); 
 
         FilamentAsset::register([

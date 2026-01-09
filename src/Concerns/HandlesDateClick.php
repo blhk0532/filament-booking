@@ -13,7 +13,7 @@ trait HandlesDateClick
      *
      * To enable date click, set this to true and override `onDateClick` to implement your logic.
      */
-    protected bool $dateClickEnabled = false;
+    // protected bool $dateClickEnabled = false;
 
     public function setDateClickEnabled(bool $enabled): void
     {
@@ -36,7 +36,7 @@ trait HandlesDateClick
      */
     public function isDateClickEnabled(): bool
     {
-        return $this->dateClickEnabled;
+        return $this->dateClickEnabled ?? false;
     }
 
     /**

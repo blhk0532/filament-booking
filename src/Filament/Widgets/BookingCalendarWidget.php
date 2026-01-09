@@ -48,6 +48,8 @@ class BookingCalendarWidget extends FullCalendarWidget implements HasCalendar
 {
     public ?int $recordId = null;
 
+    public Model|string|null $model = null;
+
     use CanBeConfigured, CanRefreshCalendar, HasOptions, HasSchema, InteractsWithCalendar, InteractsWithEventRecord, InteractsWithEvents, InteractsWithRawJS, InteractsWithRecords {
         // Prefer the contract-compatible refreshRecords (chainable) from CanRefreshCalendar
         CanRefreshCalendar::refreshRecords insteadof InteractsWithEvents;
@@ -627,7 +629,7 @@ class BookingCalendarWidget extends FullCalendarWidget implements HasCalendar
             $roleValue = (string) $userRole;
         }
 
-        return in_array($roleValue, ['admin', 'super_admin'], true);
+        return in_array($roleValue, ['admin', 'super', 'super_admin'], true);
     }
 
     protected function getDateClickContextMenuActions(): array
